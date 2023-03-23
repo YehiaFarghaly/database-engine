@@ -29,7 +29,6 @@ public class Table implements Serializable {
 		if (this.prototype == null) {
 			TupleDirector tupDir = new TupleDirector(new TupleBuilder());
 			tupDir.makeTuple(getColNameType());
-			tupDir.getTuple().setPrimaryKey(getPKColumn());
 			this.prototype = tupDir.getTuple();
 		}
 		return this.prototype.getCopy();

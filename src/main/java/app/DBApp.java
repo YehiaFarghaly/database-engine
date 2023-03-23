@@ -1,8 +1,15 @@
 package app;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import com.opencsv.exceptions.CsvValidationException;
+
+import dataManipulation.csvReader;
+import dataManipulation.csvWriter;
 import exceptions.DBAppException;
 import storage.*;
 import validation.Validator;
@@ -13,9 +20,17 @@ import constants.Constants;
 public class DBApp implements IDatabase {
 
 	private Hashtable<String, Table> myTables;// contains table names and the corresponding table;
+	private csvReader reader;
+	private csvWriter writer;
 
-	public DBApp() {
+	public DBApp() throws IOException {
 		this.myTables = new Hashtable<>();
+		writer = new csvWriter();
+		reader = new csvReader();
+	}
+
+	public static void main(String[] args) throws IOException {
+
 	}
 
 	@Override
@@ -31,6 +46,7 @@ public class DBApp implements IDatabase {
 
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.put(strTableName, table);
+		writer.write(table);
 
 	}
 
@@ -70,11 +86,4 @@ public class DBApp implements IDatabase {
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
-
-	public static void main(String[] args) {
-		DBApp engine = new DBApp();
-		engine.init();
-
-	}
-
 }

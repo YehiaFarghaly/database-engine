@@ -1,7 +1,9 @@
 package app;
 
+import java.io.IOException;
 import java.util.*;
 import exceptions.DBAppException;
+import sql.SQLTerm;
 
 public interface IDatabase {
 
@@ -20,6 +22,6 @@ public interface IDatabase {
 
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException;
 
-//	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException;
+	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException;
 	
 }
