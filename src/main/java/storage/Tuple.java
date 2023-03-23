@@ -1,9 +1,10 @@
 package storage;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class Tuple implements Cloneable, ITuple {
+public class Tuple implements Cloneable, ITuple, Serializable {
 
 	private Vector<Cell> cells;
 	private Object primaryKey; // used in binary search within the same page
