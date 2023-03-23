@@ -1,10 +1,12 @@
 package app;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import exceptions.DBAppException;
 import storage.*;
 import search.*;
+import sql.SQLTerm;
 
 public class DBApp implements IDatabase {
 
@@ -50,7 +52,7 @@ public class DBApp implements IDatabase {
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
-		return new Selector(SQLTerm[] arrSQLTerms, String[] strarrOperators).getResults();
+		return new Selector( arrSQLTerms, strarrOperators).getResult();
 	}
 
 }

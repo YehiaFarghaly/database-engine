@@ -2,6 +2,8 @@ package storage;
 
 import java.io.Serializable;
 import java.util.Hashtable;
+import java.util.Vector;
+
 import search.TableSearch;
 
 public class Table implements Serializable {
@@ -75,26 +77,26 @@ public class Table implements Serializable {
 	}
 
 	public Vector<Tuple> search(String colName, String value) {
-		return TableSearch.search(this, String colName, String value);
+		return TableSearch.search(this,  colName,  value);
 	}
 
 	public Vector<Tuple> searchGreaterThan(String colName, String value) {
-		return TableSearch.searchGreaterThan(this, String colName, String value);
+		return TableSearch.searchGreaterThan(this,  colName,  value);
 	}
 
 	public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
-		return TableSearch.searchGreaterThanOrEqual(this, String colName, String value);
+		return TableSearch.searchGreaterThanOrEqual(this,  colName,  value);
 	}
 
 	public Vector<Tuple> searchLessThan(String colName, String value) {
-		return TableSearch.searchLessThan(this, String colName, String value);
+		return TableSearch.searchLessThan(this,  colName,  value);
 	}
 
 	public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
-		return TableSearch.searchLessThanOrEqual(this, String colName, String value);
+		return TableSearch.searchLessThanOrEqual(this,  colName,  value);
 	}
 
 	public Vector<Tuple> searchNotEqual(String colName, String value) {
-		return TableSearch.searchNotEqual(this, String colName, String value);
+		return TableSearch.searchNotEqual(this,  colName,  value);
 	}
 }

@@ -1,4 +1,9 @@
 package search;
+import java.util.Iterator;
+import java.util.Vector;
+
+import sql.SQLTerm;
+import storage.Tuple;
 import validation.*;
 
 public class Selector {
@@ -9,7 +14,7 @@ public class Selector {
         //for loop
         arrSQLTerms[0].isValid();
         //for loop
-        validateOperatorBetween(strarrOperators[0]);
+        Validator.validateOperatorBetween(strarrOperators[0]);
     }
 
     public Iterator<Tuple> getResult() {

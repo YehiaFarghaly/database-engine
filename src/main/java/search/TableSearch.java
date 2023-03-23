@@ -2,6 +2,9 @@ package search;
 
 import java.util.*;
 
+import storage.Table;
+import storage.Tuple;
+
 public class TableSearch {
     public static Vector<Tuple> search(Table table, String colName, String value) {
 

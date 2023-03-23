@@ -1,6 +1,10 @@
 package search;
 
-import java.utl.*;
+import java.util.Vector;
+
+
+import storage.Page;
+import storage.Tuple;
 
 public class PageSearch {
 

@@ -9,7 +9,7 @@ public class Page implements Serializable {
 	private Vector<Tuple> tuples;
 	private Object minPK, maxPK;
 	private int size;
-	private final String tableName;
+	private String tableName;
 
 	public Page(String tableName) {
 		this.tuples = new Vector<>();this.tableName=tableName;
@@ -44,26 +44,26 @@ public class Page implements Serializable {
 	}
 
 	public Vector<Tuple> search(String colName, String value) {
-		return PageSearch.search(this, String colName, String value);
+		return PageSearch.search(this, colName,  value);
 	}
 
 	public Vector<Tuple> searchGreaterThan(String colName, String value) {
-		return PageSearch.searchGreaterThan(this, String colName, String value);
+		return PageSearch.searchGreaterThan(this,  colName,  value);
 	}
 
 	public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
-		return PageSearch.searchGreaterThanOrEqual(this, String colName, String value);
+		return PageSearch.searchGreaterThanOrEqual(this,  colName,  value);
 	}
 
 	public Vector<Tuple> searchLessThan(String colName, String value) {
-		return PageSearch.searchLessThan(this, String colName, String value);
+		return PageSearch.searchLessThan(this,  colName,  value);
 	}
 
 	public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
-		return PageSearch.searchLessThanOrEqual(this, String colName, String value);
+		return PageSearch.searchLessThanOrEqual(this,  colName,  value);
 	}
 
 	public Vector<Tuple> searchNotEqual(String colName, String value) {
-		return PageSearch.searchNotEqual(this, String colName, String value);
+		return PageSearch.searchNotEqual(this, colName,  value);
 	}
 }

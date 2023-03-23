@@ -1,3 +1,4 @@
+package sql;
 import validation.*;
 public class SQLTerm{
 String _strTableName, _strColumnName ,_strOperator;
@@ -9,7 +10,7 @@ Object _objValue;
         this._strOperator = _strOperator;
         this._objValue = _objValue;
     }
-    boolean isValid(){
-        return validator.validateOperatorInside(this);
+    public boolean isValid(){
+        return Validator.validateOperatorInside(this);
     }
 }

@@ -1,12 +1,14 @@
 package validation;
 
+import sql.SQLTerm;
+
 public class Validator {
 
-    boolean validateOperatorInside(SQLTerm term) {
+    public static boolean validateOperatorInside(SQLTerm term) {
         return false;
     }
 
-    boolean validateOperatorBetween(String operator) {
+    public static boolean validateOperatorBetween(String operator) {
         return false;
     }
 
