@@ -2,17 +2,18 @@ package storage;
 
 import java.io.Serializable;
 import java.util.Hashtable;
+import search.TableSearch;
 
 public class Table implements Serializable {
 
 	private String name, PKColumn;
 	private Tuple prototype;
 	private Hashtable<String, String> colNameType, colNameMin, colNameMax;
-	
+
 	// we still need to store Pages
 
 	public Table(String name, String PK, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
-			Hashtable<String, String> colNameMax) {
+				 Hashtable<String, String> colNameMax) {
 
 		this.name = name;
 		this.PKColumn = PK;
@@ -32,8 +33,7 @@ public class Table implements Serializable {
 		return this.prototype.getCopy();
 	}
 
-	
-	
+
 	public String getName() {
 		return name;
 	}
@@ -74,4 +74,27 @@ public class Table implements Serializable {
 		this.colNameMax = colNameMax;
 	}
 
+	public Vector<Tuple> search(String colName, String value) {
+		return TableSearch.search(this, String colName, String value);
+	}
+
+	public Vector<Tuple> searchGreaterThan(String colName, String value) {
+		return TableSearch.searchGreaterThan(this, String colName, String value);
+	}
+
+	public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
+		return TableSearch.searchGreaterThanOrEqual(this, String colName, String value);
+	}
+
+	public Vector<Tuple> searchLessThan(String colName, String value) {
+		return TableSearch.searchLessThan(this, String colName, String value);
+	}
+
+	public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
+		return TableSearch.searchLessThanOrEqual(this, String colName, String value);
+	}
+
+	public Vector<Tuple> searchNotEqual(String colName, String value) {
+		return TableSearch.searchNotEqual(this, String colName, String value);
+	}
 }
