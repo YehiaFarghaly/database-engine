@@ -1,6 +1,8 @@
 package storage;
 
-public class Cell {
+import java.io.Serializable;
+
+public class Cell implements Serializable {
 
 	private Object key, value;
 

@@ -12,8 +12,10 @@ import dataManipulation.csvReader;
 import dataManipulation.csvWriter;
 import exceptions.DBAppException;
 import storage.*;
+import validation.Validator;
 import search.*;
 import sql.SQLTerm;
+import constants.Constants;
 
 public class DBApp implements IDatabase {
 
@@ -51,6 +53,20 @@ public class DBApp implements IDatabase {
 	@Override
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		// TODO Auto-generated method stub
+		boolean validTable = Validator.validTable(strTableName);
+		boolean validTuple = Validator.validTuple(htblColNameValue);
+		if (!validTable) {
+
+			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
+
+		} else if (!validTuple) {
+			
+			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
+			
+		} else {
+			
+             
+		}
 
 	}
 
@@ -70,17 +86,4 @@ public class DBApp implements IDatabase {
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
-
-	public Hashtable<String, Table> getMyTables() {
-		return myTables;
-	}
-
-	public csvReader getReader() {
-		return reader;
-	}
-
-	public csvWriter getWriter() {
-		return writer;
-	}
-
 }
