@@ -54,7 +54,9 @@ public class DBApp implements IDatabase {
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		// TODO Auto-generated method stub
 		boolean validTable = Validator.validTable(strTableName);
+		
 		boolean validTuple = Validator.validTuple(htblColNameValue);
+		
 		if (!validTable) {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
@@ -64,8 +66,11 @@ public class DBApp implements IDatabase {
 			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
 			
 		} else {
+			Table table = (Table) Serializer.serialize(Constants.DATA_PATH);
 			
-             
+			table.insertTuple(htblColNameValue);
+			
+            Serializer.deserialize(table,Constants.DATA_PATH); 
 		}
 
 	}
