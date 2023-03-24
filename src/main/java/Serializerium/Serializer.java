@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.util.Vector;
 import constants.Constants;
 import storage.Cell;
+import storage.Page;
 import storage.Tuple;
 
 public class Serializer {
@@ -17,7 +18,7 @@ public class Serializer {
 		
 		// pass the table name and a vector for all the table pages names 
 		
-		FileOutputStream fileOut = new FileOutputStream(Constants.DATA_TABLE+TableName+Constants.DATA_EXTENSTION);
+		FileOutputStream fileOut = new FileOutputStream(Constants.DATA_TABLE + TableName + Constants.DATA_EXTENSTION);
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		out.writeObject(PagesOfTable);
 		out.close();
@@ -28,7 +29,7 @@ public class Serializer {
 		
 		//	it returns all table pages name in a vector  
 	
-		FileInputStream fileIn = new FileInputStream(Constants.DATA_TABLE+TableName+Constants.DATA_EXTENSTION);
+		FileInputStream fileIn = new FileInputStream(Constants.DATA_TABLE + TableName + Constants.DATA_EXTENSTION);
 		ObjectInputStream in = new ObjectInputStream(fileIn);
 		Vector<String> TablePageName = (Vector<String>) in.readObject();
 		in.close();
@@ -36,22 +37,21 @@ public class Serializer {
 		return TablePageName;
 	}
 	
-	public void SerializePage(String PageName,Vector<Tuple> records) throws IOException {
-		FileOutputStream fileOut = new FileOutputStream(Constants.DATA_PAGE+PageName+Constants.DATA_EXTENSTION);
+	public void SerializePage(String PageName,Page records) throws IOException {
+		FileOutputStream fileOut = new FileOutputStream(Constants.DATA_PAGE + PageName + Constants.DATA_EXTENSTION);
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		out.writeObject(records);
 		out.close();
 		fileOut.close();
 	}
 	
-	public Vector<Tuple> deserializePage(String PageName) throws IOException, ClassNotFoundException {
+	public Page deserializePage(String PageName) throws IOException, ClassNotFoundException {
 	
-		FileInputStream fileIn = new FileInputStream(Constants.DATA_PAGE+PageName+Constants.DATA_EXTENSTION);
+		FileInputStream fileIn = new FileInputStream(Constants.DATA_PAGE + PageName + Constants.DATA_EXTENSTION);
 		ObjectInputStream in = new ObjectInputStream(fileIn);
-		Vector<Tuple> records = (Vector<Tuple>) in.readObject();
+		Page records = (Page) in.readObject();
 		in.close();
 		fileIn.close();
 		return records;
 	}
-	
 }
