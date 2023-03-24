@@ -78,6 +78,20 @@ public class Table implements Serializable {
 	}
 
 	public void insertTuple(Hashtable<String, Object> htblColNameValue) throws DBAppException {
+		
+		Tuple tuple = createTuple(htblColNameValue);
+		
+		if(isEmptyTable()) {
+			
+		}
+	}
+	
+	public boolean isEmptyTable() {
+		return pages.size()==0;
+	}
+
+	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
+		
 		Tuple tuple = getPrototype();
 
 		for (Cell c : tuple.getCells()) {
@@ -85,8 +99,8 @@ public class Table implements Serializable {
 			c.setValue(htblColNameValue.get(c.getKey()));
 
 		}
-
-		insertTupleIntoPage(tuple);
+		
+		return tuple;
 	}
 
 	public void insertTupleIntoPage(Tuple tuple) {
