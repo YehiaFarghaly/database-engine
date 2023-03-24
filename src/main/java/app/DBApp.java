@@ -53,7 +53,7 @@ public class DBApp implements IDatabase {
 	@Override
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		// TODO Auto-generated method stub
-		boolean validTable = Validator.validTable(strTableName);
+		boolean validTable = Validator.validTable(strTableName,myTables);
 		boolean validTuple = Validator.validTuple(htblColNameValue);
 		if (!validTable) {
 

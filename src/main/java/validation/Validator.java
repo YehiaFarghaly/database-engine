@@ -2,7 +2,9 @@ package validation;
 
 import java.util.Hashtable;
 
+import app.DBApp;
 import sql.SQLTerm;
+import storage.Table;
 
 public class Validator {
 
@@ -10,11 +12,15 @@ public class Validator {
         return false;
     }
 
+
     public static boolean validateOperatorBetween(String operator) {
         return false;
     }
     
-    public static boolean validTable(String tableName) {
+    public static boolean validTable(String tableName,Hashtable<String, Table> myTables) {
+    	if(myTables.containsKey(tableName)) {
+    		return true;
+    	}
     	return false;
     }
     
