@@ -54,7 +54,7 @@ public class DBApp implements IDatabase {
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		// TODO Auto-generated method stub
 		boolean validTable = Validator.validTable(strTableName,myTables);
-		boolean validTuple = Validator.validTuple(htblColNameValue);
+		boolean validTuple = Validator.validTuple(strTableName,htblColNameValue);
 		if (!validTable) {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
