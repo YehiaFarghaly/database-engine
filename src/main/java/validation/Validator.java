@@ -36,10 +36,12 @@ public class Validator {
     	return -1;
     }
     
-    public static boolean validTuple(String tableName,Hashtable<String,Object> tuple) {
-    	String [] columns = csvReader.read(tableName).get(0);
-    	String [] datatypes = csvReader.read(tableName).get(1);
-    	String [] pk = csvReader.read(tableName).get(2);
+    public static boolean validTuple(Table table,Hashtable<String,Object> tuple) throws CsvValidationException, IOException {
+    	csvReader cr = new csvReader();
+    	String tablename = table.getName();
+    	String [] columns = cr.read(tablename).get(0);
+    	String [] datatypes = cr.read(tablename).get(1);
+    	String [] pk = cr.read(tablename).get(2);
     	if(tuple.size()!=columns.length) {
     		return false;
     	}
@@ -51,7 +53,7 @@ public class Validator {
     		}
     	}
     	int pk_index = findrowpk(columns,pk);
-    	if(TableSearch.search(tuple.get(columns[pk_index])))
+    	if(table.search(columns[pk_index],(String) tuple.get(columns[pk_index]))!=null) return false;
     	return true;
     	
     }
