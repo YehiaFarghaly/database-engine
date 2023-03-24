@@ -14,6 +14,9 @@ public class Serializer {
 	
 	
 	public void SerializeTable(String TableName,Vector<String> PagesOfTable) throws IOException {
+		
+		// pass the table name and a vector for all the table pages names 
+		
 		FileOutputStream fileOut = new FileOutputStream(Constants.DATA_TABLE+TableName+Constants.DATA_EXTENSTION);
 		ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		out.writeObject(PagesOfTable);
@@ -22,6 +25,8 @@ public class Serializer {
 	}
 	
 	public Vector<String> deserializeTable(String TableName) throws IOException, ClassNotFoundException {
+		
+		//	it returns all table pages name in a vector  
 	
 		FileInputStream fileIn = new FileInputStream(Constants.DATA_TABLE+TableName+Constants.DATA_EXTENSTION);
 		ObjectInputStream in = new ObjectInputStream(fileIn);
