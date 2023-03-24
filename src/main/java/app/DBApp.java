@@ -25,18 +25,13 @@ public class DBApp implements IDatabase {
 
 	public DBApp() throws IOException {
 		this.myTables = new Hashtable<>();
-		writer = new csvWriter();
-		reader = new csvReader();
-	}
-
-	public static void main(String[] args) throws IOException {
-
+		this.writer = new csvWriter();
+		this.reader = new csvReader();
 	}
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
-
+		this.myTables = reader.readAll(); // to read all tables in the metadata file
 	}
 
 	@Override
@@ -45,27 +40,32 @@ public class DBApp implements IDatabase {
 			Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
-		myTables.put(strTableName, table);
-		writer.write(table);
-
+		getMyTables().put(strTableName, table);
+		getWriter().write(table);
 	}
 
 	@Override
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		// TODO Auto-generated method stub
 		boolean validTable = Validator.validTable(strTableName);
+		
 		boolean validTuple = Validator.validTuple(htblColNameValue);
+		
 		if (!validTable) {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
 
 		} else if (!validTuple) {
-			
+
 			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
-			
+
 		} else {
+			Table table = (Table) Serializer.serialize(Constants.DATA_PATH);
 			
-             
+			table.insertTuple(htblColNameValue);
+			
+            Serializer.deserialize(table,Constants.DATA_PATH); 
+
 		}
 
 	}
@@ -102,5 +102,17 @@ public class DBApp implements IDatabase {
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
+	}
+
+	public Hashtable<String, Table> getMyTables() {
+		return myTables;
+	}
+
+	public csvReader getReader() {
+		return reader;
+	}
+
+	public csvWriter getWriter() {
+		return writer;
 	}
 }

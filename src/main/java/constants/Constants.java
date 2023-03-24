@@ -10,4 +10,6 @@ public final class Constants {
      public static final String DATA_PAGE = "Pages//";
      
      public static final String DATA_EXTENSTION = ".ser";
+     
+     public static final String METADATA_PATH = "Metadata//metadata.csv";
 }
