@@ -65,7 +65,7 @@ public class PageSearch {
         Vector<Tuple> results = new Vector<Tuple>();
         //the next if condition may not work if a column info of a table has changed
         //we can solve it by adding time of last updates on a table these updates are [add/remove index] in a log file
-        if (this.colName == null || !this.colName.equals(colName))
+      //  if (this.colName == null || !this.colName.equals(colName))
             collectInfo(colName, value);
 
         if (hasIndex) {
@@ -95,25 +95,95 @@ public class PageSearch {
 
     
     public Vector<Tuple> searchGreaterThan(String colName, String value) {
+        Vector<Tuple> results = new Vector<Tuple>();
+        collectInfo(colName, value);
 
-        return new Vector<Tuple>();
+        if (hasIndex) {
+        } else if (isPK) {
+
+        } else {
+            try {
+                results = linearSearch(colName, value, Condition.greaterThan, null);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return results;
+
+
     }
 
     public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
 
-        return new Vector<Tuple>();
+        Vector<Tuple> results = new Vector<Tuple>();
+        collectInfo(colName, value);
+
+        if (hasIndex) {
+        } else if (isPK) {
+
+        } else {
+            try {
+                results = linearSearch(colName, value, Condition.greaterThan, Condition.equal);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return results;
+
     }
 
     public Vector<Tuple> searchLessThan(String colName, String value) {
-        return new Vector<Tuple>();
+        Vector<Tuple> results = new Vector<Tuple>();
+        collectInfo(colName, value);
+
+        if (hasIndex) {
+        } else if (isPK) {
+
+        } else {
+            try {
+                results = linearSearch(colName, value, Condition.lessThan, null);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return results;
+
     }
 
     public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
-        return new Vector<Tuple>();
+        Vector<Tuple> results = new Vector<Tuple>();
+        collectInfo(colName, value);
+
+        if (hasIndex) {
+        } else if (isPK) {
+
+        } else {
+            try {
+                results = linearSearch(colName, value, Condition.lessThan, Condition.equal);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return results;
+
     }
 
     public Vector<Tuple> searchNotEqual(String colName, String value) {
-        return new Vector<Tuple>();
+        Vector<Tuple> results = new Vector<Tuple>();
+        collectInfo(colName, value);
+
+        if (hasIndex) {
+        } else if (isPK) {
+
+        } else {
+            try {
+                results = linearSearch(colName, value, Condition.notEqual, null);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return results;
+
     }
 
     private int getColNumber(String colName) {
