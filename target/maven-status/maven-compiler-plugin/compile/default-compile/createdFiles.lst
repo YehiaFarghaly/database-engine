@@ -2,13 +2,11 @@ app\IDatabase.class
 search\TableSearch.class
 sql\SQLTerm.class
 search\Selector.class
-dataManipulation\csvWriter.class
 storage\Table.class
 storage\Page.class
 storage\TupleDirector.class
+Serializerium\Serializer.class
 storage\TupleBuilder.class
-validation\Validator.class
-app\DBApp.class
 storage\ITuple.class
 exceptions\DBAppException.class
 storage\Cell.class

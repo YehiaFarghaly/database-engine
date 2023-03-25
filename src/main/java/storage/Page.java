@@ -5,8 +5,8 @@ import java.util.Vector;
 import search.PageSearch;
 
 public class Page implements Serializable {
-    private String name;
-    private int maxRows;
+	private String name;
+	private int maxRows;
 	private Vector<Tuple> tuples;
 	private Object minPK, maxPK;
 	private int size;
@@ -14,8 +14,8 @@ public class Page implements Serializable {
 
 	public Page(String tableName) {
 		this.tuples = new Vector<>();
-		this.tableName=tableName;
-		name = minPK+""+tableName;
+		this.tableName = tableName;
+		name = minPK + "" + tableName;
 	}
 
 	public Object getMinPK() {
@@ -41,7 +41,7 @@ public class Page implements Serializable {
 	public String getTableName() {
 		return tableName;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -49,36 +49,46 @@ public class Page implements Serializable {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
-	
+
 	public void insertIntoPage(Tuple tuple) {
-		
+
 	}
 
 	public Vector<Tuple> search(String colName, String value) {
-		return PageSearch.search(this, colName,  value);
+		return
+				new PageSearch(this).search(colName, value);
 	}
 
 	public Vector<Tuple> searchGreaterThan(String colName, String value) {
-		return PageSearch.searchGreaterThan(this,  colName,  value);
+		return
+				new PageSearch(this).searchGreaterThan(colName, value);
 	}
 
 	public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
-		return PageSearch.searchGreaterThanOrEqual(this,  colName,  value);
+		return
+				new PageSearch(this).searchGreaterThanOrEqual(colName, value);
 	}
 
 	public Vector<Tuple> searchLessThan(String colName, String value) {
-		return PageSearch.searchLessThan(this,  colName,  value);
+		return
+				new PageSearch(this).searchLessThan(colName, value);
 	}
 
 	public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
-		return PageSearch.searchLessThanOrEqual(this,  colName,  value);
+		return
+				new PageSearch(this).searchLessThanOrEqual(colName, value);
 	}
 
 	public Vector<Tuple> searchNotEqual(String colName, String value) {
-		return PageSearch.searchNotEqual(this, colName,  value);
+		return
+				new PageSearch(this).searchNotEqual(colName, value);
 	}
 
 	public boolean isFull() {
-		return size==maxRows;
+		return size == maxRows;
 	}
+	public Vector<Tuple> getTuples() {
+		return tuples;
+	}
+
 }
