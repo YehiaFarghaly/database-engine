@@ -8,7 +8,7 @@ import exceptions.DBAppException;
 import search.TableSearch;
 
 public class Table implements Serializable {
-	private Vector<Page> pages;
+	private Vector<String> pagesName;
 	private int maxRowsInPage;
 	private int lastPage;
 	private String name, PKColumn;
