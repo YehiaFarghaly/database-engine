@@ -2,6 +2,7 @@ package search;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Vector;
 
 
@@ -74,12 +75,19 @@ public class PageSearch {
         if (hasIndex) {
 
         } else if (isPK) {
+            int idx = binarySearch(value);
 
+            if(idx!=-1) {
 
-            binarySearch(colName, value, Condition.equal, null);
+                Vector<Tuple> left = searchLeft(idx, Condition.equal, value);
+                Collections.reverse(left);
+                 left.addAll(searchRight(idx, Condition.equal, value));
+                results =left;
+            }
+
         } else {
             try {
-                results =  linearSearch(colName, value, Condition.equal, null);
+                results = linearSearch(colName, value, Condition.equal, null);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -87,11 +95,50 @@ public class PageSearch {
         return results;
     }
 
-    private Vector<Tuple> binarySearch(String colName, String value, Condition condition1, Condition condition2) {
+    private Vector<Tuple>  searchRight(int idx, Condition condition, String value) {
         Vector<Tuple> results = new Vector<Tuple>();
+        for (int i = idx; i<page.getSize(); i++) {
+            Tuple curTuple = page.getTuples().get(i);
+            if (isToBeAdded(curTuple.getCells().get(colNum), value, condition)) {
+                results.add(curTuple);
+            } else
+                break;
 
+        }
+        return results;
+    }
 
-        return  results;
+    private Vector<Tuple> searchLeft(int idx, Condition condition, String value) {
+        Vector<Tuple> results = new Vector<Tuple>();
+        for (int i = idx; i > -1; i--) {
+            Tuple curTuple = page.getTuples().get(i);
+            if (isToBeAdded(curTuple.getCells().get(colNum), value, condition)) {
+                results.add(curTuple);
+            } else
+                break;
+
+        }
+        return results;
+    }
+
+    private int binarySearch(String value) {
+        int mid = 0, low = 0, high = page.getSize();
+        Tuple curTuple = null;
+        Vector<Tuple> rows = page.getTuples();
+        while (low <= high) {
+            mid = low + (high - low) / 2;
+            curTuple = rows.get(mid);
+            Cell curCel = curTuple.getCells().get(colNum);
+            int compVal = new Compare().compareTo(colType, curCel.getValue(), value);
+
+            if (compVal > 0)
+                high = mid - 1;
+            else if (compVal < 0)
+                low = mid + 1;
+            else
+                return mid;
+        }
+        return -1;
     }
 
     private Vector<Tuple> linearSearch(String colName, String value, Condition condition1, Condition condition2) throws IOException{
