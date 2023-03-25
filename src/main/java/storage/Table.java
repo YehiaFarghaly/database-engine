@@ -9,7 +9,6 @@ import search.TableSearch;
 
 public class Table implements Serializable {
 	private Vector<String> pagesName;
-	private int maxRowsInPage;
 	private int lastPage;
 	private String name, PKColumn;
 	private Tuple prototype;
@@ -25,6 +24,7 @@ public class Table implements Serializable {
 		this.colNameType = colNameType;
 		this.colNameMin = colNameMin;
 		this.colNameMax = colNameMax;
+		pagesName = new Vector();
 
 	}
 
@@ -78,20 +78,42 @@ public class Table implements Serializable {
 	}
 
 	public void insertTuple(Hashtable<String, Object> htblColNameValue) throws DBAppException {
-		
+
 		Tuple tuple = createTuple(htblColNameValue);
-		
-		if(isEmptyTable()) {
+
+		if (isEmptyTable()) {
+			
+			insertNewPage(tuple);
+		}
+		else {
+			Page page = search(tuple);
+			
+			if(page.isFull()) {
+				
+			}
+			
+			else {
+				
+				page.insertIntoPage(tuple);
+			}
 			
 		}
+
 	}
 	
+
+	public void insertNewPage(Tuple tuple) {
+		Page page = new Page(name);
+		page.insertIntoPage(tuple);
+		pagesName.add(page.getName());
+	}
+
 	public boolean isEmptyTable() {
-		return pagesName.size()==0;
+		return pagesName.size() == 0;
 	}
 
 	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
-		
+
 		Tuple tuple = getPrototype();
 
 		for (Cell c : tuple.getCells()) {
@@ -99,7 +121,7 @@ public class Table implements Serializable {
 			c.setValue(htblColNameValue.get(c.getKey()));
 
 		}
-		
+
 		return tuple;
 	}
 
