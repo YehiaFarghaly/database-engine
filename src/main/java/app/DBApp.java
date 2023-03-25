@@ -45,12 +45,10 @@ public class DBApp implements IDatabase {
 	}
 
 	@Override
-	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, ClassNotFoundException, IOException {
+	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException {
 		// TODO Auto-generated method stub
-		boolean validTable = Validator.validTable(strTableName);
-		
-		boolean validTuple = Validator.validTuple(htblColNameValue);
-		
+		boolean validTable = Validator.validTable(strTableName,myTables);
+		boolean validTuple = Validator.validTuple(myTables.get(strTableName),htblColNameValue);
 		if (!validTable) {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);

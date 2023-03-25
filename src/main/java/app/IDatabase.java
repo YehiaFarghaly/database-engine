@@ -2,6 +2,9 @@ package app;
 
 import java.io.IOException;
 import java.util.*;
+
+import com.opencsv.exceptions.CsvValidationException;
+
 import exceptions.DBAppException;
 import sql.SQLTerm;
 
@@ -15,7 +18,7 @@ public interface IDatabase {
 
 //	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException;
 
-	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, ClassNotFoundException, IOException;
+	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, CsvValidationException;
 
 	public void updateTable(String strTableName, String strClusteringKeyValue,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException;
