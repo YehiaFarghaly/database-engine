@@ -87,7 +87,7 @@ public class DBApp implements IDatabase {
 
 		} else {
 
-			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
+			 validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
 
 			if (!validTuple) {
 
