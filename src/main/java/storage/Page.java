@@ -1,7 +1,10 @@
 package storage;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Vector;
+
+import Serializerium.Serializer;
 import search.PageSearch;
 
 public class Page implements Serializable {
@@ -15,6 +18,7 @@ public class Page implements Serializable {
 	public Page(String tableName) {
 		this.tuples = new Vector<>();
 		this.tableName=tableName;
+		// Name should not be defined here as minPK is still null.
 		name = minPK+""+tableName;
 	}
 
@@ -45,15 +49,37 @@ public class Page implements Serializable {
 	public String getName() {
 		return name;
 	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public Tuple removeLastTuple() {
+		return tuples.remove(tuples.size()-1);
+	}
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
 	
-	public void insertIntoPage(Tuple tuple) {
-		
+	public void insertIntoPage(Tuple tuple) throws IOException {
+		int position = search(tuple);
+		  tuples.add(position, tuple);
+		  size++;
+		  Serializer.SerializePage(name, this);
+		  newMinMax();
+	}
+	
+	public void newMinMax() {
+		minPK = tuples.get(0).getPrimaryKey();
+		maxPK = tuples.get(tuples.size()-1).getPrimaryKey();
 	}
 
+	
+	public int search(Tuple tuple) {
+		return 0;
+	}
+	
 	public Vector<Tuple> search(String colName, String value) {
 		return PageSearch.search(this, colName,  value);
 	}
