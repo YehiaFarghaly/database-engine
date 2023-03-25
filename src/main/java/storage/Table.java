@@ -87,7 +87,7 @@ public class Table implements Serializable {
 	}
 	
 	public boolean isEmptyTable() {
-		return pages.size()==0;
+		return pagesName.size()==0;
 	}
 
 	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
