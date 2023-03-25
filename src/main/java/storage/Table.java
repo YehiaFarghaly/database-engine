@@ -119,6 +119,10 @@ public class Table implements Serializable {
 		for (Cell c : tuple.getCells()) {
 
 			c.setValue(htblColNameValue.get(c.getKey()));
+			
+			if(c.getKey().equals(getPKColumn())) {
+				tuple.setPrimaryKey(c.getValue());
+			}
 
 		}
 
