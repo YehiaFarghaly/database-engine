@@ -28,33 +28,51 @@ public class Validator {
     	}
     	return false;
     }
-    public static int findrowpk(String [] columns,String[] pk) {
+    public static int findRowPK(String [] columns,String[] pk) {
     	for(int i=0;i<columns.length;i++) {
     		if(pk[i]=="TRUE") return i;
     		
     	}
     	return -1;
     }
+    public static boolean isTheSameNumberOfColumns(Hashtable<String,Object> tuple,String [] columns){
+    	if(tuple.size()!=columns.length) {
+    		return false;
+    	}
+    	return true;
+    }
+    public static boolean containsAllColumns(Hashtable<String,Object> tuple,String [] columns){
+    	for(int i=0;i<columns.length;i++) {
+    		if(!tuple.containsKey(columns[i])) {
+    			return false;}
+    	}
+    	return true;
+    }
+    public static boolean isTheSameDataType(Hashtable<String,Object> tuple,String [] columns,String [] dataTypes){
+    	for(int i=0;i<columns.length;i++) {
+    			if(!tuple.get(columns[i]).getClass().equals(dataTypes[i]))	return false;
+
+    	}
+    	return true;
+    }
+    public static boolean foundPK(Table table,String[] columns,String []pk,Hashtable<String,Object> tuple) {
+    	int pkIndex = findRowPK(columns,pk);
+    	if(table.search(columns[pkIndex],(String) tuple.get(columns[pkIndex]))!=null) return false;
+    	return true;
+    }
     
     public static boolean validTuple(Table table,Hashtable<String,Object> tuple) throws CsvValidationException, IOException {
     	csvReader cr = new csvReader();
     	String tablename = table.getName();
     	String [] columns = cr.read(tablename).get(0);
-    	String [] datatypes = cr.read(tablename).get(1);
+    	String [] dataTypes = cr.read(tablename).get(1);
     	String [] pk = cr.read(tablename).get(2);
-    	if(tuple.size()!=columns.length) {
+    	if(!isTheSameNumberOfColumns(tuple,columns) || !containsAllColumns(tuple,columns) || !isTheSameDataType(tuple,columns,dataTypes) ||!foundPK(table,columns,pk,tuple)){
     		return false;
-    	}
-    	for(int i=0;i<columns.length;i++) {
-    		if(!tuple.containsKey(columns[i])) {
-    			return false;}
-    		else {
-    			if(!tuple.get(columns[i]).getClass().equals(datatypes[i]))	return false;
     		}
+    	else {
+    		return true;
     	}
-    	int pk_index = findrowpk(columns,pk);
-    	if(table.search(columns[pk_index],(String) tuple.get(columns[pk_index]))!=null) return false;
-    	return true;
     	
     }
 
