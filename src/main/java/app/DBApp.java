@@ -45,10 +45,11 @@ public class DBApp implements IDatabase {
 	}
 
 	@Override
-	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
+	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
 		// TODO Auto-generated method stub
-		boolean validTable = Validator.validTable(strTableName,myTables);
-		boolean validTuple = Validator.validTuple(myTables.get(strTableName),htblColNameValue);
+		boolean validTable = Validator.validTable(strTableName, myTables);
+		boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
 		if (!validTable) {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
@@ -57,13 +58,12 @@ public class DBApp implements IDatabase {
 
 			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
 
-		} else { 
-			
-			Table table = Serializer.deserializeTable(strTableName);			
+		} else {
+
+			Table table = Serializer.deserializeTable(strTableName);
 			table.insertTuple(htblColNameValue);
-			
-            
-            Serializer.SerializeTable(table);
+
+			Serializer.SerializeTable(table);
 
 		}
 
@@ -85,18 +85,20 @@ public class DBApp implements IDatabase {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
 
-		} else if (!validTuple) {
-			
-			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
-			
 		} else {
-			
-			Table TargetTable = myTables.get(strTableName);
-			
-			
-             
-		}
 
+			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
+
+			if (!validTuple) {
+
+				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
+
+			} else {
+
+				Table TargetTable = myTables.get(strTableName);
+
+			}
+		}
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
