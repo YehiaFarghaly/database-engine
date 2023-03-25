@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
-
+import Serializerium.Serializer;
 import com.opencsv.exceptions.CsvValidationException;
 
 import dataManipulation.csvReader;
@@ -45,7 +45,7 @@ public class DBApp implements IDatabase {
 	}
 
 	@Override
-	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, ClassNotFoundException, IOException {
 		// TODO Auto-generated method stub
 		boolean validTable = Validator.validTable(strTableName);
 		
@@ -59,12 +59,14 @@ public class DBApp implements IDatabase {
 
 			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
 
-		} else {
-			Table table = (Table) Serializer.serialize(Constants.DATA_PATH);
+		} else { 
+			
+			Table table = Serializer.deserializeTable(strTableName); 
 			
 			table.insertTuple(htblColNameValue);
 			
-            Serializer.deserialize(table,Constants.DATA_PATH); 
+            
+            Serializer.SerializeTable(table);
 
 		}
 

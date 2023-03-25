@@ -8,7 +8,7 @@ import exceptions.DBAppException;
 import search.TableSearch;
 
 public class Table implements Serializable {
-	private Vector<Page> pages;
+	private Vector<String> pagesName;
 	private int maxRowsInPage;
 	private int lastPage;
 	private String name, PKColumn;
@@ -87,7 +87,7 @@ public class Table implements Serializable {
 	}
 	
 	public boolean isEmptyTable() {
-		return pages.size()==0;
+		return pagesName.size()==0;
 	}
 
 	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
