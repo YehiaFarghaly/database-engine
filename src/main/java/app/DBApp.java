@@ -74,8 +74,18 @@ public class DBApp implements IDatabase {
 
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException {
-		// TODO Auto-generated method stub
+			Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException {
+		boolean validTable = Validator.validTable(strTableName,myTables);
+		boolean validTupleUpdate = Validator.validTupleUpdate(myTables.get(strTableName),htblColNameValue);
+	
+		if (!validTable) {
+
+			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
+
+		} else if (!validTupleUpdate) {
+			
+		}
+
 
 	}
 
