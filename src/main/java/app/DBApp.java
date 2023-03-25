@@ -45,7 +45,7 @@ public class DBApp implements IDatabase {
 	}
 
 	@Override
-	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException {
+	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
 		// TODO Auto-generated method stub
 		boolean validTable = Validator.validTable(strTableName,myTables);
 		boolean validTuple = Validator.validTuple(myTables.get(strTableName),htblColNameValue);
@@ -59,8 +59,7 @@ public class DBApp implements IDatabase {
 
 		} else { 
 			
-			Table table = Serializer.deserializeTable(strTableName); 
-			
+			Table table = Serializer.deserializeTable(strTableName);			
 			table.insertTuple(htblColNameValue);
 			
             

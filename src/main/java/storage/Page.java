@@ -53,9 +53,6 @@ public class Page implements Serializable {
 	public void insertIntoPage(Tuple tuple) {
 		
 	}
-	public boolean isFull() {
-		return size==maxRows;
-	}
 
 	public Vector<Tuple> search(String colName, String value) {
 		return PageSearch.search(this, colName,  value);
@@ -79,5 +76,9 @@ public class Page implements Serializable {
 
 	public Vector<Tuple> searchNotEqual(String colName, String value) {
 		return PageSearch.searchNotEqual(this, colName,  value);
+	}
+
+	public boolean isFull() {
+		return size==maxRows;
 	}
 }

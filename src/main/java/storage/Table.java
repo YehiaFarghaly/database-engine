@@ -132,6 +132,9 @@ public class Table implements Serializable {
 	public Vector<Tuple> search(String colName, String value) {
 		return TableSearch.search(this, colName, value);
 	}
+	public Page search(Tuple t) {
+		return null;
+	}
 
 	public Vector<Tuple> searchGreaterThan(String colName, String value) {
 		return TableSearch.searchGreaterThan(this, colName, value);

@@ -1,6 +1,7 @@
 package validation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import com.opencsv.exceptions.CsvValidationException;
@@ -64,10 +65,16 @@ public class Validator {
     public static boolean validTuple(Table table,Hashtable<String,Object> tuple) throws CsvValidationException, IOException {
     	csvReader cr = new csvReader();
     	String tablename = table.getName();
-    	String [] columns = cr.read(tablename).get(0);
-    	String [] dataTypes = cr.read(tablename).get(1);
-    	String [] pk = cr.read(tablename).get(2);
-    	if(!isTheSameNumberOfColumns(tuple,columns) || !containsAllColumns(tuple,columns) || !isTheSameDataType(tuple,columns,dataTypes) ||!foundPK(table,columns,pk,tuple)){
+    	ArrayList<String[]> tableInfo = cr.readTable(tablename);
+    	
+    	String [] columns = tableInfo.get(0);
+    	String [] dataTypes = tableInfo.get(1);
+    	String [] pk = tableInfo.get(2);
+    	
+    	if( !isTheSameNumberOfColumns(tuple,columns) ||
+    		!containsAllColumns(tuple,columns)       ||
+    	    !isTheSameDataType(tuple,columns,dataTypes) ||
+    	    !foundPK(table,columns,pk,tuple)) {
     		return false;
     		}
     	else {
