@@ -26,6 +26,9 @@ public class PageSearch {
     String indexName = null;
     String indexType = null;
     String colName = null;
+
+    String colType = null;
+
     int colNum = 0;
 
     public PageSearch(Page page) {
@@ -37,8 +40,13 @@ public class PageSearch {
     private void collectInfo(String colName, String value) {
 
         ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
+        int i = 0;
         for (String curCol[] : tableCol) {
             if (curCol[1].equals(colName)) {
+                colNum = i;
+
+                colType = curCol[2];
+
                 if (curCol[3].toLowerCase().equals("true"))
                     isPK = true;
                 if (!curCol[4].toLowerCase().equals("null"))
@@ -48,14 +56,16 @@ public class PageSearch {
                     indexName = curCol[4];
                     indexType = curCol[5];
                 }
+                break;
             }
 
+            i++;
         }
     }
 
     public Vector<Tuple> search(String colName, String value) {
         //validator.valid
-
+        Vector<Tuple> results = new Vector<Tuple>();
         //the next if condition may not work if a column info of a table has changed
         //we can solve it by adding time of last updates on a table these updates are [add/remove index] in a log file
         if (this.colName == null || !this.colName.equals(colName))
@@ -65,66 +75,63 @@ public class PageSearch {
 
         } else if (isPK) {
 
+
+            binarySearch(colName, value, Condition.equal, null);
         } else {
-            //linear search
             try {
-                linearSearch(colName, value, Condition.equal, null);
+                results =  linearSearch(colName, value, Condition.equal, null);
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        return new Vector<Tuple>();
-    }
-
-    private Vector<Tuple> linearSearch(String colName, String value, Condition condition1, Condition condition2) throws IOException, ClassNotFoundException {
-        Vector<Tuple> results = new Vector<Tuple>();
-        //deserializePage(page.getName());
-        int colNum = getColNumber(colName);
-        for (Tuple curTuple : page.getTuples()) {
-            Cell curCel = curTuple.getCells().get(colNum);
-            boolean toBeAdded = false;
-            if (condition1 != null)
-                switch (condition1) {
-                    case equal:
-                        toBeAdded = curCel.getValue().equals(value);
-                        break;
-                    case notEqual:
-                        toBeAdded = !curCel.getValue().equals(value);
-                        break;
-                    case lessThan:
-                        toBeAdded = curCel.getValue().equals(value);
-                        break;
-                    case greaterThan:
-                        toBeAdded = curCel.getValue().equals(value);
-                        break;
-
-                }
-            //NOT COMPLETE
-
-            if (condition2 != null && !toBeAdded)
-                switch (condition2) {
-                    case equal:
-                        toBeAdded = curCel.getValue().equals(value);
-                        break;
-                    case notEqual:
-                        toBeAdded = !curCel.getValue().equals(value);
-                        break;
-                    case lessThan:
-                        toBeAdded = curCel.getValue().equals(value);
-                        break;
-                    case greaterThan:
-                        toBeAdded = curCel.getValue().equals(value);
-                        break;
-
-                }
-            if (toBeAdded) {
-                results.add(curTuple);
             }
         }
         return results;
+    }
+
+    private Vector<Tuple> binarySearch(String colName, String value, Condition condition1, Condition condition2) {
+        Vector<Tuple> results = new Vector<Tuple>();
+
+
+        return  results;
+    }
+
+    private Vector<Tuple> linearSearch(String colName, String value, Condition condition1, Condition condition2) throws IOException{
+
+        Vector<Tuple> results = new Vector<Tuple>();
+        int colNum = getColNumber(colName);
+        for (Tuple curTuple : page.getTuples()) {
+            Cell curCel = curTuple.getCells().get(colNum);
+            boolean isToBeAdded = false;
+            if (condition1 != null)
+                isToBeAdded = isToBeAdded( curCel, value, condition1);
+
+            if (condition2 != null && !isToBeAdded) {
+                isToBeAdded = isToBeAdded( curCel,value, condition2);
+            }
+            if (isToBeAdded)
+                results.add(curTuple);
+
+        }
+        return results;
+    }
+
+    private boolean isToBeAdded(Cell curCel,String value, Condition condition) {
+        boolean isToBeAdded =false;
+        switch (condition){
+            case equal:
+                isToBeAdded = (new Compare().compareTo(colType, curCel.getValue(), value) == 0);
+                break;
+            case notEqual:
+                isToBeAdded = (new Compare().compareTo(colType, curCel.getValue(), value) != 0);
+                break;
+            case lessThan:
+                isToBeAdded = (new Compare().compareTo(colType, curCel.getValue(), value) < 0);
+                break;
+            case greaterThan:
+                isToBeAdded = (new Compare().compareTo(colType, curCel.getValue(), value) > 0);
+                break;
+
+        }
+        return isToBeAdded;
     }
 
     public Vector<Tuple> searchGreaterThan(String colName, String value) {

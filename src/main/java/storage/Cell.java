@@ -4,9 +4,10 @@ import java.io.Serializable;
 
 public class Cell implements Serializable {
 
-	private Object key, value;
+	private Object value;
+	private String key ;
 
-	public Cell(Object key, Object value) {
+	public Cell(String key, Object value) {
 		this.key = key;
 		this.value = value;
 	}
