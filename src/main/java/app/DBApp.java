@@ -49,22 +49,25 @@ public class DBApp implements IDatabase {
 			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
 		// TODO Auto-generated method stub
 		boolean validTable = Validator.validTable(strTableName, myTables);
-		boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
+
 		if (!validTable) {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
 
-		} else if (!validTuple) {
-
-			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
-
 		} else {
 
-			Table table = Serializer.deserializeTable(strTableName);
-			table.insertTuple(htblColNameValue);
+			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
+			
+			if (!validTuple) {
+				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
 
-			Serializer.SerializeTable(table);
+			} else {
 
+				Table table = Serializer.deserializeTable(strTableName);
+				table.insertTuple(htblColNameValue);
+
+				Serializer.SerializeTable(table);
+			}
 		}
 
 	}
@@ -77,17 +80,17 @@ public class DBApp implements IDatabase {
 	}
 
 	@Override
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException {
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, CsvValidationException, IOException {
 		// TODO I need to remove the duplicates in the following lines later
-		boolean validTable = Validator.validTable(strTableName,myTables);
-		boolean validTuple = Validator.validTuple(myTables.get(strTableName),htblColNameValue);
+		boolean validTable = Validator.validTable(strTableName, myTables);
 		if (!validTable) {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
 
 		} else {
 
-			 validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
+			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
 
 			if (!validTuple) {
 
