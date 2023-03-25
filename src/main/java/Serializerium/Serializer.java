@@ -9,49 +9,60 @@ import java.util.Vector;
 import constants.Constants;
 import storage.Cell;
 import storage.Page;
+import storage.Table;
 import storage.Tuple;
 
 public class Serializer {
-	
-	
-	public void SerializeTable(String TableName,Vector<String> PagesOfTable) throws IOException {
-		
-		// pass the table name and a vector for all the table pages names 
-		
-		FileOutputStream fileOut = new FileOutputStream(Constants.DATA_TABLE + TableName + Constants.DATA_EXTENSTION);
-		ObjectOutputStream out = new ObjectOutputStream(fileOut);
-		out.writeObject(PagesOfTable);
+	static FileOutputStream fileOut;
+	static ObjectOutputStream out;
+	static FileInputStream fileIn;
+	static ObjectInputStream in;
+
+	public static void SerializeTable(Table table) throws IOException {
+		out = getOutStream(table.getName());
+		out.writeObject(table);
 		out.close();
 		fileOut.close();
 	}
-	
-	public Vector<String> deserializeTable(String TableName) throws IOException, ClassNotFoundException {
-		
-		//	it returns all table pages name in a vector  
-	
-		FileInputStream fileIn = new FileInputStream(Constants.DATA_TABLE + TableName + Constants.DATA_EXTENSTION);
-		ObjectInputStream in = new ObjectInputStream(fileIn);
-		Vector<String> TablePageName = (Vector<String>) in.readObject();
+
+	public static Table deserializeTable(String TableName) throws IOException, ClassNotFoundException {
+		in = getInputStream(TableName);
+		Table table = (Table) in.readObject();
 		in.close();
 		fileIn.close();
-		return TablePageName;
+		return table;
 	}
-	
-	public void SerializePage(String PageName,Page records) throws IOException {
-		FileOutputStream fileOut = new FileOutputStream(Constants.DATA_PAGE + PageName + Constants.DATA_EXTENSTION);
-		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+
+	public static void SerializePage(String PageName, Page records) throws IOException {
+		out = getOutStream(PageName);
 		out.writeObject(records);
 		out.close();
 		fileOut.close();
 	}
-	
-	public Page deserializePage(String PageName) throws IOException, ClassNotFoundException {
-	
-		FileInputStream fileIn = new FileInputStream(Constants.DATA_PAGE + PageName + Constants.DATA_EXTENSTION);
-		ObjectInputStream in = new ObjectInputStream(fileIn);
+
+	public static Page deserializePage(String PageName) throws IOException, ClassNotFoundException {
+		in = getInputStream(PageName);
 		Page records = (Page) in.readObject();
 		in.close();
 		fileIn.close();
 		return records;
+	}
+
+	public static ObjectOutputStream getOutStream(String name) throws IOException {
+		String path = getPath(name);
+		fileOut = new FileOutputStream(path);
+		out = new ObjectOutputStream(fileOut);
+		return out;
+	}
+
+	public static ObjectInputStream getInputStream(String name) throws IOException {
+		String path = getPath(name);
+		fileIn = new FileInputStream(path);
+		in = new ObjectInputStream(fileIn);
+		return in;
+	}
+
+	public static String getPath(String name) {
+		return Constants.DATA_TABLE + name + Constants.DATA_EXTENSTION;
 	}
 }
