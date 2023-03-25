@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
-
+import Serializerium.Serializer;
 import com.opencsv.exceptions.CsvValidationException;
 
 import dataManipulation.csvReader;
@@ -25,18 +25,13 @@ public class DBApp implements IDatabase {
 
 	public DBApp() throws IOException {
 		this.myTables = new Hashtable<>();
-		writer = new csvWriter();
-		reader = new csvReader();
-	}
-
-	public static void main(String[] args) throws IOException {
-
+		this.writer = new csvWriter();
+		this.reader = new csvReader();
 	}
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
-
+		this.myTables = reader.readAll(); // to read all tables in the metadata file
 	}
 
 	@Override
@@ -45,9 +40,8 @@ public class DBApp implements IDatabase {
 			Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
-		myTables.put(strTableName, table);
-		writer.write(table);
-
+		getMyTables().put(strTableName, table);
+		getWriter().write(table);
 	}
 
 	@Override
@@ -60,12 +54,18 @@ public class DBApp implements IDatabase {
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
 
 		} else if (!validTuple) {
-			
+
 			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
+
+		} else { 
 			
-		} else {
+			Table table = Serializer.deserializeTable(strTableName); 
 			
-             
+			table.insertTuple(htblColNameValue);
+			
+            
+            Serializer.SerializeTable(table);
+
 		}
 
 	}
@@ -79,11 +79,40 @@ public class DBApp implements IDatabase {
 
 	@Override
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
-		// TODO Auto-generated method stub
+		// TODO I need to remove the duplicates in the following lines later
+		boolean validTable = Validator.validTable(strTableName);
+		boolean validTuple = Validator.validTuple(htblColNameValue);
+		if (!validTable) {
+
+			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
+
+		} else if (!validTuple) {
+			
+			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
+			
+		} else {
+			
+			Table TargetTable = myTables.get(strTableName);
+			
+			
+             
+		}
 
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
+	}
+
+	public Hashtable<String, Table> getMyTables() {
+		return myTables;
+	}
+
+	public csvReader getReader() {
+		return reader;
+	}
+
+	public csvWriter getWriter() {
+		return writer;
 	}
 }

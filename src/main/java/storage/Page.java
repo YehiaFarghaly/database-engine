@@ -5,14 +5,17 @@ import java.util.Vector;
 import search.PageSearch;
 
 public class Page implements Serializable {
-
+    private String name;
+    private int maxRows;
 	private Vector<Tuple> tuples;
 	private Object minPK, maxPK;
 	private int size;
 	private String tableName;
 
 	public Page(String tableName) {
-		this.tuples = new Vector<>();this.tableName=tableName;
+		this.tuples = new Vector<>();
+		this.tableName=tableName;
+		name = minPK+""+tableName;
 	}
 
 	public Object getMinPK() {
@@ -38,9 +41,20 @@ public class Page implements Serializable {
 	public String getTableName() {
 		return tableName;
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
+	}
+	
+	public void insertIntoPage(Tuple tuple) {
+		
+	}
+	public boolean isFull() {
+		return size==maxRows;
 	}
 
 	public Vector<Tuple> search(String colName, String value) {
