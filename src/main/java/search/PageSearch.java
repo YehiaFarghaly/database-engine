@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
-
-
 import storage.Cell;
 import storage.Page;
 import storage.Tuple;
@@ -71,13 +69,13 @@ public class PageSearch {
         if (hasIndex) {
 
         } else if (isPK) {
-            int idx = binarySearch(value);
+            int idx = binarySearch(value,Condition.equal,null);
 
             if(idx!=-1) {
 
-                Vector<Tuple> left = searchLeft(idx, Condition.equal, value);
+                Vector<Tuple> left = searchLeft(idx, Condition.equal,null, value);
                 Collections.reverse(left);
-                 left.addAll(searchRight(idx, Condition.equal, value));
+                 left.addAll(searchRight(idx, Condition.equal,null, value));
                 results =left;
             }
 
@@ -91,15 +89,17 @@ public class PageSearch {
         return results;
     }
 
-    
-
-    
     public Vector<Tuple> searchGreaterThan(String colName, String value) {
         Vector<Tuple> results = new Vector<Tuple>();
         collectInfo(colName, value);
 
         if (hasIndex) {
         } else if (isPK) {
+            int idx = binarySearch(value,Condition.greaterThan,null);
+            Vector<Tuple> left = searchLeft(idx, Condition.greaterThan,null, value);
+            Collections.reverse(left);
+            left.addAll(searchRight(idx, Condition.greaterThan,null, value));
+            results =left;
 
         } else {
             try {
@@ -120,6 +120,11 @@ public class PageSearch {
 
         if (hasIndex) {
         } else if (isPK) {
+            int idx = binarySearch(value,Condition.greaterThan,Condition.equal);
+            Vector<Tuple> left = searchLeft(idx, Condition.greaterThan,Condition.equal, value);
+            Collections.reverse(left);
+            left.addAll(searchRight(idx, Condition.greaterThan,Condition.equal, value));
+            results =left;
 
         } else {
             try {
@@ -138,7 +143,11 @@ public class PageSearch {
 
         if (hasIndex) {
         } else if (isPK) {
-
+            int idx = binarySearch(value,Condition.lessThan,null);
+            Vector<Tuple> left = searchLeft(idx, Condition.lessThan,null, value);
+            Collections.reverse(left);
+            left.addAll(searchRight(idx, Condition.lessThan,null, value));
+            results =left;
         } else {
             try {
                 results = linearSearch(colName, value, Condition.lessThan, null);
@@ -156,6 +165,11 @@ public class PageSearch {
 
         if (hasIndex) {
         } else if (isPK) {
+            int idx = binarySearch(value,Condition.lessThan,Condition.equal);
+            Vector<Tuple> left = searchLeft(idx, Condition.lessThan,Condition.equal, value);
+            Collections.reverse(left);
+            left.addAll(searchRight(idx, Condition.lessThan,Condition.equal, value));
+            results =left;
 
         } else {
             try {
@@ -189,7 +203,7 @@ public class PageSearch {
     private int getColNumber(String colName) {
         return 0;
     }
-    private int binarySearch(String value) {
+    private int binarySearch(String value,Condition condition,Condition condition2) {
         int mid = 0, low = 0, high = page.getSize();
         Tuple curTuple = null;
         Vector<Tuple> rows = page.getTuples();
@@ -199,20 +213,34 @@ public class PageSearch {
             Cell curCel = curTuple.getCells().get(colNum);
             int compVal = new Compare().compareTo(colType, curCel.getValue(), value);
 
-            if (compVal > 0)
-                high = mid - 1;
-            else if (compVal < 0)
-                low = mid + 1;
-            else
+            if (isToBeAdded(curCel, value, condition))
                 return mid;
+            if (condition2 != null && condition2.equals(Condition.equal))
+                if (compVal == 0) return mid;
+
+            switch (condition) {
+                case equal:
+                    if (compVal > 0)
+                        high = mid - 1;
+                    else if (compVal < 0)
+                        low = mid + 1;
+                    break;
+                case greaterThan:
+                    low = mid + 1;
+                    break;
+                case lessThan:
+                    high = mid - 1;
+                    break;
+            }
         }
         return -1;
     }
-    private Vector<Tuple>  searchRight(int idx, Condition condition, String value) {
+    private Vector<Tuple>  searchRight(int idx, Condition condition,Condition condition2, String value) {
         Vector<Tuple> results = new Vector<Tuple>();
         for (int i = idx; i< page.getSize(); i++) {
             Tuple curTuple = page.getTuples().get(i);
-            if (isToBeAdded(curTuple.getCells().get(colNum), value, condition)) {
+            if (isToBeAdded(curTuple.getCells().get(colNum), value, condition)||
+                    (condition2!=null && isToBeAdded(curTuple.getCells().get(colNum), value, condition2))) {
                 results.add(curTuple);
             } else
                 break;
@@ -221,11 +249,12 @@ public class PageSearch {
         return results;
     }
 
-    private Vector<Tuple> searchLeft(int idx, Condition condition, String value) {
+    private Vector<Tuple> searchLeft(int idx, Condition condition,Condition condition2, String value) {
         Vector<Tuple> results = new Vector<Tuple>();
         for (int i = idx; i > -1; i--) {
             Tuple curTuple = page.getTuples().get(i);
-            if (isToBeAdded(curTuple.getCells().get(colNum), value, condition)) {
+            if (isToBeAdded(curTuple.getCells().get(colNum), value, condition)||
+                    (condition2!=null && isToBeAdded(curTuple.getCells().get(colNum), value, condition2)))  {
                 results.add(curTuple);
             } else
                 break;
