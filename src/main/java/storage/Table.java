@@ -155,4 +155,8 @@ public class Table implements Serializable {
 	public Vector<Tuple> searchNotEqual(String colName, String value) {
 		return TableSearch.searchNotEqual(this, colName, value);
 	}
+	public Vector<String> getPagesName() {
+		return pagesName;
+	}
+
 }

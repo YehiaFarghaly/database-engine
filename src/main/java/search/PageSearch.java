@@ -11,8 +11,6 @@ import storage.Page;
 import storage.Tuple;
 import dataManipulation.csvReader;
 
-import static Serializerium.Serializer.deserializePage;
-
 enum Condition {
     equal,
     notEqual,
@@ -21,41 +19,39 @@ enum Condition {
 }
 public class PageSearch {
 
-    Page page;
-    boolean isPK = false;
-    boolean hasIndex = false;
-    String indexName = null;
-    String indexType = null;
-    String colName = null;
+    private Page page;
+    private boolean isPK = false;
+    private boolean hasIndex = false;
+    private String indexName = null;
+    private String indexType = null;
+    private String colName = null;
 
-    String colType = null;
+    private String colType = null;
 
-    int colNum = 0;
+    private int colNum = 0;
 
     public PageSearch(Page page) {
-        this.page = page;
-
-
+        this.setPage(page);
     }
 
     private void collectInfo(String colName, String value) {
 
-        ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
+        ArrayList<String[]> tableCol = new csvReader().readTable(getPage().getTableName());
         int i = 0;
         for (String curCol[] : tableCol) {
             if (curCol[1].equals(colName)) {
-                colNum = i;
+                setColNum(i);
 
-                colType = curCol[2];
+                setColType(curCol[2]);
 
                 if (curCol[3].toLowerCase().equals("true"))
-                    isPK = true;
+                    setPK(true);
                 if (!curCol[4].toLowerCase().equals("null"))
-                    hasIndex = true;
+                    setHasIndex(true);
 
-                if (hasIndex) {
-                    indexName = curCol[4];
-                    indexType = curCol[5];
+                if (isHasIndex()) {
+                    setIndexName(curCol[4]);
+                    setIndexType(curCol[5]);
                 }
                 break;
             }
@@ -69,12 +65,12 @@ public class PageSearch {
         Vector<Tuple> results = new Vector<Tuple>();
         //the next if condition may not work if a column info of a table has changed
         //we can solve it by adding time of last updates on a table these updates are [add/remove index] in a log file
-        if (this.colName == null || !this.colName.equals(colName))
+        if (this.getColName() == null || !this.getColName().equals(colName))
             collectInfo(colName, value);
 
-        if (hasIndex) {
+        if (isHasIndex()) {
 
-        } else if (isPK) {
+        } else if (isPK()) {
             int idx = binarySearch(value);
 
             if(idx!=-1) {
@@ -95,91 +91,8 @@ public class PageSearch {
         return results;
     }
 
-    private Vector<Tuple>  searchRight(int idx, Condition condition, String value) {
-        Vector<Tuple> results = new Vector<Tuple>();
-        for (int i = idx; i<page.getSize(); i++) {
-            Tuple curTuple = page.getTuples().get(i);
-            if (isToBeAdded(curTuple.getCells().get(colNum), value, condition)) {
-                results.add(curTuple);
-            } else
-                break;
 
-        }
-        return results;
-    }
 
-    private Vector<Tuple> searchLeft(int idx, Condition condition, String value) {
-        Vector<Tuple> results = new Vector<Tuple>();
-        for (int i = idx; i > -1; i--) {
-            Tuple curTuple = page.getTuples().get(i);
-            if (isToBeAdded(curTuple.getCells().get(colNum), value, condition)) {
-                results.add(curTuple);
-            } else
-                break;
-
-        }
-        return results;
-    }
-
-    private int binarySearch(String value) {
-        int mid = 0, low = 0, high = page.getSize();
-        Tuple curTuple = null;
-        Vector<Tuple> rows = page.getTuples();
-        while (low <= high) {
-            mid = low + (high - low) / 2;
-            curTuple = rows.get(mid);
-            Cell curCel = curTuple.getCells().get(colNum);
-            int compVal = new Compare().compareTo(colType, curCel.getValue(), value);
-
-            if (compVal > 0)
-                high = mid - 1;
-            else if (compVal < 0)
-                low = mid + 1;
-            else
-                return mid;
-        }
-        return -1;
-    }
-
-    private Vector<Tuple> linearSearch(String colName, String value, Condition condition1, Condition condition2) throws IOException{
-
-        Vector<Tuple> results = new Vector<Tuple>();
-        int colNum = getColNumber(colName);
-        for (Tuple curTuple : page.getTuples()) {
-            Cell curCel = curTuple.getCells().get(colNum);
-            boolean isToBeAdded = false;
-            if (condition1 != null)
-                isToBeAdded = isToBeAdded( curCel, value, condition1);
-
-            if (condition2 != null && !isToBeAdded) {
-                isToBeAdded = isToBeAdded( curCel,value, condition2);
-            }
-            if (isToBeAdded)
-                results.add(curTuple);
-
-        }
-        return results;
-    }
-
-    private boolean isToBeAdded(Cell curCel,String value, Condition condition) {
-        boolean isToBeAdded =false;
-        switch (condition){
-            case equal:
-                isToBeAdded = (new Compare().compareTo(colType, curCel.getValue(), value) == 0);
-                break;
-            case notEqual:
-                isToBeAdded = (new Compare().compareTo(colType, curCel.getValue(), value) != 0);
-                break;
-            case lessThan:
-                isToBeAdded = (new Compare().compareTo(colType, curCel.getValue(), value) < 0);
-                break;
-            case greaterThan:
-                isToBeAdded = (new Compare().compareTo(colType, curCel.getValue(), value) > 0);
-                break;
-
-        }
-        return isToBeAdded;
-    }
 
     public Vector<Tuple> searchGreaterThan(String colName, String value) {
 
@@ -206,5 +119,153 @@ public class PageSearch {
     private int getColNumber(String colName) {
         return 0;
     }
+    private int binarySearch(String value) {
+        int mid = 0, low = 0, high = getPage().getSize();
+        Tuple curTuple = null;
+        Vector<Tuple> rows = getPage().getTuples();
+        while (low <= high) {
+            mid = low + (high - low) / 2;
+            curTuple = rows.get(mid);
+            Cell curCel = curTuple.getCells().get(getColNum());
+            int compVal = new Compare().compareTo(getColType(), curCel.getValue(), value);
 
+            if (compVal > 0)
+                high = mid - 1;
+            else if (compVal < 0)
+                low = mid + 1;
+            else
+                return mid;
+        }
+        return -1;
+    }
+    private Vector<Tuple>  searchRight(int idx, Condition condition, String value) {
+        Vector<Tuple> results = new Vector<Tuple>();
+        for (int i = idx; i< getPage().getSize(); i++) {
+            Tuple curTuple = getPage().getTuples().get(i);
+            if (isToBeAdded(curTuple.getCells().get(getColNum()), value, condition)) {
+                results.add(curTuple);
+            } else
+                break;
+
+        }
+        return results;
+    }
+
+    private Vector<Tuple> searchLeft(int idx, Condition condition, String value) {
+        Vector<Tuple> results = new Vector<Tuple>();
+        for (int i = idx; i > -1; i--) {
+            Tuple curTuple = getPage().getTuples().get(i);
+            if (isToBeAdded(curTuple.getCells().get(getColNum()), value, condition)) {
+                results.add(curTuple);
+            } else
+                break;
+
+        }
+        return results;
+    }
+
+
+
+    private Vector<Tuple> linearSearch(String colName, String value, Condition condition1, Condition condition2) throws IOException{
+
+        Vector<Tuple> results = new Vector<Tuple>();
+        int colNum = getColNumber(colName);
+        for (Tuple curTuple : getPage().getTuples()) {
+            Cell curCel = curTuple.getCells().get(colNum);
+            boolean isToBeAdded = false;
+            if (condition1 != null)
+                isToBeAdded = isToBeAdded( curCel, value, condition1);
+
+            if (condition2 != null && !isToBeAdded) {
+                isToBeAdded = isToBeAdded( curCel,value, condition2);
+            }
+            if (isToBeAdded)
+                results.add(curTuple);
+
+        }
+        return results;
+    }
+    private boolean isToBeAdded(Cell curCel,String value, Condition condition) {
+        boolean isToBeAdded =false;
+        switch (condition){
+            case equal:
+                isToBeAdded = (new Compare().compareTo(getColType(), curCel.getValue(), value) == 0);
+                break;
+            case notEqual:
+                isToBeAdded = (new Compare().compareTo(getColType(), curCel.getValue(), value) != 0);
+                break;
+            case lessThan:
+                isToBeAdded = (new Compare().compareTo(getColType(), curCel.getValue(), value) < 0);
+                break;
+            case greaterThan:
+                isToBeAdded = (new Compare().compareTo(getColType(), curCel.getValue(), value) > 0);
+                break;
+
+        }
+        return isToBeAdded;
+    }
+
+    private Page getPage() {
+        return page;
+    }
+
+    private void setPage(Page page) {
+        this.page = page;
+    }
+
+    private boolean isPK() {
+        return isPK;
+    }
+
+    private void setPK(boolean PK) {
+        isPK = PK;
+    }
+
+    private boolean isHasIndex() {
+        return hasIndex;
+    }
+
+    private void setHasIndex(boolean hasIndex) {
+        this.hasIndex = hasIndex;
+    }
+
+    private String getIndexName() {
+        return indexName;
+    }
+
+    private void setIndexName(String indexName) {
+        this.indexName = indexName;
+    }
+
+    private String getIndexType() {
+        return indexType;
+    }
+
+    private void setIndexType(String indexType) {
+        this.indexType = indexType;
+    }
+
+    private String getColName() {
+        return colName;
+    }
+
+    private void setColName(String colName) {
+        this.colName = colName;
+    }
+
+    private String getColType() {
+        return colType;
+    }
+
+    private void setColType(String colType) {
+        this.colType = colType;
+    }
+
+    private int getColNum() {
+        return colNum;
+    }
+
+    private void setColNum(int colNum) {
+        this.colNum = colNum;
+    }
 }
