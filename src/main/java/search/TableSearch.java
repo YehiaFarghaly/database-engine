@@ -14,7 +14,10 @@ public class TableSearch {
         for (String pageName : table.getPagesName()) {
             try {
                 Page page = Serializer.deserializePage(pageName);
-                results.addAll(page.search(colName,value));
+                Vector<Tuple>temp = page.search(colName,value);
+                results.addAll(temp);
+                if(temp.size()>0&&colName.equals(table.getPKColumn()))return results;
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (ClassNotFoundException e) {
