@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Vector;
+
 import Serializerium.Serializer;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -74,18 +76,29 @@ public class DBApp implements IDatabase {
 
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException {
+			Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
 		boolean validTable = Validator.validTable(strTableName,myTables);
-		boolean validTupleUpdate = Validator.validTupleUpdate(myTables.get(strTableName),htblColNameValue);
-	
+		
 		if (!validTable) {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
 
-		} else if (!validTupleUpdate) {
-			
-		}
+		} else {
+			boolean validTupleUpdate = Validator.validTupleUpdate(myTables.get(strTableName),htblColNameValue);
+			if (!validTupleUpdate) {
+				
+				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
+			}else {
+				
+				Table table = Serializer.deserializeTable(strTableName);
+				updateTuple(table,strClusteringKeyValue);
 
+				Serializer.SerializeTable(table);
+
+			}
+
+		}
+			
 
 	}
 
@@ -128,5 +141,12 @@ public class DBApp implements IDatabase {
 
 	public csvWriter getWriter() {
 		return writer;
+	}
+	public static void upadteTuple(Table table,String strClusteringKeyValue,Hashtable<String, Object> htblColNameValue) {
+		Tuple t = TableSearch.SearchForUpdate(table,strClusteringKeyValue);
+		Vector<Cell> v = t.getCells();
+		for(int i=0;i<v.size();i++) {
+			
+		}
 	}
 }

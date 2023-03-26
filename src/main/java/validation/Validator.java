@@ -11,6 +11,7 @@ import dataManipulation.csvReader;
 import search.TableSearch;
 import sql.SQLTerm;
 import storage.Table;
+import storage.Tuple;
 
 public class Validator {
 
@@ -64,7 +65,8 @@ public class Validator {
     }
     public static boolean foundPK(Table table,String[] columns,String []pk,Hashtable<String,Object> tuple) {
     	int pkIndex = findRowPK(columns,pk);
-    	if(table.search(columns[pkIndex],(String) tuple.get(columns[pkIndex]))!=null) return false;
+    	Tuple t = table.createTuple(tuple);
+    	if(table.search(t)==-1) return false;
     	return true;
     }
     

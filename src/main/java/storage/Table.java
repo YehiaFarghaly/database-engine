@@ -200,6 +200,8 @@ public class Table implements Serializable {
 
 		return tuple;
 	}
+	
+	
 
 	public Vector<Tuple> search(String colName, String value) {
 		return TableSearch.search(this, colName, value);
