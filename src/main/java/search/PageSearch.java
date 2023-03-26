@@ -22,10 +22,9 @@ public class PageSearch {
     private boolean hasIndex = false;
     private String indexName = null;
     private String indexType = null;
+
     private String colName = null;
-
     private String colType = null;
-
     private int colNum = 0;
 
     public PageSearch(Page page) {
@@ -57,7 +56,7 @@ public class PageSearch {
             i++;
         }
     }
-    public Vector<Tuple> search(String colName, String value) {
+    public Vector<Tuple> search(String colName, String value) throws IOException {
         Vector<Tuple> results = new Vector<Tuple>();
             collectInfo(colName, value);
         if (hasIndex) {
@@ -69,17 +68,12 @@ public class PageSearch {
                 results.add(page.getTuples().get(idx));
 
 
-        } else {
-            try {
+        } else
                 results = linearSearch(colName, value, Condition.equal, null);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
         return results;
     }
 
-    public Vector<Tuple> searchGreaterThan(String colName, String value) {
+    public Vector<Tuple> searchGreaterThan(String colName, String value) throws IOException {
         Vector<Tuple> results = new Vector<Tuple>();
         collectInfo(colName, value);
 
@@ -91,19 +85,15 @@ public class PageSearch {
             left.addAll(searchRight(idx, Condition.greaterThan,null, value));
             results =left;
 
-        } else {
-            try {
+        } else
                 results = linearSearch(colName, value, Condition.greaterThan, null);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+
         return results;
 
 
     }
 
-    public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
+    public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) throws IOException {
 
         Vector<Tuple> results = new Vector<Tuple>();
         collectInfo(colName, value);
@@ -116,18 +106,13 @@ public class PageSearch {
             left.addAll(searchRight(idx, Condition.greaterThan,Condition.equal, value));
             results =left;
 
-        } else {
-            try {
+        } else
                 results = linearSearch(colName, value, Condition.greaterThan, Condition.equal);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
         return results;
 
     }
 
-    public Vector<Tuple> searchLessThan(String colName, String value) {
+    public Vector<Tuple> searchLessThan(String colName, String value) throws IOException {
         Vector<Tuple> results = new Vector<Tuple>();
         collectInfo(colName, value);
 
@@ -138,18 +123,14 @@ public class PageSearch {
             Collections.reverse(left);
             left.addAll(searchRight(idx, Condition.lessThan,null, value));
             results =left;
-        } else {
-            try {
+        } else
                 results = linearSearch(colName, value, Condition.lessThan, null);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+
         return results;
 
     }
 
-    public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
+    public Vector<Tuple> searchLessThanOrEqual(String colName, String value) throws IOException {
         Vector<Tuple> results = new Vector<Tuple>();
         collectInfo(colName, value);
 
@@ -161,18 +142,12 @@ public class PageSearch {
             left.addAll(searchRight(idx, Condition.lessThan,Condition.equal, value));
             results =left;
 
-        } else {
-            try {
+        } else
                 results = linearSearch(colName, value, Condition.lessThan, Condition.equal);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
         return results;
 
     }
-
-    public Vector<Tuple> searchNotEqual(String colName, String value) {
+    public Vector<Tuple> searchNotEqual(String colName, String value) throws IOException {
         Vector<Tuple> results = new Vector<Tuple>();
         collectInfo(colName, value);
 
@@ -182,19 +157,14 @@ public class PageSearch {
             results.addAll(page.getTuples());
             results.remove(idx);
 
-        } else {
-            try {
-                results = linearSearch(colName, value, Condition.notEqual, null);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        } else
+            results = linearSearch(colName, value, Condition.notEqual, null);
+
         return results;
 
     }
-
     private int getColNumber(String colName) {
-        return 0;
+        return colNum;
     }
     private int binarySearch(String value,Condition condition,Condition condition2) {
         int mid = 0, low = 0, high = page.getSize();
@@ -255,9 +225,6 @@ public class PageSearch {
         }
         return results;
     }
-
-    
-
     private Vector<Tuple> linearSearch(String colName, String value, Condition condition1, Condition condition2) throws IOException{
 
         Vector<Tuple> results = new Vector<Tuple>();

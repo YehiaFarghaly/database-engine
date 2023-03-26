@@ -1,5 +1,6 @@
 package storage;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Vector;
 import search.PageSearch;
@@ -55,33 +56,57 @@ public class Page implements Serializable {
 	}
 
 	public Vector<Tuple> search(String colName, String value) {
-		return
-				new PageSearch(this).search(colName, value);
+		try {
+			return
+					new PageSearch(this).search(colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Vector<Tuple> searchGreaterThan(String colName, String value) {
-		return
-				new PageSearch(this).searchGreaterThan(colName, value);
+		try {
+			return
+					new PageSearch(this).searchGreaterThan(colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
-		return
-				new PageSearch(this).searchGreaterThanOrEqual(colName, value);
+		try {
+			return
+					new PageSearch(this).searchGreaterThanOrEqual(colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Vector<Tuple> searchLessThan(String colName, String value) {
-		return
-				new PageSearch(this).searchLessThan(colName, value);
+		try {
+			return
+					new PageSearch(this).searchLessThan(colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
-		return
-				new PageSearch(this).searchLessThanOrEqual(colName, value);
+		try {
+			return
+					new PageSearch(this).searchLessThanOrEqual(colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Vector<Tuple> searchNotEqual(String colName, String value) {
-		return
-				new PageSearch(this).searchNotEqual(colName, value);
+		try {
+			return
+					new PageSearch(this).searchNotEqual(colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public boolean isFull() {
