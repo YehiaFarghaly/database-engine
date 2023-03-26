@@ -91,7 +91,7 @@ public class DBApp implements IDatabase {
 			}else {
 				
 				Table table = Serializer.deserializeTable(strTableName);
-				updateTuple(table,strClusteringKeyValue);
+				upadteTuple(table,strClusteringKeyValue,htblColNameValue);
 
 				Serializer.SerializeTable(table);
 
@@ -142,11 +142,23 @@ public class DBApp implements IDatabase {
 	public csvWriter getWriter() {
 		return writer;
 	}
-	public static void upadteTuple(Table table,String strClusteringKeyValue,Hashtable<String, Object> htblColNameValue) {
-		Tuple t = TableSearch.SearchForUpdate(table,strClusteringKeyValue);
-		Vector<Cell> v = t.getCells();
-		for(int i=0;i<v.size();i++) {
-			
+	
+	public static Page getPageToUpdate(String strClusteringKeyValue,Table table,Tuple tuple) throws ClassNotFoundException, IOException {
+		tuple.setPrimaryKey(strClusteringKeyValue);
+		int pkPagePosition = table.search(tuple);
+		return table.getPageAtPosition(pkPagePosition);
+	}
+	public static Tuple getTupleToUpdate(Tuple tuple,Page page) {
+		int pkVectorPoition = page.search(tuple);
+		return page.getTuples().get(pkVectorPoition);
+
+	}
+	public static void upadteTuple(Table table,String strClusteringKeyValue,Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException {
+		Tuple tuple = new Tuple(); 
+		Page page = getPageToUpdate(strClusteringKeyValue, table, tuple);
+		tuple = getTupleToUpdate(tuple, page);
+		for (Cell c : tuple.getCells()) {
+			c.setValue(htblColNameValue.get(c.getKey()));    
 		}
 	}
 }

@@ -170,7 +170,7 @@ public class Table implements Serializable {
 		return position == pagesName.size() - 1;
 	}
 
-	private Page getPageAtPosition(int position) throws ClassNotFoundException, IOException {
+	public Page getPageAtPosition(int position) throws ClassNotFoundException, IOException {
 
 		String pageName = pagesName.get(position);
 		Page page = Serializer.deserializePage(pageName);

@@ -26,6 +26,10 @@ public class Page implements Serializable {
 		return minPK;
 	}
 
+	public Vector<Tuple> getTuples() {
+		return tuples;
+	}
+
 	public void setMinPK(Object minPK) {
 		this.minPK = minPK;
 	}

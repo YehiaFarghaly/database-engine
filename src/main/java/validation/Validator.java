@@ -82,7 +82,7 @@ public class Validator {
     	if( !isTheSameNumberOfColumns(tuple,columns) ||
     		!containsAllColumns(tuple,columns)       ||
     	    !isTheSameDataType(tuple,columns,dataTypes) ||
-    	    !foundPK(table,columns,pk,tuple)) {
+    	    foundPK(table,columns,pk,tuple)) {
     		return false;
     		}
     	else {
@@ -108,9 +108,7 @@ public class Validator {
     	String [] columns = tableInfo.get(0);
     	String [] dataTypes = tableInfo.get(1);
     	String [] pk = tableInfo.get(2);
-    	if( !containsAllColumnsUpdate(tuple,columns,pk)       ||
-    	    !isTheSameDataTypeUpdate(tuple,columns,dataTypes,pk) ||
-    	    !foundPK(table,columns,pk,tuple)) {
+    	if( !isTheSameDataTypeUpdate(tuple,columns,dataTypes,pk) ||!foundPK(table,columns,pk,tuple)) {
     		return false;
     		}
     	else {
