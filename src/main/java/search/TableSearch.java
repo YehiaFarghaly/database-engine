@@ -110,5 +110,23 @@ public class TableSearch {
 
         return results;
     }
+   static Tuple searchForUpdate(Table table,String value) {
+        //value of pk to binary search with
+       Tuple result = null;
+       for (String pageName : table.getPagesName()) {
+           try {
+               Page page = Serializer.deserializePage(pageName);
+               Vector<Tuple> ret = page.search(table.getPKColumn(), value);
+               if (ret.size() > 0)
+                   result = ret.get(0);
+           } catch (IOException e) {
+               throw new RuntimeException(e);
+           } catch (ClassNotFoundException e) {
+               throw new RuntimeException(e);
+           }
+       }
+
+       return result;
+   }
 
 }

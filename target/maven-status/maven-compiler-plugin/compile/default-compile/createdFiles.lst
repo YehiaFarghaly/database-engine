@@ -2,11 +2,17 @@ app\IDatabase.class
 search\TableSearch.class
 sql\SQLTerm.class
 search\Selector.class
+dataManipulation\csvWriter.class
+search\Compare.class
 storage\Table.class
+search\Condition.class
 storage\Page.class
 storage\TupleDirector.class
 Serializerium\Serializer.class
 storage\TupleBuilder.class
+validation\Validator.class
+search\PageSearch$1.class
+app\DBApp.class
 storage\ITuple.class
 exceptions\DBAppException.class
 storage\Cell.class

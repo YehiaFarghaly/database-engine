@@ -77,26 +77,27 @@ public class DBApp implements IDatabase {
 	}
 
 	@Override
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException {
 		// TODO I need to remove the duplicates in the following lines later
-		boolean validTable = Validator.validTable(strTableName);
-		boolean validTuple = Validator.validTuple(htblColNameValue);
+		boolean validTable = Validator.validTable(strTableName, myTables);
 		if (!validTable) {
 
 			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
 
-		} else if (!validTuple) {
-			
-			System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
-			
 		} else {
-			
-			Table TargetTable = myTables.get(strTableName);
-			
-			
-             
-		}
 
+			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
+
+			if (!validTuple) {
+
+				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
+
+			} else {
+
+				Table TargetTable = myTables.get(strTableName);
+
+			}
+		}
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {

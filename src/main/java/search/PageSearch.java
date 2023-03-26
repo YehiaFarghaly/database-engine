@@ -57,27 +57,17 @@ public class PageSearch {
             i++;
         }
     }
-
     public Vector<Tuple> search(String colName, String value) {
-        //validator.valid
         Vector<Tuple> results = new Vector<Tuple>();
-        //the next if condition may not work if a column info of a table has changed
-        //we can solve it by adding time of last updates on a table these updates are [add/remove index] in a log file
-      //  if (this.colName == null || !this.colName.equals(colName))
             collectInfo(colName, value);
-
         if (hasIndex) {
 
         } else if (isPK) {
             int idx = binarySearch(value,Condition.equal,null);
 
-            if(idx!=-1) {
+            if(idx!=-1)
+                results.add(page.getTuples().get(idx));
 
-                Vector<Tuple> left = searchLeft(idx, Condition.equal,null, value);
-                Collections.reverse(left);
-                 left.addAll(searchRight(idx, Condition.equal,null, value));
-                results =left;
-            }
 
         } else {
             try {
@@ -188,6 +178,9 @@ public class PageSearch {
 
         if (hasIndex) {
         } else if (isPK) {
+            int idx = binarySearch(value,Condition.equal,null);
+            results.addAll(page.getTuples());
+            results.remove(idx);
 
         } else {
             try {
