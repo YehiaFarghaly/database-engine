@@ -1,5 +1,6 @@
 package storage;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -130,30 +131,66 @@ public class Table implements Serializable {
 	}
 
 	public Vector<Tuple> search(String colName, String value) {
-		return TableSearch.search(this, colName, value);
+		try {
+			return TableSearch.search(this, colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	public Page search(Tuple t) {
 		return null;
 	}
 
 	public Vector<Tuple> searchGreaterThan(String colName, String value) {
-		return TableSearch.searchGreaterThan(this, colName, value);
+		try {
+			return TableSearch.searchGreaterThan(this, colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
-		return TableSearch.searchGreaterThanOrEqual(this, colName, value);
+		try {
+			return TableSearch.searchGreaterThanOrEqual(this, colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Vector<Tuple> searchLessThan(String colName, String value) {
-		return TableSearch.searchLessThan(this, colName, value);
+		try {
+			return TableSearch.searchLessThan(this, colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
-		return TableSearch.searchLessThanOrEqual(this, colName, value);
+		try {
+			return TableSearch.searchLessThanOrEqual(this, colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Vector<Tuple> searchNotEqual(String colName, String value) {
-		return TableSearch.searchNotEqual(this, colName, value);
+		try {
+			return TableSearch.searchNotEqual(this, colName, value);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	public Vector<String> getPagesName() {
 		return pagesName;
