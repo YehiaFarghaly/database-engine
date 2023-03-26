@@ -18,12 +18,15 @@ public interface IDatabase {
 
 //	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException;
 
-	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException;
+	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, CsvValidationException, ClassNotFoundException;
 
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException;
+			Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, CsvValidationException, ClassNotFoundException;
+
 
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException ;
+
+
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException;
 	
