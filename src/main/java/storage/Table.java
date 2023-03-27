@@ -1,8 +1,11 @@
 package storage;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import Serializerium.Serializer;
@@ -28,7 +31,15 @@ public class Table implements Serializable {
 		pagesName = new Vector<String>();
 
 	}
+	
+	public Vector<String> getPagesName() {
+		return pagesName;
+	}
 
+	public void setPagesName(Vector<String> pagesName) {
+		this.pagesName = pagesName;
+	}
+	
 	public Tuple getPrototype() {
 		if (this.prototype == null) {
 			TupleDirector tupDir = new TupleDirector(new TupleBuilder());
@@ -106,6 +117,41 @@ public class Table implements Serializable {
 		}
 
 	}
+	
+	public void DeleteTuples(Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException
+	{
+		HashMap<String ,HashMap<Tuple, Integer>> ToBeDelete = new HashMap<>();
+		for (String ColName : htblColNameValue.keySet()) {
+			
+			Object value = htblColNameValue.get(ColName);
+			ToBeDelete = linearSearch(ColName, value.toString());
+			
+			for(String PageName : ToBeDelete.keySet())
+			{
+				Page page = Serializer.deserializePage(PageName);
+				for(Tuple tuple : ToBeDelete.get(pagesName).keySet())
+				{
+					page.DeleteFromPage(tuple);
+				}
+				if(page.isEmpty())
+				{
+					deleteEmptyPage(page);
+				}
+			}			
+		}
+
+		if (isEmptyTable())
+		{
+			deleteEmptyTable();
+		}
+		
+	}
+
+	private void deleteEmptyTable() {
+		File pagefile = new File(this.name);
+		pagefile.delete();
+		
+	}
 
 	private void handleFullPageInsertion(Page currentPage, int position, Tuple tuple)
 			throws ClassNotFoundException, IOException {
@@ -132,6 +178,12 @@ public class Table implements Serializable {
 
 		}
 
+	}
+	
+	private void deleteEmptyPage(Page page) throws IOException
+	{
+		this.getPagesName().remove(page.getName());
+		page.DeleteEmptyPage();
 	}
 
 	private boolean arePagesEqual(Page page1, Page page2) {
@@ -161,6 +213,7 @@ public class Table implements Serializable {
 	}
 
 	private void insertNewPage(Tuple tuple) throws IOException {
+		// TODO a new file must be created here
 		Page page = new Page(name);
 		page.insertIntoPage(tuple);
 		pagesName.add(page.getName());
@@ -205,6 +258,9 @@ public class Table implements Serializable {
 
 	public Vector<Tuple> search(String colName, String value) {
 		return TableSearch.search(this, colName, value);
+	}
+	public HashMap<String ,HashMap<Tuple, Integer>> linearSearch(String colName, String value) {
+		return TableSearch.linearSearch(this, colName, value);
 	}
 
 	public int search(Tuple t) {

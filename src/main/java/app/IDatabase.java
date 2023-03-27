@@ -24,7 +24,7 @@ public interface IDatabase {
 			Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, CsvValidationException, ClassNotFoundException;
 
 
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException ;
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException ;
 
 
 

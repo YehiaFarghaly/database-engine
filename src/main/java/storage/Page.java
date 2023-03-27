@@ -1,5 +1,6 @@
 package storage;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Vector;
@@ -73,6 +74,18 @@ public class Page implements Serializable {
 		  Serializer.SerializePage(name, this);
 		  newMinMax();
 	}
+	public void DeleteFromPage(Tuple tuple) throws IOException {
+		int position = search(tuple);
+		  tuples.add(position, tuple);
+		  size--;
+		  Serializer.SerializePage(name, this);
+		  newMinMax();
+	}
+	
+	public void DeleteEmptyPage() throws IOException {
+		 File pagefile = new File(this.name);
+		 pagefile.delete();
+	}
 	
 	public void newMinMax() {
 		minPK = tuples.get(0).getPrimaryKey();
@@ -110,5 +123,8 @@ public class Page implements Serializable {
 
 	public boolean isFull() {
 		return size==maxRows;
+	}
+	public boolean isEmpty() {
+		return size==0;
 	}
 }
