@@ -1,13 +1,21 @@
 package search;
 
+import java.io.IOException;
 import java.util.*;
 
+import Serializerium.Serializer;
+import storage.Page;
 import storage.Table;
 import storage.Tuple;
 
 import static Serializerium.Serializer.deserializePage;
 import static constants.Constants.*;
 public class TableSearch {
+	
+	public static HashMap<String ,HashMap<Tuple, Integer>> linearSearch(Table table ,String colName, String value) {
+		return null;
+    }
+	
     public static Vector<Tuple> search(Table table, String colName, String value) {
 
     public HashMap<String, HashMap<Tuple, Integer>> linearSearch(Table table, String colName, String value) throws IOException, ClassNotFoundException, DBAppException, ParseException {
