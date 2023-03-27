@@ -2,6 +2,8 @@ package storage;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Vector;
 
 import Serializerium.Serializer;
@@ -84,31 +86,15 @@ public class Page implements Serializable {
 		return 0;
 	}
 	
-	public Vector<Tuple> search(String colName, String value) {
-		return PageSearch.search(this, colName,  value);
-	}
-
-	public Vector<Tuple> searchGreaterThan(String colName, String value) {
-		return PageSearch.searchGreaterThan(this,  colName,  value);
-	}
-
-	public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
-		return PageSearch.searchGreaterThanOrEqual(this,  colName,  value);
-	}
-
-	public Vector<Tuple> searchLessThan(String colName, String value) {
-		return PageSearch.searchLessThan(this,  colName,  value);
-	}
-
-	public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
-		return PageSearch.searchLessThanOrEqual(this,  colName,  value);
-	}
-
-	public Vector<Tuple> searchNotEqual(String colName, String value) {
-		return PageSearch.searchNotEqual(this, colName,  value);
-	}
 
 	public boolean isFull() {
 		return size==maxRows;
 	}
+	public int binarySearch(String value) {
+		return new PageSearch(this).binarySearch(value);
+	}
+	public HashMap<Tuple, ArrayList<Integer>> linearSearch(String colName , String value) {
+		return new PageSearch(this).linearSearch(colName, value);
+	}
+
 }

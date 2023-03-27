@@ -1,42 +1,152 @@
 package search;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Vector;
-
-
+import dataManipulation.csvReader;
+import storage.Cell;
 import storage.Page;
+import storage.Table;
 import storage.Tuple;
+
+import static Serializerium.Serializer.deserializeTable;
 
 public class PageSearch {
 
-    public static Vector<Tuple> search(Page page,String colName, String value) {
+    private Page page;
+    private boolean isPK = false;
+    private boolean hasIndex = false;
+    private String indexName = null;
+    private String indexType = null;
 
-        return new Vector<Tuple>();
+    private String colName = null;
+    private String colType = null;
+    private int colNum = 0;
+
+    private String PKColName = null;
+    private String PKColType = null;
+
+
+    public PageSearch(Page page) {
+        this.page = page;
     }
 
-    public static Vector<Tuple> searchGreaterThan(Page page,String colName, String value) {
+    public int binarySearch(String value) {
+        //binary search in only done on PK column
+        //returns
+        // positive -> (index of wanted value )
+        // negative -> (  -(index) where the element should be inserted )
+        int low = 0, high = page.getSize();
 
-        return new Vector<Tuple>();
+        while (low <= high) {
+
+            int mid = low + (high - low) / 2;
+
+            Tuple currTuple = page.getTuples().get(mid);
+
+            Object PKValueOfCurrTuple = getValueOfColInTuple(currTuple, this.PKColName);
+
+            int comp = getComparisonResult(PKColType, PKValueOfCurrTuple, value);
+
+            if (comp == 0)
+                return mid;
+            else if (comp < 0) {
+                low = mid + 1;
+            } else
+                high = mid - 1;
+
+        }
+        return -(high + 1); // or low
     }
 
-    public static Vector<Tuple> searchGreaterThanOrEqual(Page page,String colName, String value) {
+    public HashMap<Tuple, ArrayList<Integer>> linearSearch(String colName, String value) {
+        setColType(colName);
+        HashMap<Tuple, ArrayList<Integer>> results = new HashMap<Tuple, ArrayList<Integer>>();
+        int i = 0;
+        for (Tuple currTuple : page.getTuples()) {
 
-        return new Vector<Tuple>();
+            Object currValue = getValueOfColInTuple(currTuple, colName);
+
+            int comp = getComparisonResult(colType, currValue, value);
+
+            if (comp == 0) {
+
+                if (!results.containsKey(currTuple))
+                    results.put(currTuple, new ArrayList<>());
+
+                results.get(currTuple).add(i);
+            }
+            i++;
+        }
+        return results;
     }
 
-    public static Vector<Tuple> searchLessThan(Page page,String colName, String value) {
-        return new Vector<Tuple>();
+    private void collectAllInfo(String colName) {
+
+        ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
+        int i = 0;
+        for (String curCol[] : tableCol) {
+            if (curCol[3].toLowerCase().equals("true"))
+                PKColName = curCol[1];
+
+            if (curCol[1].equals(colName)) {
+                colNum = (i);
+
+                colType = (curCol[2]);
+
+                if (curCol[3].toLowerCase().equals("true"))
+                    isPK = (true);
+                if (!curCol[4].toLowerCase().equals("null"))
+                    hasIndex = (true);
+
+                if (hasIndex) {
+                    indexName = (curCol[4]);
+                    indexType = (curCol[5]);
+                }
+                break;
+            }
+
+            i++;
+        }
+    }
+    private boolean setColType(String colName) {
+        ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
+        for (String curCol[] : tableCol) {
+            if (curCol[1].equals(colName)) {
+                this.colType = (curCol[2]);
+                return true;
+            }
+        }
+        return false;
     }
 
-    public static Vector<Tuple> searchLessThanOrEqual(Page page,String colName, String value) {
-        return new Vector<Tuple>();
+    private int getComparisonResult(String colType, Object currValue, String value) {
+        return new Compare().compareTo(PKColType, currValue, value);
     }
 
-    public static Vector<Tuple> searchNotEqual(Page page,String colName, String value) {
-        return new Vector<Tuple>();
+    private boolean setPKColNameType() {
+        ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
+        for (String curCol[] : tableCol) {
+            if (curCol[3].toLowerCase().equals("true")) {
+
+                PKColName = curCol[1];
+                PKColType = curCol[2];
+                return true;
+            }
+
+//        Table table = deserializeTable(page.getTableName());
+//        PKColName = table.getPKColumn();
+        }
+        return false;
     }
 
-    private int getColNumber(Page page , String colName) {
-        return 0;
-    }
 
+    Object getValueOfColInTuple(Tuple currTuple, String colName) {
+        //search for the value of colName in the cells of the tuple
+        for (Cell currCellInTuple : currTuple.getCells())
+            if (currCellInTuple.getKey().equals(colName))
+                return currCellInTuple.getValue();
+        return null;
+    }
 }
