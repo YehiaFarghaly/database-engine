@@ -10,6 +10,10 @@ import exceptions.DBAppException;
 import search.TableSearch;
 
 public class Table implements Serializable {
+	public Vector<String> getPagesName() {
+		return pagesName;
+	}
+
 	private Vector<String> pagesName;
 	private String name, PKColumn;
 	private Tuple prototype;
@@ -201,33 +205,5 @@ public class Table implements Serializable {
 		return tuple;
 	}
 	
-	
 
-	public Vector<Tuple> search(String colName, String value) {
-		return TableSearch.search(this, colName, value);
-	}
-
-	public int search(Tuple t) {
-		return 0;
-	}
-
-	public Vector<Tuple> searchGreaterThan(String colName, String value) {
-		return TableSearch.searchGreaterThan(this, colName, value);
-	}
-
-	public Vector<Tuple> searchGreaterThanOrEqual(String colName, String value) {
-		return TableSearch.searchGreaterThanOrEqual(this, colName, value);
-	}
-
-	public Vector<Tuple> searchLessThan(String colName, String value) {
-		return TableSearch.searchLessThan(this, colName, value);
-	}
-
-	public Vector<Tuple> searchLessThanOrEqual(String colName, String value) {
-		return TableSearch.searchLessThanOrEqual(this, colName, value);
-	}
-
-	public Vector<Tuple> searchNotEqual(String colName, String value) {
-		return TableSearch.searchNotEqual(this, colName, value);
-	}
 }

@@ -93,7 +93,7 @@ public class Page implements Serializable {
 	public int binarySearch(String value) {
 		return new PageSearch(this).binarySearch(value);
 	}
-	public HashMap<Tuple, ArrayList<Integer>> linearSearch(String colName , String value) {
+	public HashMap<Tuple,Integer> linearSearch(String colName , String value) {
 		return new PageSearch(this).linearSearch(colName, value);
 	}
 

@@ -60,9 +60,9 @@ public class PageSearch {
         return -(high + 1); // or low
     }
 
-    public HashMap<Tuple, ArrayList<Integer>> linearSearch(String colName, String value) {
+    public HashMap<Tuple, Integer> linearSearch(String colName, String value) {
         setColType(colName);
-        HashMap<Tuple, ArrayList<Integer>> results = new HashMap<Tuple, ArrayList<Integer>>();
+        HashMap<Tuple, Integer> results = new HashMap<Tuple,Integer>();
         int i = 0;
         for (Tuple currTuple : page.getTuples()) {
 
@@ -70,13 +70,10 @@ public class PageSearch {
 
             int comp = getComparisonResult(colType, currValue, value);
 
-            if (comp == 0) {
+            if (comp == 0)
+                results.put(currTuple, i);
 
-                if (!results.containsKey(currTuple))
-                    results.put(currTuple, new ArrayList<>());
 
-                results.get(currTuple).add(i);
-            }
             i++;
         }
         return results;
