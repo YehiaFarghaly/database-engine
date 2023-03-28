@@ -93,7 +93,7 @@ public class Table implements Serializable {
 
 		} else {
 
-			int position = search(tuple);
+			int position = 0;//search(tuple);
 
 			Page page = getPageAtPosition(position);
 

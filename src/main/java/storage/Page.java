@@ -2,11 +2,13 @@ package storage;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
 import Serializerium.Serializer;
+import exceptions.DBAppException;
 import search.PageSearch;
 
 public class Page implements Serializable {
@@ -90,10 +92,10 @@ public class Page implements Serializable {
 	public boolean isFull() {
 		return size==maxRows;
 	}
-	public int binarySearch(String value) {
+	public int binarySearch(String value) throws DBAppException, ParseException {
 		return new PageSearch(this).binarySearch(value);
 	}
-	public HashMap<Tuple,Integer> linearSearch(String colName , String value) {
+	public HashMap<Tuple,Integer> linearSearch(String colName , String value) throws DBAppException, ParseException {
 		return new PageSearch(this).linearSearch(colName, value);
 	}
 

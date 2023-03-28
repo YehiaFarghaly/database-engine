@@ -1,57 +1,73 @@
 package search;
 
+import constants.Constants;
+import exceptions.DBAppException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static constants.Constants.*;
+
 public class Compare {
 
-    public Compare(){
+    public Compare() {
 
     }
-    Integer compareTo(String colType, Object cellValue , String value) {
 
-        switch (colType.toLowerCase()){
-            case "java.lang.integer": return intCompare(cellValue,value);
-            case "java.lang.string":return stringCompare(cellValue,value);
-            case "java.lang.double":return doubleCompare(cellValue,value);
-            case "java.util.date":return dateCompare(cellValue,value);
+    Integer compareValue(String colType, Object cellValue, String value) throws DBAppException, ParseException {
+
+        switch (colType) {
+            case INTEGER_DATA_TYPE_NAME:
+                return intCompare(cellValue, value);
+            case STRING_DATA_TYPE_NAME:
+                return stringCompare(cellValue, value);
+            case DOUBLE_DATA_TYPE_NAME:
+                return doubleCompare(cellValue, value);
+            case DATE_DATA_TYPE_NAME:
+                return dateCompare(cellValue, value);
         }
-
-        return null;
+        throw new DBAppException(colType + ": " + Constants.ERROR_MESSAGE_DATATYPE);
     }
 
-    private int dateCompare(Object cellValue, String value)  {
+    private int dateCompare(Object cellValue, String value) throws DBAppException, ParseException {
+        Date date1 = (Date) cellValue;
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.DATE_FORMATE);
+        Date date2 = null;
+        date2 = dateFormat.parse(value);
+        int comp = date1.compareTo(date2);
+        if (comp == 0) return EQUAL;
+        if (comp < 0) return LESS_THAN;
+        else return GREATER_THAN;
 
-        Date d1= (Date) cellValue;
-        SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
-        Date d2 = null;
-        try {
-            d2 = sdformat.parse(value);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-        return d1.compareTo(d2);
-        //0 equal
-        //+ d1> d2
-        //- d1 < d2
     }
+
 
     private int doubleCompare(Object cellValue, String value) {
+        Double double1 = (Double) cellValue;
+        Double double2 = Double.parseDouble(value);
+        int comp = double1.compareTo(double2);
+        if (comp == 0) return EQUAL;
+        if (comp < 0) return LESS_THAN;
+        else return GREATER_THAN;
 
-        Double d1 = (Double) cellValue;
-        Double d2 = Double.parseDouble(value);
-        return d1.compareTo(d2);
     }
 
     private int stringCompare(Object cellValue, String value) {
-        String d1 = (String) cellValue;
-        return d1.compareTo(value);
-    }
+        String string1 = (String) cellValue;
+        int comp = string1.compareTo(value);
+        if (comp == 0) return EQUAL;
+        if (comp < 0) return LESS_THAN;
+        else return GREATER_THAN;
 
+    }
     private int intCompare(Object cellValue, String value) {
-        Integer d1 = (Integer) cellValue;
-        Integer d2 = Integer.parseInt(value);
-        return d1.compareTo(d2);
+        Integer int1 = (Integer) cellValue;
+        Integer int2 = Integer.parseInt(value);
+        int comp = int1.compareTo(int2);
+        if (comp == 0) return EQUAL;
+        if (comp < 0) return LESS_THAN;
+        else return GREATER_THAN;
+
     }
 }

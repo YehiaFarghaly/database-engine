@@ -1,16 +1,15 @@
 package search;
 
-import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
+
+import static constants.Constants.*;
 import dataManipulation.csvReader;
+import exceptions.DBAppException;
 import storage.Cell;
 import storage.Page;
-import storage.Table;
 import storage.Tuple;
-
-import static Serializerium.Serializer.deserializeTable;
 
 public class PageSearch {
 
@@ -23,7 +22,6 @@ public class PageSearch {
     private String colName = null;
     private String colType = null;
     private int colNum = 0;
-
     private String PKColName = null;
     private String PKColType = null;
 
@@ -32,13 +30,13 @@ public class PageSearch {
         this.page = page;
     }
 
-    public int binarySearch(String value) {
+    public int binarySearch(String value) throws DBAppException, ParseException {
         //binary search in only done on PK column
         //returns
         // positive -> (index of wanted value )
         // negative -> (  -(index) where the element should be inserted )
-        int low = 0, high = page.getSize();
 
+        int low = 0, high = page.getSize() - 1;
         while (low <= high) {
 
             int mid = low + (high - low) / 2;
@@ -49,20 +47,20 @@ public class PageSearch {
 
             int comp = getComparisonResult(PKColType, PKValueOfCurrTuple, value);
 
-            if (comp == 0)
+            if (comp == EQUAL)
                 return mid;
-            else if (comp < 0) {
+            else if (comp == LESS_THAN)
                 low = mid + 1;
-            } else
+            else
                 high = mid - 1;
 
         }
         return -(high + 1); // or low
     }
 
-    public HashMap<Tuple, Integer> linearSearch(String colName, String value) {
+    public HashMap<Tuple, Integer> linearSearch(String colName, String value) throws DBAppException, ParseException {
         setColType(colName);
-        HashMap<Tuple, Integer> results = new HashMap<Tuple,Integer>();
+        HashMap<Tuple, Integer> results = new HashMap<Tuple, Integer>();
         int i = 0;
         for (Tuple currTuple : page.getTuples()) {
 
@@ -84,22 +82,20 @@ public class PageSearch {
         ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
         int i = 0;
         for (String curCol[] : tableCol) {
-            if (curCol[3].toLowerCase().equals("true"))
-                PKColName = curCol[1];
+            if (curCol[PRIMARY_KEY_INDEX].toLowerCase().equals("true"))
+                PKColName = curCol[COLUMN_NAME_INDEX];
 
-            if (curCol[1].equals(colName)) {
-                colNum = (i);
-
-                colType = (curCol[2]);
-
-                if (curCol[3].toLowerCase().equals("true"))
-                    isPK = (true);
-                if (!curCol[4].toLowerCase().equals("null"))
-                    hasIndex = (true);
+            if (curCol[COLUMN_NAME_INDEX].equals(colName)) {
+                colNum = i;
+                colType = curCol[COLUMN_TYPE_INDEX];
+                if (curCol[PRIMARY_KEY_INDEX].toLowerCase().equals("true"))
+                    isPK = true;
+                if (!curCol[INDEX_NAME_INDEX].toLowerCase().equals("null"))
+                    hasIndex = true;
 
                 if (hasIndex) {
-                    indexName = (curCol[4]);
-                    indexType = (curCol[5]);
+                    indexName = curCol[INDEX_NAME_INDEX];
+                    indexType = curCol[INDEX_TYPE_INDEX];
                 }
                 break;
             }
@@ -107,28 +103,29 @@ public class PageSearch {
             i++;
         }
     }
+
     private boolean setColType(String colName) {
         ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
         for (String curCol[] : tableCol) {
-            if (curCol[1].equals(colName)) {
-                this.colType = (curCol[2]);
+            if (curCol[COLUMN_NAME_INDEX].equals(colName)) {
+                this.colType = (curCol[COLUMN_TYPE_INDEX]);
                 return true;
             }
         }
         return false;
     }
 
-    private int getComparisonResult(String colType, Object currValue, String value) {
-        return new Compare().compareTo(PKColType, currValue, value);
+    private int getComparisonResult(String colType, Object currValue, String value) throws DBAppException, ParseException {
+        return new Compare().compareValue(colType, currValue, value);
     }
 
     private boolean setPKColNameType() {
         ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
         for (String curCol[] : tableCol) {
-            if (curCol[3].toLowerCase().equals("true")) {
+            if (curCol[PRIMARY_KEY_INDEX].toLowerCase().equals("true")) {
 
-                PKColName = curCol[1];
-                PKColType = curCol[2];
+                PKColName = curCol[COLUMN_NAME_INDEX];
+                PKColType = curCol[COLUMN_TYPE_INDEX];
                 return true;
             }
 
@@ -138,12 +135,14 @@ public class PageSearch {
         return false;
     }
 
-
     Object getValueOfColInTuple(Tuple currTuple, String colName) {
         //search for the value of colName in the cells of the tuple
+        Object ret = null;
         for (Cell currCellInTuple : currTuple.getCells())
-            if (currCellInTuple.getKey().equals(colName))
-                return currCellInTuple.getValue();
-        return null;
+            if (currCellInTuple.getKey().equals(colName)) {
+                ret = currCellInTuple.getValue();
+                break;
+            }
+        return ret;
     }
 }
