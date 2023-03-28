@@ -170,7 +170,7 @@ public class Table implements Serializable {
 		return position == pagesName.size() - 1;
 	}
 
-	private Page getPageAtPosition(int position) throws ClassNotFoundException, IOException {
+	public Page getPageAtPosition(int position) throws ClassNotFoundException, IOException {
 
 		String pageName = pagesName.get(position);
 		Page page = Serializer.deserializePage(pageName);
@@ -200,6 +200,8 @@ public class Table implements Serializable {
 
 		return tuple;
 	}
+	
+	
 
 	public Vector<Tuple> search(String colName, String value) {
 		return TableSearch.search(this, colName, value);
