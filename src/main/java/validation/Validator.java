@@ -71,7 +71,7 @@ public class Validator {
     public static boolean isTheSameDataTypeUpdate(Hashtable<String,Object> tuple,String [] columns,String [] dataTypes,String [] pk){
     	int pkIndex = findRowPK(columns,pk);
     	for(int i=0;i<columns.length&&i!=pkIndex;i++) {
-    			if(!tuple.get(columns[i]).getClass().equals(dataTypes[i]))	return false;
+    			if(!tuple.get(columns[i]).getClass().toString().endsWith(dataTypes[i]))	return false;
     	}
     	return true;
     }
