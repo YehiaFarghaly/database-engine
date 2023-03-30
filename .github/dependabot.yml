@@ -5,14 +5,10 @@
 
 version: 2
 updates:
-  - package-ecosystem: maven # See documentation for possible values
+  - package-ecosystem: "maven" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: daily
+      interval: "daily"
     open-pull-requests-limit: 10
-    ignore:
-      - dependency-name: org.apache.maven.plugins:maven-release-plugin
-        versions:
-          - "> 2.1"
     commit-message:
       prefix: dependency
