@@ -10,7 +10,7 @@ import storage.Page;
 import storage.Table;
 import constants.Constants;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.util.Hashtable;
@@ -72,15 +72,19 @@ public class DBAppTest {
 		assertThat(engine.getMyTables().containsKey(newTableName));
 	}
 	
+	private Hashtable<String,Object> createRow(int idInput, String nameInput, int ageInput){
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(id, idInput);
+		htblColNameValue.put(name, nameInput);
+		htblColNameValue.put(age, ageInput);
+		return htblColNameValue;
+	}
 
 	@Test
 	void testInsertIntoTable_ValidInput_ShouldInsertSuccessfully() throws ClassNotFoundException, IOException, CsvValidationException, DBAppException {
 		// Given 
-		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-		htblColNameValue.put(id, 1);
-		htblColNameValue.put(name, "Yehia");
-		htblColNameValue.put(age, 21);
-        
+		Hashtable<String, Object> htblColNameValue = createRow(1,"Yehia",21);
+		
 		// When
 		engine.insertIntoTable(newTableName, htblColNameValue);
 		
@@ -89,5 +93,23 @@ public class DBAppTest {
 		assertThat(table.getPagesName().size()==1);
 		Page page = table.getPageAtPosition(0);
 		assertThat(page.getSize()==1);
+	}
+	
+	@Test
+	void testInsertIntoTable_InvalidTuple_ShouldFailInsert() throws CsvValidationException, ClassNotFoundException, DBAppException, IOException {
+		// Given
+		Hashtable<String,Object> htblColNameValue = createRow(1,"Mohamed",21);
+		
+		// When
+		Exception exception = assertThrows(DBAppException.class,()->{
+		engine.insertIntoTable(newTableName, htblColNameValue);
+		}
+		);
+		
+		//Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+		
 	}
 }

@@ -54,14 +54,14 @@ public class DBApp implements IDatabase {
 
 		if (!validTable) {
 
-			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
+			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
 
 		} else {
 
 			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
 			
 			if (!validTuple) {
-				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
+				throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 
 			} else {
 
