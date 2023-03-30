@@ -37,6 +37,18 @@ public final class Constants {
      public static final int EQUAL = 0;
      public static final int LESS_THAN = -1;
      public static final int GREATER_THAN = 1;
+     
+     public static final String ID = "id";
+     public static final String NAME = "name";
+     public static final String AGE = "age";
+     
+     public static final String MIN_ID_VALUE="0";
+     public static final String MIN_AGE_VALUE="1";
+     public static final String MIN_NAME_VALUE="1";
+     
+     public static final String MAX_ID_VALUE="100000";
+     public static final String MAX_AGE_VALUE="100";
+     public static final String MAX_NAME_VALUE="20";
 
 
 }
