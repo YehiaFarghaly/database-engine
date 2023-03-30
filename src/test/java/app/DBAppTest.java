@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.util.Hashtable;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.assertj.core.api.Assertions.*;
@@ -37,7 +38,7 @@ public class DBAppTest {
 		}
 	}
 
-	@BeforeEach
+	@BeforeAll
 	void setEnvironment() throws IOException {
 		engine = new DBApp();
 		engine.init();
