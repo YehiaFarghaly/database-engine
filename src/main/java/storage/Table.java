@@ -13,7 +13,7 @@ public class Table implements Serializable {
 	public Vector<String> getPagesName() {
 		return pagesName;
 	}
-
+    private int cntPage;
 	private Vector<String> pagesName;
 	private String name, PKColumn;
 	private Tuple prototype;
@@ -23,7 +23,7 @@ public class Table implements Serializable {
 
 	public Table(String name, String PK, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
 			Hashtable<String, String> colNameMax) {
-
+        cntPage = 0;
 		this.name = name;
 		this.PKColumn = PK;
 		this.colNameType = colNameType;
@@ -167,6 +167,7 @@ public class Table implements Serializable {
 	private void insertNewPage(Tuple tuple) throws IOException {
 		Page page = new Page(name);
 		page.insertIntoPage(tuple);
+		page.setName((cntPage++)+"");
 		pagesName.add(page.getName());
 	}
 

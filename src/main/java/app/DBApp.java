@@ -145,7 +145,7 @@ public class DBApp implements IDatabase {
 	
 	public static Page getPageToUpdate(String strClusteringKeyValue,Table table,Tuple tuple) throws ClassNotFoundException, IOException {
 		tuple.setPrimaryKey(strClusteringKeyValue);
-		int pkPagePosition = table.search(tuple);
+		int pkPagePosition = 0; // table.search(tuple);
 		return table.getPageAtPosition(pkPagePosition);
 	}
 	public static Tuple getTupleToUpdate(Tuple tuple,Page page) {

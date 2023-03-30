@@ -79,7 +79,7 @@ public class Validator {
     public static boolean foundPK(Table table,String[] columns,String []pk,Hashtable<String,Object> tuple) {
     	int pkIndex = findRowPK(columns,pk);
     	Tuple t = table.createTuple(tuple);
-    	if(table.search(t)==-1) return false;
+//    	if(table.search(t)==-1) return false;
     	return true;
     }
     

@@ -22,8 +22,6 @@ public class Page implements Serializable {
 	public Page(String tableName) {
 		this.tuples = new Vector<>();
 		this.tableName=tableName;
-		// Name should not be defined here as minPK is still null.
-		name = minPK+""+tableName;
 	}
 
 	public Object getMinPK() {
