@@ -123,10 +123,6 @@ public class DBApp implements IDatabase {
 
 				Table table = Serializer.deserializeTable(strTableName);
 				table.DeleteTuples(htblColNameValue);
-				if (table.isEmptyTable())
-					table.deleteEmptyTable();
-				else
-					Serializer.SerializeTable(table);
 			}
 		}
 

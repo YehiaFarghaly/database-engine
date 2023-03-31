@@ -130,7 +130,7 @@ public class Table implements Serializable {
 			
 		}
 	}
-	public void iterateOverPageName(String colName,Object value) throws ClassNotFoundException, IOException, DBAppException, ParseException 
+	private void iterateOverPageName(String colName,Object value) throws ClassNotFoundException, IOException, DBAppException, ParseException 
 	{
 		for(String PageName : this.getPagesName())
 		{
@@ -139,7 +139,7 @@ public class Table implements Serializable {
 			deletePageRecords(ToBeDelete,page);
 		}
 	}
-	public void deletePageRecords(HashMap<Tuple, Integer> ToBeDelete, Page page) throws IOException
+	private void deletePageRecords(HashMap<Tuple, Integer> ToBeDelete, Page page) throws IOException
 	{
 		for(Tuple tuple : ToBeDelete.keySet())
 			page.DeleteFromPage(tuple);
@@ -151,7 +151,6 @@ public class Table implements Serializable {
 	public void deleteEmptyTable() {
 		File pagefile = new File(this.name);
 		pagefile.delete();
-		
 	}
 
 	private void handleFullPageInsertion(Page currentPage, int position, Tuple tuple)
