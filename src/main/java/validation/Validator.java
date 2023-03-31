@@ -71,7 +71,7 @@ public class Validator {
     public static boolean isTheSameDataTypeUpdate(Hashtable<String,Object> tuple,String [] columns,String [] dataTypes,String [] pk){
     	int pkIndex = findRowPK(columns,pk);
     	for(int i=0;i<columns.length&&i!=pkIndex;i++) {
-    			if(!tuple.get(columns[i]).getClass().equals(dataTypes[i]))	return false;
+    			if(!tuple.get(columns[i]).getClass().toString().endsWith(dataTypes[i]))	return false;
     	}
     	return true;
     }
@@ -79,18 +79,27 @@ public class Validator {
     public static boolean foundPK(Table table,String[] columns,String []pk,Hashtable<String,Object> tuple) {
     	int pkIndex = findRowPK(columns,pk);
     	Tuple t = table.createTuple(tuple);
-    	if(table.search(t)==-1) return false;
+//    	if(table.search(t)==-1) return false;
     	return true;
     }
     
     private static void getTableInfo(Table table) {
     	csvReader cr = new csvReader();
-    	String tablename = table.getName();
-    	ArrayList<String[]> tableInfo = cr.readTable(tablename);
-    	
-    	columns = tableInfo.get(0);
-    	dataTypes = tableInfo.get(1);
-    	pk = tableInfo.get(2);
+		String tablename = table.getName();
+		ArrayList<String[]> tableInfo = cr.readTable(tablename);
+
+		int size = tableInfo.size();
+
+		columns = new String[size];
+		dataTypes = new String[size];
+		pk = new String[size];
+
+		for (int i = 0; i < size; i++) {
+			columns[i] = tableInfo.get(i)[1];
+			dataTypes[i] = tableInfo.get(i)[2];
+			pk[i] = tableInfo.get(i)[3];
+		}
+
     }
     
     public static boolean validTuple(Table table,Hashtable<String,Object> tuple) throws CsvValidationException, IOException {
