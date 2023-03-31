@@ -1,6 +1,7 @@
 package app;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -103,7 +104,7 @@ public class DBApp implements IDatabase {
 	}
 
 	@Override
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
 		// TODO Auto-generated method stub
 		boolean validTable = Validator.validTable(strTableName, myTables);
 
@@ -122,7 +123,10 @@ public class DBApp implements IDatabase {
 
 				Table table = Serializer.deserializeTable(strTableName);
 				table.DeleteTuples(htblColNameValue);
-				Serializer.SerializeTable(table);
+				if (table.isEmptyTable())
+					table.deleteEmptyTable();
+				else
+					Serializer.SerializeTable(table);
 			}
 		}
 

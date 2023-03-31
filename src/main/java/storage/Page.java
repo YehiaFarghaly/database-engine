@@ -3,9 +3,12 @@ package storage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Vector;
 
 import Serializerium.Serializer;
+import exceptions.DBAppException;
 import search.PageSearch;
 
 public class Page implements Serializable {
@@ -126,5 +129,8 @@ public class Page implements Serializable {
 	}
 	public boolean isEmpty() {
 		return size==0;
+	}
+	public HashMap<Tuple, Integer> linearSearch(String colName, String value) throws DBAppException, ParseException {
+		return new PageSearch(this).linearSearch(colName, value);
 	}
 }

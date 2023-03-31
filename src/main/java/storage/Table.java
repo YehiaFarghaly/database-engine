@@ -3,6 +3,7 @@ package storage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map.Entry;
@@ -10,6 +11,7 @@ import java.util.Vector;
 
 import Serializerium.Serializer;
 import exceptions.DBAppException;
+import search.PageSearch;
 import search.TableSearch;
 
 public class Table implements Serializable {
@@ -118,36 +120,35 @@ public class Table implements Serializable {
 
 	}
 	
-	public void DeleteTuples(Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException
+	public void DeleteTuples(Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException, DBAppException, ParseException
 	{
-		HashMap<String ,HashMap<Tuple, Integer>> ToBeDelete = new HashMap<>();
-		for (String ColName : htblColNameValue.keySet()) {
-			
-			Object value = htblColNameValue.get(ColName);
-			ToBeDelete = linearSearch(ColName, value.toString());
-			
-			for(String PageName : ToBeDelete.keySet())
-			{
-				Page page = Serializer.deserializePage(PageName);
-				for(Tuple tuple : ToBeDelete.get(pagesName).keySet())
-				{
-					page.DeleteFromPage(tuple);
-				}
-				if(page.isEmpty())
-				{
-					deleteEmptyPage(page);
-				}
-			}			
-		}
-
-		if (isEmptyTable())
-		{
-			deleteEmptyTable();
-		}
 		
+		for (String colName : htblColNameValue.keySet()) {
+			
+			Object value = htblColNameValue.get(colName);
+			iterateOverPageName(colName,value);
+			
+		}
+	}
+	public void iterateOverPageName(String colName,Object value) throws ClassNotFoundException, IOException, DBAppException, ParseException 
+	{
+		for(String PageName : this.getPagesName())
+		{
+			Page page = Serializer.deserializePage(PageName);
+			HashMap<Tuple, Integer> ToBeDelete = page.linearSearch(colName, value.toString());
+			deletePageRecords(ToBeDelete,page);
+		}
+	}
+	public void deletePageRecords(HashMap<Tuple, Integer> ToBeDelete, Page page) throws IOException
+	{
+		for(Tuple tuple : ToBeDelete.keySet())
+			page.DeleteFromPage(tuple);
+
+		if(page.isEmpty())
+			deleteEmptyPage(page);
 	}
 
-	private void deleteEmptyTable() {
+	public void deleteEmptyTable() {
 		File pagefile = new File(this.name);
 		pagefile.delete();
 		
@@ -231,7 +232,7 @@ public class Table implements Serializable {
 
 	}
 
-	private boolean isEmptyTable() {
+	public boolean isEmptyTable() {
 		return pagesName.size() == 0;
 	}
 
@@ -259,7 +260,7 @@ public class Table implements Serializable {
 	public Vector<Tuple> search(String colName, String value) {
 		return TableSearch.search(this, colName, value);
 	}
-	public HashMap<String ,HashMap<Tuple, Integer>> linearSearch(String colName, String value) {
+	public HashMap<String ,HashMap<Tuple, Integer>> TablelinearSearch(String colName, String value) {
 		return TableSearch.linearSearch(this, colName, value);
 	}
 

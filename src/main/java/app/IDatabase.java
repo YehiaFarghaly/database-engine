@@ -1,6 +1,7 @@
 package app;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 import com.opencsv.exceptions.CsvValidationException;
@@ -24,7 +25,7 @@ public interface IDatabase {
 			Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, CsvValidationException, ClassNotFoundException;
 
 
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException ;
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException ;
 
 
 
