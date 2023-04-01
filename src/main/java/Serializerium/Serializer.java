@@ -18,51 +18,51 @@ public class Serializer {
 	static FileInputStream fileIn;
 	static ObjectInputStream in;
 
-	public static void SerializeTable(Table table) throws IOException {
-		out = getOutStream(table.getName());
-		out.writeObject(table);
+	public static void SerializeTable(Table tableObject) throws IOException {
+		out = getOutStream(tableObject.getName(), tableObject.getName());
+		out.writeObject(tableObject);
 		out.close();
 		fileOut.close();
 	}
 
 	public static Table deserializeTable(String TableName) throws IOException, ClassNotFoundException {
-		in = getInputStream(TableName);
+		in = getInputStream(TableName, TableName);
 		Table table = (Table) in.readObject();
 		in.close();
 		fileIn.close();
 		return table;
 	}
 
-	public static void SerializePage(String PageName, Page records) throws IOException {
-		out = getOutStream(PageName);
-		out.writeObject(records);
+	public static void SerializePage(String PageName, Page pageObject) throws IOException {
+		out = getOutStream(pageObject.getTableName(),PageName);
+		out.writeObject(pageObject);
 		out.close();
 		fileOut.close();
 	}
 
-	public static Page deserializePage(String PageName) throws IOException, ClassNotFoundException {
-		in = getInputStream(PageName);
+	public static Page deserializePage(String tableName,String PageName) throws IOException, ClassNotFoundException {
+		in = getInputStream(tableName, PageName);
 		Page records = (Page) in.readObject();
 		in.close();
 		fileIn.close();
 		return records;
 	}
 
-	public static ObjectOutputStream getOutStream(String name) throws IOException {
-		String path = getPath(name);
+	public static ObjectOutputStream getOutStream(String tableName,String targetName) throws IOException {
+		String path = getPath(tableName,targetName);
 		fileOut = new FileOutputStream(path);
 		out = new ObjectOutputStream(fileOut);
 		return out;
 	}
 
-	public static ObjectInputStream getInputStream(String name) throws IOException {
-		String path = getPath(name);
+	public static ObjectInputStream getInputStream(String tableName,String targetName) throws IOException {
+		String path = getPath(tableName,targetName);
 		fileIn = new FileInputStream(path);
 		in = new ObjectInputStream(fileIn);
 		return in;
 	}
 
-	public static String getPath(String name) {
-		return Constants.DATA_TABLE + name + Constants.DATA_EXTENSTION;
+	private static String getPath(String tableName,String targetName) {
+		return tableName+ "//" + targetName + Constants.DATA_EXTENSTION;
 	}
 }

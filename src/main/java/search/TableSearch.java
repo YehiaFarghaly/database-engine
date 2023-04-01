@@ -18,7 +18,7 @@ public class TableSearch {
         //hasMap <pageName,<Tuple,index>>
         HashMap<String, HashMap<Tuple, Integer>> results = new HashMap<>();
         for (String pageName : table.getPagesName()) {
-            Page currPage = deserializePage(pageName);
+            Page currPage = deserializePage(table.getName(), pageName);
             results.put(pageName, currPage.linearSearch(colName, value));
         }
         return results;
@@ -42,7 +42,7 @@ public class TableSearch {
 
             mid = low + (high - low) / 2;
 
-            Page currPage = deserializePage(table.getPagesName().get(mid));
+            Page currPage = deserializePage(table.getName(), table.getPagesName().get(mid));
 
             int compWithMax = getComparisonResult(PKColType, currPage.getMaxPK(), value);
 
@@ -71,7 +71,7 @@ public class TableSearch {
 
         int pageIndex = getPagePosition(table, value);
 
-        Page currPage = deserializePage(table.getPagesName().get(pageIndex));
+        Page currPage = deserializePage(table.getName(), table.getPagesName().get(pageIndex));
 
         int rowIdx = currPage.binarySearch(value);
 
