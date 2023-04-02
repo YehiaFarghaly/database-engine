@@ -13,6 +13,7 @@ import constants.Constants;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Hashtable;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -81,7 +82,7 @@ public class DBAppTest {
 	}
 
 	@Test
-	void testInsertIntoTable_ValidInput_ShouldInsertSuccessfully() throws ClassNotFoundException, IOException, CsvValidationException, DBAppException {
+	void testInsertIntoTable_ValidInput_ShouldInsertSuccessfully() throws ClassNotFoundException, IOException, CsvValidationException, DBAppException, ParseException {
 		// Given 
 		Hashtable<String, Object> htblColNameValue = createRow(1,"Yehia",21);
 		
