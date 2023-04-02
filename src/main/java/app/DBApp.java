@@ -1,6 +1,7 @@
 package app;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -24,6 +25,7 @@ public class DBApp implements IDatabase {
 	private Hashtable<String, Table> myTables;// contains table names and the corresponding table;
 	private csvReader reader;
 	private csvWriter writer;
+	private Object clusteringKey;
 
 	public DBApp() throws IOException {
 		this.myTables = new Hashtable<>();
@@ -48,8 +50,27 @@ public class DBApp implements IDatabase {
 
 	@Override
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
-		// TODO Auto-generated method stub
+			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
+		
+		takeAction(Action.INSERT,strTableName,htblColNameValue);
+
+	}
+
+	@Override
+	public void updateTable(String strTableName, String strClusteringKeyValue,
+			Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
+		this.clusteringKey=(Object)strClusteringKeyValue;
+		takeAction(Action.UPDATE,strTableName,htblColNameValue);
+	}
+
+	@Override
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
+		takeAction(Action.DELETE,strTableName,htblColNameValue);
+	}
+	
+	private void takeAction(Action action,String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
 		boolean validTable = Validator.validTable(strTableName, myTables);
 
 		if (!validTable) {
@@ -59,70 +80,19 @@ public class DBApp implements IDatabase {
 		} else {
 
 			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
-			
+
 			if (!validTuple) {
 				throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 
 			} else {
 
 				Table table = Serializer.deserializeTable(strTableName);
-				table.insertTuple(htblColNameValue);
+				
+				if(action==Action.INSERT) table.insertTuple(htblColNameValue);
+				else if(action==Action.DELETE) table.DeleteTuples(htblColNameValue);
+				else table.updateRecordsInTaple(clusteringKey,htblColNameValue);
 
 				Serializer.SerializeTable(table);
-			}
-		}
-
-	}
-
-	@Override
-	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
-		boolean validTable = Validator.validTable(strTableName,myTables);
-		
-		if (!validTable) {
-
-			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
-
-		} else {
-			boolean validTupleUpdate = Validator.validTupleUpdate(myTables.get(strTableName),htblColNameValue);
-			if (!validTupleUpdate) {
-				
-				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
-			}else {
-				
-				Table table = Serializer.deserializeTable(strTableName);
-				upadteTuple(table,strClusteringKeyValue,htblColNameValue);
-
-				Serializer.SerializeTable(table);
-
-			}
-
-		}
-			
-
-	}
-
-	@Override
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException {
-		// TODO I need to remove the duplicates in the following lines later
-		boolean validTable = Validator.validTable(strTableName, myTables);
-		if (!validTable) {
-
-			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
-
-		} else {
-
-			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
-
-			if (!validTuple) {
-
-				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
-
-			} else {
-
-				Table TargetTable = myTables.get(strTableName);
-
 			}
 		}
 	}
@@ -142,23 +112,10 @@ public class DBApp implements IDatabase {
 	public csvWriter getWriter() {
 		return writer;
 	}
-	
-	public static Page getPageToUpdate(String strClusteringKeyValue,Table table,Tuple tuple) throws ClassNotFoundException, IOException {
-		tuple.setPrimaryKey(strClusteringKeyValue);
-		int pkPagePosition = 0; // table.search(tuple);
-		return table.getPageAtPosition(pkPagePosition);
-	}
-	public static Tuple getTupleToUpdate(Tuple tuple,Page page) {
-		int pkVectorPoition = page.search(tuple);
-		return page.getTuples().get(pkVectorPoition);
 
-	}
-	public static void upadteTuple(Table table,String strClusteringKeyValue,Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException {
-		Tuple tuple = new Tuple(); 
-		Page page = getPageToUpdate(strClusteringKeyValue, table, tuple);
-		tuple = getTupleToUpdate(tuple, page);
-		for (Cell c : tuple.getCells()) {
-			c.setValue(htblColNameValue.get(c.getKey()));    
-		}
-	}
+
+
+	
+
+
 }

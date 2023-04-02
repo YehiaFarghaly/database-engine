@@ -1,6 +1,7 @@
 package app;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 import com.opencsv.exceptions.CsvValidationException;
@@ -18,12 +19,12 @@ public interface IDatabase {
 
 //	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException;
 
-	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, CsvValidationException, ClassNotFoundException;
+	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, CsvValidationException, ClassNotFoundException, ParseException;
 
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, CsvValidationException, ClassNotFoundException;
+			Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException;
 
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException;
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws  DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException;
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException;
 	

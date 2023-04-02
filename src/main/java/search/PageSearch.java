@@ -3,6 +3,7 @@ package search;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 import static constants.Constants.*;
 import dataManipulation.csvReader;
@@ -13,130 +14,58 @@ import storage.Tuple;
 
 public class PageSearch {
 
-    private Page page;
-    private boolean isPK = false;
-    private boolean hasIndex = false;
-    private String indexName = null;
-    private String indexType = null;
 
-    private String colName = null;
-    private String colType = null;
-    private int colNum = 0;
-    private String PKColName = null;
-    private String PKColType = null;
+    public static int binarySearch(Page page,Object primaryKey) throws DBAppException, ParseException {
 
-
-    public PageSearch(Page page) {
-        this.page = page;
-    }
-
-    public int binarySearch(String value) throws DBAppException, ParseException {
-        //binary search in only done on PK column
-        //returns
-        // positive -> (index of wanted value )
-        // negative -> (  -(index) where the element should be inserted )
-
-        int low = 0, high = page.getSize() - 1;
+        int low = 0;
+        int high = page.getSize() - 1;
+        
         while (low <= high) {
 
             int mid = low + (high - low) / 2;
 
             Tuple currTuple = page.getTuples().get(mid);
 
-            Object PKValueOfCurrTuple = getValueOfColInTuple(currTuple, this.PKColName);
+            Object PKValueOfCurrTuple = currTuple.getPrimaryKey();
 
-            int comp = getComparisonResult(PKColType, PKValueOfCurrTuple, value);
+            int comp = TableSearch.compare(primaryKey,PKValueOfCurrTuple);
 
-            if (comp == EQUAL)
+            if (comp == 0)
                 return mid;
-            else if (comp == LESS_THAN)
+            else if (comp < 0)
                 low = mid + 1;
             else
                 high = mid - 1;
 
         }
-        return -(high + 1); // or low
+        
+        return low; 
     }
+    
+    // TODO : linear search should only get positions of tuples should be deleted ( The return type should be Vector of Integers )
 
-    public HashMap<Tuple, Integer> linearSearch(String colName, String value) throws DBAppException, ParseException {
-        setColType(colName);
-        HashMap<Tuple, Integer> results = new HashMap<Tuple, Integer>();
-        int i = 0;
+    public static Vector<Tuple> linearSearch(Page page,String colName, Object value) throws DBAppException, ParseException {
+    	
+        Vector<Tuple> results = new Vector<Tuple>();
+        
+        
         for (Tuple currTuple : page.getTuples()) {
 
             Object currValue = getValueOfColInTuple(currTuple, colName);
 
-            int comp = getComparisonResult(colType, currValue, value);
+            int comp = TableSearch.compare(currValue, value);
 
             if (comp == 0)
-                results.put(currTuple, i);
+                results.add(currTuple);
 
-
-            i++;
         }
+        
         return results;
     }
 
-    private void collectAllInfo(String colName) {
 
-        ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
-        int i = 0;
-        for (String curCol[] : tableCol) {
-            if (curCol[PRIMARY_KEY_INDEX].toLowerCase().equals("true"))
-                PKColName = curCol[COLUMN_NAME_INDEX];
 
-            if (curCol[COLUMN_NAME_INDEX].equals(colName)) {
-                colNum = i;
-                colType = curCol[COLUMN_TYPE_INDEX];
-                if (curCol[PRIMARY_KEY_INDEX].toLowerCase().equals("true"))
-                    isPK = true;
-                if (!curCol[INDEX_NAME_INDEX].toLowerCase().equals("null"))
-                    hasIndex = true;
-
-                if (hasIndex) {
-                    indexName = curCol[INDEX_NAME_INDEX];
-                    indexType = curCol[INDEX_TYPE_INDEX];
-                }
-                break;
-            }
-
-            i++;
-        }
-    }
-
-    private boolean setColType(String colName) {
-        ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
-        for (String curCol[] : tableCol) {
-            if (curCol[COLUMN_NAME_INDEX].equals(colName)) {
-                this.colType = (curCol[COLUMN_TYPE_INDEX]);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private int getComparisonResult(String colType, Object currValue, String value) throws DBAppException, ParseException {
-        return new Compare().compareValue(colType, currValue, value);
-    }
-
-    private boolean setPKColNameType() {
-        ArrayList<String[]> tableCol = new csvReader().readTable(page.getTableName());
-        for (String curCol[] : tableCol) {
-            if (curCol[PRIMARY_KEY_INDEX].toLowerCase().equals("true")) {
-
-                PKColName = curCol[COLUMN_NAME_INDEX];
-                PKColType = curCol[COLUMN_TYPE_INDEX];
-                return true;
-            }
-
-//        Table table = deserializeTable(page.getTableName());
-//        PKColName = table.getPKColumn();
-        }
-        return false;
-    }
-
-    Object getValueOfColInTuple(Tuple currTuple, String colName) {
-        //search for the value of colName in the cells of the tuple
+    static Object getValueOfColInTuple(Tuple currTuple, String colName) {
         Object ret = null;
         for (Cell currCellInTuple : currTuple.getCells())
             if (currCellInTuple.getKey().equals(colName)) {

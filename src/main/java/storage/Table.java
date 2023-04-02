@@ -2,6 +2,8 @@ package storage;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -19,7 +21,6 @@ public class Table implements Serializable {
 	private Tuple prototype;
 	private Hashtable<String, String> colNameType, colNameMin, colNameMax;
 
-	// we still need to store Pages
 
 	public Table(String name, String PK, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
 			Hashtable<String, String> colNameMax) {
@@ -83,7 +84,7 @@ public class Table implements Serializable {
 	}
 
 	public void insertTuple(Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, ClassNotFoundException, IOException {
+			throws DBAppException, ClassNotFoundException, IOException, ParseException {
 
 		Tuple tuple = createTuple(htblColNameValue);
 
@@ -93,7 +94,7 @@ public class Table implements Serializable {
 
 		} else {
 
-			int position = 0;//search(tuple);
+			int position =  tableBinarySearch(tuple.getPrimaryKey());
 
 			Page page = getPageAtPosition(position);
 
@@ -112,7 +113,7 @@ public class Table implements Serializable {
 	}
 
 	private void handleFullPageInsertion(Page currentPage, int position, Tuple tuple)
-			throws ClassNotFoundException, IOException {
+			throws ClassNotFoundException, IOException, DBAppException, ParseException {
 
 		if (atLastPage(position)) {
 			newLastPage(currentPage, tuple);
@@ -157,14 +158,14 @@ public class Table implements Serializable {
 		return nextPage;
 	}
 
-	private void newLastPage(Page currentPage, Tuple tuple) throws IOException {
+	private void newLastPage(Page currentPage, Tuple tuple) throws IOException, DBAppException, ParseException {
 
 		currentPage.insertIntoPage(tuple);
 		Tuple lastTuple = currentPage.removeLastTuple();
 		insertNewPage(lastTuple);
 	}
 
-	private void insertNewPage(Tuple tuple) throws IOException {
+	private void insertNewPage(Tuple tuple) throws IOException, DBAppException, ParseException {
 		Page page = new Page(name);
 		page.insertIntoPage(tuple);
 		page.setName((cntPage++)+"");
@@ -200,11 +201,53 @@ public class Table implements Serializable {
 			}
 
 		}
-		
-		tuple.setPrimaryKey(htblColNameValue.get(PKColumn));
 
 		return tuple;
 	}
+	
+	public void DeleteTuples(Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException, DBAppException, ParseException
+	{
+
+		for (String colName : htblColNameValue.keySet()) {
+
+			Object value = htblColNameValue.get(colName);
+			iterateOverPageName(colName,value);
+
+		}
+	}
+	
+	private void iterateOverPageName(String colName,Object value) throws ClassNotFoundException, IOException, DBAppException, ParseException 
+	{
+		for(String PageName : this.getPagesName())
+		{
+			Page page = Serializer.deserializePage(PageName);
+			Vector<Tuple> toBeDeleted = page.linearSearch(colName, value);
+			deletePageRecords(toBeDeleted,page);
+		}
+	}
+	
+	private void deletePageRecords(Vector<Tuple> toBeDeleted, Page page) throws IOException, DBAppException, ParseException
+	{
+		for(Tuple tuple : toBeDeleted)
+			page.DeleteFromPage(tuple);
+	}
+	
+	public void updateRecordsInTaple(Object clusteringKeyValue,
+			Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException, DBAppException, ParseException {
+		Page page = getPageToUpdate(clusteringKeyValue);
+		page.updateTuple(clusteringKeyValue, htblColNameValue);
+	}
+	
+	private  Page getPageToUpdate(Object clusteringKeyValue)
+			throws ClassNotFoundException, IOException, DBAppException, ParseException {
+		int pkPagePosition =  tableBinarySearch(clusteringKeyValue);
+		return getPageAtPosition(pkPagePosition);
+	}
+	
+	private int tableBinarySearch(Object primaryKey) throws ClassNotFoundException, DBAppException, ParseException, IOException {
+		return TableSearch.binarySearchPages(this,primaryKey);
+	}
+
 	
 
 }
