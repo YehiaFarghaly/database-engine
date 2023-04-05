@@ -61,7 +61,6 @@ public class Compare {
         else return GREATER_THAN;
 
     }
-    
     private int intCompare(Object cellValue, String value) {
         Integer int1 = (Integer) cellValue;
         Integer int2 = Integer.parseInt(value);

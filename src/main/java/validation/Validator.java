@@ -140,7 +140,13 @@ public class Validator {
     
     public static boolean checkMinMax(Hashtable<String,Object> tuple) {
     	for(int i=0;i<columns.length;i++) {
-    		if((((Comparable)tuple.get(columns[i])).compareTo((Comparable)(min[i]))<0)||(((Comparable)tuple.get(columns[i])).compareTo((Comparable)(max[i]))>0)) {
+    		
+    		Comparable insertedValue = (Comparable)tuple.get(columns[i]);
+    		Comparable minValue = (Comparable)(min[i]);
+    		Comparable maxValue = (Comparable)(max[i]);
+    		
+    		if(((insertedValue).compareTo(minValue)<0)  ||
+    			((insertedValue).compareTo(maxValue)>0)) {
     			return false;
     		}
     	}
