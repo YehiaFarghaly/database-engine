@@ -4,6 +4,8 @@ public final class Constants {
      public static final String ERROR_MESSAGE_TABLE_NAME = "Invalid table name, please enter a correct one";
 
      public static final String ERROR_MESSAGE_TUPLE_DATA = "Can't insert this tuple, please insert a valid data";
+     
+     public static final String ERROR_MESSAGE_SEARCH_NOT_FOUND = "Tuple is not found in the table";
 
      public static final  String ERROR_BINARY_SEARCH_ON_EMPTY_TABLE = "Can not apply binary search on empty Table";
 

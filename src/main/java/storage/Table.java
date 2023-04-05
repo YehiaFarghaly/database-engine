@@ -221,7 +221,7 @@ public class Table implements Serializable {
 	{
 		for(String PageName : this.getPagesName())
 		{
-			Page page = Serializer.deserializePage(PageName);
+			Page page = Serializer.deserializePage(name,PageName);
 			Vector<Tuple> toBeDeleted = page.linearSearch(colName, value);
 			deletePageRecords(toBeDeleted,page);
 		}
