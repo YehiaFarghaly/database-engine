@@ -171,6 +171,7 @@ public class Table implements Serializable {
 		Page page = new Page(name);
 		page.insertIntoPage(tuple);
 		page.setName((cntPage++)+"");
+		page.createPageFile();
 		pagesName.add(page.getName());
 	}
 
