@@ -145,12 +145,20 @@ public class Validator {
     		Comparable minValue = (Comparable)(min[i]);
     		Comparable maxValue = (Comparable)(max[i]);
     		
-    		if(((insertedValue).compareTo(minValue)<0)  ||
-    			((insertedValue).compareTo(maxValue)>0)) {
+    		if((isFirstLessThanSecond(insertedValue, minValue))  ||
+    			(isFirstGreaterThanSecond(insertedValue,maxValue))) {
     			return false;
     		}
     	}
     	return true;
+    }
+    
+    private static boolean isFirstLessThanSecond(Comparable comp1, Comparable comp2) {
+    	return (comp1).compareTo(comp2)<0;
+    }
+    
+    private static boolean isFirstGreaterThanSecond(Comparable comp1, Comparable comp2) {
+    	return(comp1).compareTo(comp2)>0;
     }
 
 }
