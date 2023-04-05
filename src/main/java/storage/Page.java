@@ -3,6 +3,7 @@ package storage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -53,15 +54,15 @@ public class Page implements Serializable {
 	public String getTableName() {
 		return tableName;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public Tuple removeLastTuple() {
 		return tuples.remove(tuples.size()-1);
 	}
@@ -120,7 +121,7 @@ public class Page implements Serializable {
 	public int pageBinarySearch(Object primaryKey) throws DBAppException, ParseException {
 		return PageSearch.binarySearch(this,primaryKey);
 	}
-	
+
 
 	public boolean isFull() {
 		return size==maxRows;
@@ -130,5 +131,25 @@ public class Page implements Serializable {
 		return PageSearch.linearSearch(this, colName, value);
 	}
 
+
+	public void createPageFile() throws IOException {
+
+		File createFile = new File(getAbsPath()+"//"+this.getName()+ Constants.DATA_EXTENSTION);
+		createFile.createNewFile();
+	}
+
+	public void deletePageFile() {
+		File folder = new File(getAbsPath());
+		if (folder.isDirectory()) {
+			File[] files = folder.listFiles();
+			if (files != null)
+				for (File file : files)
+					if(file.getName().equals(getName()+Constants.DATA_EXTENSTION))
+						file.delete();
+
+		}
+	}
+
+	public String getAbsPath(){return Paths.get("").toAbsolutePath().toString() + "//" + getTableName();}
 
 }

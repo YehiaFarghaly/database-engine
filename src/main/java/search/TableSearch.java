@@ -26,7 +26,7 @@ public class TableSearch {
 
 			int mid = low + (high - low) / 2;
 
-			currPage = deserializePage(table.getPagesName().get(mid));
+            Page currPage = deserializePage(table.getName(), table.getPagesName().get(mid));
 
 			int compareWithMin = compare(tuplePrimaryKey, currPage.getMinPK());
 

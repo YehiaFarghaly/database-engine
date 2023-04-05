@@ -1,15 +1,19 @@
 package storage;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Vector;
 
 import Serializerium.Serializer;
+import constants.Constants;
 import exceptions.DBAppException;
 import search.TableSearch;
+
 
 public class Table implements Serializable {
 	public Vector<String> getPagesName() {
@@ -23,7 +27,7 @@ public class Table implements Serializable {
 
 
 	public Table(String name, String PK, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
-			Hashtable<String, String> colNameMax) {
+				 Hashtable<String, String> colNameMax) {
         cntPage = 0;
 		this.name = name;
 		this.PKColumn = PK;
@@ -101,9 +105,7 @@ public class Table implements Serializable {
 			if (page.isFull()) {
 
 				handleFullPageInsertion(page, position, tuple);
-			}
-
-			else {
+			} else {
 
 				page.insertIntoPage(tuple);
 			}
@@ -179,9 +181,8 @@ public class Table implements Serializable {
 	public Page getPageAtPosition(int position) throws ClassNotFoundException, IOException {
 
 		String pageName = pagesName.get(position);
-		Page page = Serializer.deserializePage(pageName);
+		Page page = Serializer.deserializePage(this.getName(),pageName);
 		return page;
-
 	}
 
 	private boolean isEmptyTable() {
@@ -195,7 +196,7 @@ public class Table implements Serializable {
 		for (Cell c : tuple.getCells()) {
 
 			c.setValue(htblColNameValue.get(c.getKey()));
-			
+
 			if(c.getKey().equals(getPKColumn())) {
 				tuple.setPrimaryKey(c.getValue());
 			}
@@ -248,6 +249,25 @@ public class Table implements Serializable {
 		return TableSearch.binarySearchPages(this,primaryKey);
 	}
 
-	
+
+	public void createTableFiles() throws IOException {
+		File createFolder = new File(this.getName());
+		createFolder.mkdir();
+		File createFile = new File(this.getName()+"//"+this.getName()+ Constants.DATA_EXTENSTION);
+		createFile.createNewFile();
+	}
+
+	public void deleteTableFile() {
+		File folder = new File(getAbsPath());
+		if (folder.isDirectory()) {
+			File[] files = folder.listFiles();
+			if (files != null)
+				for (File file : files)
+					file.delete();
+			folder.delete();
+		}
+	}
+
+	public String getAbsPath(){return Paths.get("").toAbsolutePath().toString() + "//" + getName();}
 
 }
