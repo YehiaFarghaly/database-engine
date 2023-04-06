@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
+import datamanipulation.CsvReader;
+
 import static constants.Constants.*;
-import dataManipulation.csvReader;
+
 import exceptions.DBAppException;
 import storage.Cell;
 import storage.Page;
@@ -28,7 +30,7 @@ public class PageSearch {
 
             Object PKValueOfCurrTuple = currTuple.getPrimaryKey();
 
-            int comp = TableSearch.compare(primaryKey,PKValueOfCurrTuple);
+            int comp = Compare.compare(primaryKey,PKValueOfCurrTuple);
 
             if (comp == 0)
                 return mid;
@@ -53,7 +55,7 @@ public class PageSearch {
 
             Object currValue = getValueOfColInTuple(currTuple, colName);
 
-            int comp = TableSearch.compare(currValue, value);
+            int comp = Compare.compare(currValue, value);
 
             if (comp == 0)
                 results.add(currTuple);

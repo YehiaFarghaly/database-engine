@@ -1,4 +1,4 @@
-package Serializerium;
+package filecontroller;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

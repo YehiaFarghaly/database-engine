@@ -10,8 +10,8 @@ import storage.Page;
 import storage.Table;
 import storage.Tuple;
 
-import static Serializerium.Serializer.deserializePage;
 import static constants.Constants.*;
+import static filecontroller.Serializer.deserializePage;
 
 public class TableSearch {
 	private static Page currPage;
@@ -28,9 +28,9 @@ public class TableSearch {
 
             Page currPage = deserializePage(table.getName(), table.getPagesName().get(mid));
 
-			int compareWithMin = compare(tuplePrimaryKey, currPage.getMinPK());
+			int compareWithMin = Compare.compare(tuplePrimaryKey, currPage.getMinPK());
 
-			int compWithMax = compare(tuplePrimaryKey, currPage.getMaxPK());
+			int compWithMax = Compare.compare(tuplePrimaryKey, currPage.getMaxPK());
 
 			if (compWithMax <= 0 && compareWithMin >= 0) {
 				return mid;
@@ -43,8 +43,6 @@ public class TableSearch {
 		return Math.min(low, n - 1);
 	}
 
-	static int compare(Object tuplePrimaryKey, Object pagePrimaryKey) {
-		return ((Comparable) tuplePrimaryKey).compareTo((Comparable) pagePrimaryKey);
-	}
+	
 
 }

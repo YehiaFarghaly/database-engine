@@ -1,4 +1,4 @@
-package dataManipulation;
+package datamanipulation;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -12,11 +12,11 @@ import com.opencsv.exceptions.CsvValidationException;
 import constants.Constants;
 import storage.Table;
 
-public class csvReader {
+public class CsvReader {
 
 	CSVReader reader;
 
-	public csvReader() {
+	public CsvReader() {
 		try {
 			this.reader = new CSVReader(new FileReader(Constants.METADATA_PATH));
 		} catch (FileNotFoundException e) {

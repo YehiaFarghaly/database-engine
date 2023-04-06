@@ -9,14 +9,17 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import Serializerium.Serializer;
 import constants.Constants;
 import exceptions.DBAppException;
+import filecontroller.FileCreator;
+import filecontroller.FileDeleter;
+import filecontroller.FileType;
+import filecontroller.Serializer;
 import search.PageSearch;
 
 public class Page implements Serializable {
-    private String name;
-    private int maxRows;
+	private String name;
+	private int maxRows;
 	private Vector<Tuple> tuples;
 	private Object minPK, maxPK;
 	private int size;
@@ -24,7 +27,7 @@ public class Page implements Serializable {
 
 	public Page(String tableName) {
 		this.tuples = new Vector<>();
-		this.tableName=tableName;
+		this.tableName = tableName;
 	}
 
 	public Object getMinPK() {
@@ -63,93 +66,74 @@ public class Page implements Serializable {
 		this.name = name;
 	}
 
-	public Tuple removeLastTuple() {
-		return tuples.remove(tuples.size()-1);
-	}
-
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
-	
-	public void insertIntoPage(Tuple tuple) throws IOException, DBAppException, ParseException {
-		int position = pageBinarySearch(tuple.getPrimaryKey());
-		  tuples.add(position, tuple);
-		  size++;
-		  Serializer.SerializePage(name, this);
-		  newMinMax();
+
+	public boolean isFull() {
+		return size == maxRows;
 	}
-	
-	public void DeleteFromPage(Tuple tuple) throws IOException, DBAppException, ParseException {
+
+	protected Tuple removeLastTuple() {
+		return tuples.remove(tuples.size() - 1);
+	}
+
+	protected void insertIntoPage(Tuple tuple) throws IOException, DBAppException, ParseException {
 		int position = pageBinarySearch(tuple.getPrimaryKey());
-		if(position!=-1) {
-		  tuples.remove(position);
-		  size--;
-		  Serializer.SerializePage(name, this);
-		  newMinMax();
-		  handleEmptyPage();
-		}
-		else {
+		tuples.add(position, tuple);
+		size++;
+		Serializer.SerializePage(name, this);
+		newMinMax();
+	}
+
+	private void newMinMax() {
+		minPK = tuples.get(0).getPrimaryKey();
+		maxPK = tuples.get(tuples.size() - 1).getPrimaryKey();
+	}
+
+	private int pageBinarySearch(Object primaryKey) throws DBAppException, ParseException {
+		return PageSearch.binarySearch(this, primaryKey);
+	}
+
+	protected Vector<Tuple> linearSearch(String colName, Object value) throws DBAppException, ParseException {
+		return PageSearch.linearSearch(this, colName, value);
+	}
+
+	protected void DeleteFromPage(Tuple tuple) throws IOException, DBAppException, ParseException {
+		int position = pageBinarySearch(tuple.getPrimaryKey());
+		if (position != -1) {
+			tuples.remove(position);
+			size--;
+			newMinMax();
+			Serializer.SerializePage(name, this);
+			handleEmptyPage();
+		} else {
 			throw new DBAppException(Constants.ERROR_MESSAGE_SEARCH_NOT_FOUND);
 		}
 	}
-	
-	public  void updateTuple(Object clusteringKeyValue,Hashtable<String, Object> htblColNameValue) throws DBAppException, ParseException {
+
+	private void handleEmptyPage() throws IOException {
+		if (tuples.isEmpty())
+			deletePageFile();
+	}
+
+	private void deletePageFile() {
+		FileDeleter.deleteFile(this,FileType.PAGE);
+	}
+
+	protected void createPageFile() throws IOException {
+
+		FileCreator.createFile(this, FileType.PAGE);
+	}
+
+	protected void updateTuple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, ParseException {
 		int pkVectorPoition = pageBinarySearch(clusteringKeyValue);
-		Tuple tuple=tuples.get(pkVectorPoition);
-		
+		Tuple tuple = tuples.get(pkVectorPoition);
+
 		for (Cell c : tuple.getCells()) {
 			c.setValue(htblColNameValue.get(c.getKey()));
 		}
 
 	}
-	
-	private void handleEmptyPage() throws IOException {
-		if(tuples.isEmpty()) DeleteEmptyPage();
-	}
-	
-	public void DeleteEmptyPage() throws IOException {
-		 File pagefile = new File(this.name);
-		 pagefile.delete();
-	}
-	
-	public void newMinMax() {
-		minPK = tuples.get(0).getPrimaryKey();
-		maxPK = tuples.get(tuples.size()-1).getPrimaryKey();
-	}
-
-	
-	public int pageBinarySearch(Object primaryKey) throws DBAppException, ParseException {
-		return PageSearch.binarySearch(this,primaryKey);
-	}
-
-
-	public boolean isFull() {
-		return size==maxRows;
-	}
-	
-	public Vector<Tuple> linearSearch(String colName , Object value) throws DBAppException, ParseException {
-		return PageSearch.linearSearch(this, colName, value);
-	}
-
-
-	public void createPageFile() throws IOException {
-
-		File createFile = new File(getAbsPath()+"//"+this.getName()+ Constants.DATA_EXTENSTION);
-		createFile.createNewFile();
-	}
-
-	public void deletePageFile() {
-		File folder = new File(getAbsPath());
-		if (folder.isDirectory()) {
-			File[] files = folder.listFiles();
-			if (files != null)
-				for (File file : files)
-					if(file.getName().equals(getName()+Constants.DATA_EXTENSTION))
-						file.delete();
-
-		}
-	}
-
-	public String getAbsPath(){return Paths.get("").toAbsolutePath().toString() + "//" + getTableName();}
-
 }

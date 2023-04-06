@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import com.opencsv.exceptions.CsvValidationException;
 
-import Serializerium.Serializer;
 import exceptions.DBAppException;
+import filecontroller.Serializer;
 import storage.Page;
 import storage.Table;
 import constants.Constants;
@@ -55,7 +55,7 @@ public class DBAppTest {
 	}
 
 	@Test
-	void testCreateTable_ValidTableName_ShouldBeCreatedSuccessfully() throws DBAppException {
+	void testCreateTable_ValidTableName_ShouldBeCreatedSuccessfully() throws DBAppException, IOException {
 		// Given
 		Hashtable<String, String> htblColNameType = createHashtable(Constants.INTEGER_DATA_TYPE_NAME,
 				Constants.STRING_DATA_TYPE_NAME, Constants.INTEGER_DATA_TYPE_NAME);

@@ -1,14 +1,14 @@
 package validation;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
 import com.opencsv.exceptions.CsvValidationException;
-
-import app.DBApp;
-import dataManipulation.csvReader;
-import search.TableSearch;
+import datamanipulation.CsvReader;
+import exceptions.DBAppException;
+import search.Compare;
 import sql.SQLTerm;
 import storage.Table;
 import storage.Tuple;
@@ -78,15 +78,15 @@ public class Validator {
     	return true;
     }
     
-    public static boolean foundPK(Table table,Hashtable<String,Object> tuple) {
+    public static boolean foundPK(Table table,Hashtable<String,Object> tuple) throws ClassNotFoundException, DBAppException, ParseException, IOException {
     	int pkIndex = findRowPK();
     	Tuple t = table.createTuple(tuple);
-//    	if(table.search(t)==-1) return false;
+    	if(table.tableBinarySearch(t.getPrimaryKey())==-1) return false;
     	return true;
     }
     
     private static void getTableInfo(Table table) {
-    	csvReader cr = new csvReader();
+    	CsvReader cr = new CsvReader();
 		String tablename = table.getName();
 		ArrayList<String[]> tableInfo = cr.readTable(tablename);
 		int size = tableInfo.size();
@@ -103,7 +103,7 @@ public class Validator {
 
     }
     
-    public static boolean validTuple(Table table,Hashtable<String,Object> tuple) throws CsvValidationException, IOException {
+    public static boolean validTuple(Table table,Hashtable<String,Object> tuple) throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
     	getTableInfo(table);
     	if( !isTheSameNumberOfColumns(tuple) ||
     		!containsAllColumns(tuple)       ||
@@ -127,7 +127,7 @@ public class Validator {
     	return true;
     }
     
-    public static boolean validTupleUpdate(Table table,Hashtable<String,Object> tuple) throws CsvValidationException, IOException {
+    public static boolean validTupleUpdate(Table table,Hashtable<String,Object> tuple) throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
     	getTableInfo(table);
     	if( !isTheSameDataTypeUpdate(tuple) ||!foundPK(table,tuple)||!checkMinMax(tuple)) {
     		return false;
@@ -141,9 +141,9 @@ public class Validator {
     public static boolean checkMinMax(Hashtable<String,Object> tuple) {
     	for(int i=0;i<columns.length;i++) {
     		
-    		Comparable insertedValue = (Comparable)tuple.get(columns[i]);
-    		Comparable minValue = (Comparable)(min[i]);
-    		Comparable maxValue = (Comparable)(max[i]);
+    		Object insertedValue = tuple.get(columns[i]);
+    		Object minValue = min[i];
+    		Object maxValue = max[i];
     		
     		if((isFirstLessThanSecond(insertedValue, minValue))  ||
     			(isFirstGreaterThanSecond(insertedValue,maxValue))) {
@@ -153,12 +153,12 @@ public class Validator {
     	return true;
     }
     
-    private static boolean isFirstLessThanSecond(Comparable comp1, Comparable comp2) {
-    	return (comp1).compareTo(comp2)<0;
+    private static boolean isFirstLessThanSecond(Object comp1, Object comp2) {
+    	return Compare.compare(comp1, comp2)<0;
     }
     
-    private static boolean isFirstGreaterThanSecond(Comparable comp1, Comparable comp2) {
-    	return(comp1).compareTo(comp2)>0;
+    private static boolean isFirstGreaterThanSecond(Object comp1, Object comp2) {
+    	return Compare.compare(comp1, comp2)>0;
     }
 
 }

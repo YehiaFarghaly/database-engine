@@ -1,34 +1,28 @@
 package storage;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import Serializerium.Serializer;
-import constants.Constants;
 import exceptions.DBAppException;
+import filecontroller.FileCreator;
+import filecontroller.FileDeleter;
+import filecontroller.FileType;
+import filecontroller.Serializer;
 import search.TableSearch;
 
-
 public class Table implements Serializable {
-	public Vector<String> getPagesName() {
-		return pagesName;
-	}
-    private int cntPage;
+	
+	private int cntPage;
 	private Vector<String> pagesName;
 	private String name, PKColumn;
 	private Tuple prototype;
 	private Hashtable<String, String> colNameType, colNameMin, colNameMax;
 
-
 	public Table(String name, String PK, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
-				 Hashtable<String, String> colNameMax) {
-        cntPage = 0;
+			Hashtable<String, String> colNameMax) {
+		cntPage = 0;
 		this.name = name;
 		this.PKColumn = PK;
 		this.colNameType = colNameType;
@@ -36,15 +30,6 @@ public class Table implements Serializable {
 		this.colNameMax = colNameMax;
 		pagesName = new Vector<String>();
 
-	}
-
-	public Tuple getPrototype() {
-		if (this.prototype == null) {
-			TupleDirector tupDir = new TupleDirector(new TupleBuilder());
-			tupDir.makeTuple(getColNameType());
-			this.prototype = tupDir.getTuple();
-		}
-		return this.prototype.getCopy();
 	}
 
 	public String getName() {
@@ -86,34 +71,70 @@ public class Table implements Serializable {
 	public void setColNameMax(Hashtable<String, String> colNameMax) {
 		this.colNameMax = colNameMax;
 	}
+	
+	public boolean isEmpty() {
+		return pagesName.size() == 0;
+	}
+	
+	public Vector<String> getPagesName() {
+		return pagesName;
+	}
 
 	public void insertTuple(Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, ClassNotFoundException, IOException, ParseException {
 
 		Tuple tuple = createTuple(htblColNameValue);
-
-		if (isEmptyTable()) {
-
+		if (isEmpty()) {
 			insertNewPage(tuple);
-
 		} else {
-
-			int position =  tableBinarySearch(tuple.getPrimaryKey());
-
+			int position = tableBinarySearch(tuple.getPrimaryKey());
 			Page page = getPageAtPosition(position);
-
 			if (page.isFull()) {
-
 				handleFullPageInsertion(page, position, tuple);
 			} else {
-
 				page.insertIntoPage(tuple);
+			}
+		}
+	}
+	
+	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
+
+		Tuple tuple = getPrototype();
+
+		for (Cell c : tuple.getCells()) {
+
+			c.setValue(htblColNameValue.get(c.getKey()));
+
+			if (c.getKey().equals(getPKColumn())) {
+				tuple.setPrimaryKey(c.getValue());
 			}
 
 		}
 
+		return tuple;
+	}
+	
+	private Tuple getPrototype() {
+		if (this.prototype == null) {
+			TupleDirector tupDir = new TupleDirector(new TupleBuilder());
+			tupDir.makeTuple(getColNameType());
+			this.prototype = tupDir.getTuple();
+		}
+		return this.prototype.getCopy();
 	}
 
+	public Page getPageAtPosition(int position) throws ClassNotFoundException, IOException {
+
+		String pageName = pagesName.get(position);
+		Page page = Serializer.deserializePage(this.getName(), pageName);
+		return page;
+	}
+	
+	public int tableBinarySearch(Object primaryKey)
+			throws ClassNotFoundException, DBAppException, ParseException, IOException {
+		return TableSearch.binarySearchPages(this, primaryKey);
+	}
+	
 	private void handleFullPageInsertion(Page currentPage, int position, Tuple tuple)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
 
@@ -121,24 +142,17 @@ public class Table implements Serializable {
 			newLastPage(currentPage, tuple);
 		} else {
 			Page nextAvailablePage = getNextAvailablePage(position, currentPage, tuple);
-
 			Page nextPage = getPageAtPosition(++position);
 			currentPage.insertIntoPage(tuple);
 			Tuple lastTuple = currentPage.removeLastTuple();
-
 			while (!arePagesEqual(nextPage, nextAvailablePage)) {
-
 				currentPage = nextPage;
 				nextPage = getPageAtPosition(++position);
 				currentPage.insertIntoPage(lastTuple);
 				lastTuple = currentPage.removeLastTuple();
-
 			}
-
 			nextAvailablePage.insertIntoPage(lastTuple);
-
 		}
-
 	}
 
 	private boolean arePagesEqual(Page page1, Page page2) {
@@ -170,8 +184,8 @@ public class Table implements Serializable {
 	private void insertNewPage(Tuple tuple) throws IOException, DBAppException, ParseException {
 		Page page = new Page(name);
 		page.insertIntoPage(tuple);
-		page.setName((cntPage++)+"");
-		page.createPageFile();
+		page.setName((cntPage++) + "");
+		FileCreator.createFile(page, FileType.PAGE);
 		pagesName.add(page.getName());
 	}
 
@@ -179,96 +193,50 @@ public class Table implements Serializable {
 		return position == pagesName.size() - 1;
 	}
 
-	public Page getPageAtPosition(int position) throws ClassNotFoundException, IOException {
-
-		String pageName = pagesName.get(position);
-		Page page = Serializer.deserializePage(this.getName(),pageName);
-		return page;
-	}
-
-	private boolean isEmptyTable() {
-		return pagesName.size() == 0;
-	}
-
-	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
-
-		Tuple tuple = getPrototype();
-
-		for (Cell c : tuple.getCells()) {
-
-			c.setValue(htblColNameValue.get(c.getKey()));
-
-			if(c.getKey().equals(getPKColumn())) {
-				tuple.setPrimaryKey(c.getValue());
-			}
-
-		}
-
-		return tuple;
-	}
-	
-	public void DeleteTuples(Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException, DBAppException, ParseException
-	{
+	public void DeleteTuples(Hashtable<String, Object> htblColNameValue)
+			throws ClassNotFoundException, IOException, DBAppException, ParseException {
 
 		for (String colName : htblColNameValue.keySet()) {
 
 			Object value = htblColNameValue.get(colName);
-			iterateOverPageName(colName,value);
+			iterateOverPageName(colName, value);
 
 		}
 	}
-	
-	private void iterateOverPageName(String colName,Object value) throws ClassNotFoundException, IOException, DBAppException, ParseException 
-	{
-		for(String PageName : this.getPagesName())
-		{
-			Page page = Serializer.deserializePage(name,PageName);
+
+	private void iterateOverPageName(String colName, Object value)
+			throws ClassNotFoundException, IOException, DBAppException, ParseException {
+		for (String PageName : this.getPagesName()) {
+			Page page = Serializer.deserializePage(name, PageName);
 			Vector<Tuple> toBeDeleted = page.linearSearch(colName, value);
-			deletePageRecords(toBeDeleted,page);
+			deletePageRecords(toBeDeleted, page);
 		}
 	}
-	
-	private void deletePageRecords(Vector<Tuple> toBeDeleted, Page page) throws IOException, DBAppException, ParseException
-	{
-		for(Tuple tuple : toBeDeleted)
+
+	private void deletePageRecords(Vector<Tuple> toBeDeleted, Page page)
+			throws IOException, DBAppException, ParseException {
+		for (Tuple tuple : toBeDeleted)
 			page.DeleteFromPage(tuple);
 	}
-	
-	public void updateRecordsInTaple(Object clusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException, DBAppException, ParseException {
+
+	public void updateRecordsInTaple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue)
+			throws ClassNotFoundException, IOException, DBAppException, ParseException {
 		Page page = getPageToUpdate(clusteringKeyValue);
 		page.updateTuple(clusteringKeyValue, htblColNameValue);
 	}
-	
-	private  Page getPageToUpdate(Object clusteringKeyValue)
+
+	private Page getPageToUpdate(Object clusteringKeyValue)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
-		int pkPagePosition =  tableBinarySearch(clusteringKeyValue);
+		int pkPagePosition = tableBinarySearch(clusteringKeyValue);
 		return getPageAtPosition(pkPagePosition);
 	}
-	
-	private int tableBinarySearch(Object primaryKey) throws ClassNotFoundException, DBAppException, ParseException, IOException {
-		return TableSearch.binarySearchPages(this,primaryKey);
-	}
-
 
 	public void createTableFiles() throws IOException {
-		File createFolder = new File(this.getName());
-		createFolder.mkdir();
-		File createFile = new File(this.getName()+"//"+this.getName()+ Constants.DATA_EXTENSTION);
-		createFile.createNewFile();
+		FileCreator.createTableFolder(this);
+		FileCreator.createFile(this, FileType.TABLE);
 	}
-
-	public void deleteTableFile() {
-		File folder = new File(getAbsPath());
-		if (folder.isDirectory()) {
-			File[] files = folder.listFiles();
-			if (files != null)
-				for (File file : files)
-					file.delete();
-			folder.delete();
-		}
+	
+	public void deleteTableFiles() {
+		FileDeleter.deleteFile(this, FileType.TABLE);
 	}
-
-	public String getAbsPath(){return Paths.get("").toAbsolutePath().toString() + "//" + getName();}
-
 }
