@@ -43,8 +43,6 @@ public class PageSearch {
         
         return low; 
     }
-    
-    // TODO : linear search should only get positions of tuples should be deleted ( The return type should be Vector of Integers )
 
     public static Vector<Tuple> linearSearch(Page page,String colName, Object value) throws DBAppException, ParseException {
     	
