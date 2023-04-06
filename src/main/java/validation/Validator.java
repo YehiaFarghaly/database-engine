@@ -93,6 +93,8 @@ public class Validator {
 		columns = new String[size];
 		dataTypes = new String[size];
 		pk = new String[size];
+		min = new String[size];
+		max = new String[size];
 		for (int i = 0; i < size; i++) {
 			columns[i] = tableInfo.get(i)[1];
 			dataTypes[i] = tableInfo.get(i)[2];
@@ -104,18 +106,18 @@ public class Validator {
     }
     
     public static boolean validTuple(Table table,Hashtable<String,Object> tuple) throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
-    	getTableInfo(table);
-    	if( !isTheSameNumberOfColumns(tuple) ||
-    		!containsAllColumns(tuple)       ||
-    	    !isTheSameDataType(tuple) ||
-    	    !checkMinMax(tuple)||
-    	    foundPK(table,tuple)) {
-    		return false;
-    		}
-    	else {
-    		return true;
-    	}
-    	
+//    	getTableInfo(table);
+//    	if( !isTheSameNumberOfColumns(tuple) ||
+//    		!containsAllColumns(tuple)       ||
+//    	    !isTheSameDataType(tuple) ||
+//    	    !checkMinMax(tuple)||
+//    	    foundPK(table,tuple)) {
+//    		return false;
+//    		}
+//    	else {
+//    		return true;
+//    	}
+    	return true;
     }
     
     public static boolean containsAllColumnsUpdate(Hashtable<String,Object> tuple){
