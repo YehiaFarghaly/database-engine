@@ -48,11 +48,13 @@ public class DBApp implements IDatabase {
 	}
 
 	 /**
-     * Initializes the database management system by reading all the tables from their CSV files.
+     * Initializes the database management system by reading all the tables from \****   their CSV files   ****\.
      */
 	@Override
 	public void init() {
-		this.myTables = reader.readAll();
+		
+		//TODO we need to load the tables with serialization not with csv
+		
 	}
 
     /**
@@ -72,6 +74,8 @@ public class DBApp implements IDatabase {
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
 			Hashtable<String, String> htblColNameMax) throws DBAppException, IOException {
 
+		Validator.validateTableCreation(myTables, strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
+		
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.put(strTableName, table);
 		writer.write(table);
