@@ -2,12 +2,18 @@ package constants;
 
 public final class Constants {
      public static final String ERROR_MESSAGE_TABLE_NAME = "Invalid table name, please enter a correct one";
+     
+     public static final String ERROR_MESSAGE_REPEATED_TABLE_NAME = "Table name already exists, please enter another one";
 
      public static final String ERROR_MESSAGE_TUPLE_DATA = "Can't insert this tuple, please insert a valid data";
      
      public static final String ERROR_MESSAGE_SEARCH_NOT_FOUND = "Tuple is not found in the table";
 
      public static final  String ERROR_BINARY_SEARCH_ON_EMPTY_TABLE = "Can not apply binary search on empty Table";
+     
+     public static final String ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID = "Min or Max values are Invalid, please enter another one";
+     
+     public static final String ERROR_MESSAGE_INVALID_CLUSTERINGKEY = "Clusteringkey is invalid, please enter another one";
 
      public static final String DATA_EXTENSTION = ".ser";
 
