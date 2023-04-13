@@ -1,5 +1,7 @@
 package storage;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -14,6 +16,10 @@ import search.TableSearch;
 
 public class Table implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 994119161960187256L;
 	private int cntPage;
 	private Vector<String> pagesName;
 	private String name, PKColumn;
@@ -183,9 +189,9 @@ public class Table implements Serializable {
 
 	private void insertNewPage(Tuple tuple) throws IOException, DBAppException, ParseException {
 		Page page = new Page(name);
-		page.insertIntoPage(tuple);
 		page.setName((cntPage++) + "");
-		FileCreator.createFile(page, FileType.PAGE);
+		page.createPageFile();
+		page.insertIntoPage(tuple);
 		pagesName.add(page.getName());
 	}
 
@@ -206,10 +212,18 @@ public class Table implements Serializable {
 
 	private void iterateOverPageName(String colName, Object value)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
-		for (String PageName : this.getPagesName()) {
-			Page page = Serializer.deserializePage(name, PageName);
+		for (int i=0;i<pagesName.size();i++) {
+			String pageName = pagesName.get(i);
+			String path = Serializer.getPath(name, pageName);
+			File pageFile = new File(path);
+			if(pageFile.exists()) {
+			Page page = Serializer.deserializePage(name, pagesName.get(i));
 			Vector<Tuple> toBeDeleted = page.linearSearch(colName, value);
 			deletePageRecords(toBeDeleted, page);
+			}
+			else {
+				pagesName.remove(i--);
+			}
 		}
 	}
 

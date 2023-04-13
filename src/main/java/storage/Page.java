@@ -20,17 +20,19 @@ import filecontroller.Serializer;
 import search.PageSearch;
 
 public class Page implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2857345022460368698L;
 	private String name;
 	private int maxRows;
 	private Vector<Tuple> tuples;
 	private Object minPK, maxPK;
-	private int size;
 	private String tableName;
 
 	public Page(String tableName) throws IOException {
 		this.tuples = new Vector<>();
 		this.tableName = tableName;
-		size = 0;
 		Properties prop = ConfigReader.readProperties();
 		maxRows = Integer.parseInt(prop.getProperty(Constants.MAX_ROWS_IN_PAGE));
 	}
@@ -56,7 +58,7 @@ public class Page implements Serializable {
 	}
 
 	public int getSize() {
-		return size;
+		return tuples.size();
 	}
 
 	public String getTableName() {
@@ -76,7 +78,7 @@ public class Page implements Serializable {
 	}
 
 	public boolean isFull() {
-		return size == maxRows;
+		return tuples.size() == maxRows;
 	}
 
 	protected Tuple removeLastTuple() {
@@ -86,15 +88,16 @@ public class Page implements Serializable {
 	protected void insertIntoPage(Tuple tuple) throws IOException, DBAppException, ParseException {
 		int position = pageBinarySearch(tuple.getPrimaryKey());
 		tuples.add(position, tuple);
-		size++;
-		Serializer.SerializePage(name, this);
 		newMinMax();
+		Serializer.SerializePage(name, this);
 	}
 
 	private void newMinMax() {
+		if(tuples.size()>0) {
 		minPK = tuples.get(0).getPrimaryKey();
 		maxPK = tuples.get(tuples.size() - 1).getPrimaryKey();
-	}
+		}
+		}
 
 	private int pageBinarySearch(Object primaryKey) throws DBAppException, ParseException {
 		return PageSearch.binarySearch(this, primaryKey);
@@ -108,7 +111,6 @@ public class Page implements Serializable {
 		int position = pageBinarySearch(tuple.getPrimaryKey());
 		if (position != -1) {
 			tuples.remove(position);
-			size--;
 			newMinMax();
 			Serializer.SerializePage(name, this);
 			handleEmptyPage();
@@ -118,8 +120,10 @@ public class Page implements Serializable {
 	}
 
 	private void handleEmptyPage() throws IOException {
-		if (tuples.isEmpty())
+		if (tuples.isEmpty()) {
 			deletePageFile();
+		}
+		
 	}
 
 	private void deletePageFile() {

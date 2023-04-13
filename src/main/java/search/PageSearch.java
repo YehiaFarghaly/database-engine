@@ -34,7 +34,7 @@ public class PageSearch {
 
             if (comp == 0)
                 return mid;
-            else if (comp < 0)
+            else if (comp > 0)
                 low = mid + 1;
             else
                 high = mid - 1;

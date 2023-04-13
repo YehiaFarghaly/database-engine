@@ -62,7 +62,7 @@ public class Serializer {
 		return in;
 	}
 
-	private static String getPath(String tableName,String targetName) {
+	public static String getPath(String tableName,String targetName) {
 		return tableName+ "//" + targetName + Constants.DATA_EXTENSTION;
 	}
 }
