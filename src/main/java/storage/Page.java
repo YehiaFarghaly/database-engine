@@ -7,10 +7,12 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Vector;
 
 import constants.Constants;
 import exceptions.DBAppException;
+import filecontroller.ConfigReader;
 import filecontroller.FileCreator;
 import filecontroller.FileDeleter;
 import filecontroller.FileType;
@@ -25,9 +27,12 @@ public class Page implements Serializable {
 	private int size;
 	private String tableName;
 
-	public Page(String tableName) {
+	public Page(String tableName) throws IOException {
 		this.tuples = new Vector<>();
 		this.tableName = tableName;
+		size = 0;
+		Properties prop = ConfigReader.readProperties();
+		maxRows = Integer.parseInt(prop.getProperty(Constants.MAX_ROWS_IN_PAGE));
 	}
 
 	public Object getMinPK() {

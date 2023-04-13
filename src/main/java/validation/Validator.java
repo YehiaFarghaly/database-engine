@@ -54,6 +54,22 @@ public class Validator {
 		}
 
 	}
+	
+	public static void validateTable(String tableName, Hashtable<String,Table> myTables) {
+		
+	}
+	
+	public static void validateInsertionInput(Table table,Hashtable<String, Object> htblColNameValue) {
+		
+	}
+	
+	public static void validateDeletionInput(Table table,Hashtable<String, Object> htblColNameValue) {
+		
+	}
+	
+	public static void validateUpdateInput(Table table,Hashtable<String, Object> htblColNameValue) {
+		
+	}
 
 	private static boolean validClusteringKey(String strClusteringKeyColumn) {
 		// TODO Auto-generated method stub

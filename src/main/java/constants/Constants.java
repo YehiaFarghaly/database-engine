@@ -37,11 +37,6 @@ public final class Constants {
      public static final int INDEX_NAME_INDEX = 4;
 
      public static final int INDEX_TYPE_INDEX = 5;
-
-
-     public static final int EQUAL = 0;
-     public static final int LESS_THAN = -1;
-     public static final int GREATER_THAN = 1;
      
      public static final String ID = "id";
      public static final String NAME = "name";
@@ -54,6 +49,10 @@ public final class Constants {
      public static final String MAX_ID_VALUE="100000";
      public static final String MAX_AGE_VALUE="100";
      public static final String MAX_NAME_VALUE="20";
+     
+     public static final String MAX_ROWS_IN_PAGE = "MaximumRowsCountinTablePage";
+
+	public static final String CONFIG_PATH = "DBApp.config";
 
 
 }

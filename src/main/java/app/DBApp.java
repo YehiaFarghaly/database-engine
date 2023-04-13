@@ -18,9 +18,10 @@ import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
 
 /**
- * The DBApp class represents a database management system. It implements the IDatabase interface and provides methods
- * for initializing the system, creating tables, creating indices, inserting, updating and deleting records, and selecting records using
- * SQL terms.
+ * The DBApp class represents a database management system. It implements the
+ * IDatabase interface and provides methods for initializing the system,
+ * creating tables, creating indices, inserting, updating and deleting records,
+ * and selecting records using SQL terms.
  */
 public class DBApp implements IDatabase {
 
@@ -29,7 +30,7 @@ public class DBApp implements IDatabase {
 	private CsvWriter writer;
 	private Object clusteringKey;
 
-	public DBApp() throws IOException {
+	public DBApp() {
 		this.myTables = new Hashtable<>();
 		this.writer = new CsvWriter();
 		this.reader = new CsvReader();
@@ -47,53 +48,64 @@ public class DBApp implements IDatabase {
 		return writer;
 	}
 
-	 /**
-     * Initializes the database management system by reading all the tables from \****   their CSV files   ****\.
-     */
+	/**
+	 * Initializes the database management system by reading all the tables from
+	 * \**** their CSV files ****\.
+	 */
 	@Override
 	public void init() {
-		
-		//TODO we need to load the tables with serialization not with csv
-		
+		// TODO we need to load the tables with serialization not with csv
+
 	}
 
-    /**
-     * Creates a new table in the system with the specified parameters.
-     * 
-     * @param strTableName          The name of the table.
-     * @param strClusteringKeyColumn The name of the clustering key column.
-     * @param htblColNameType       A Hashtable containing the name and data type of each column in the table.
-     * @param htblColNameMin        A Hashtable containing the name and minimum value of each column in the table.
-     * @param htblColNameMax        A Hashtable containing the name and maximum value of each column in the table.
-     * 
-     * @throws DBAppException If the table name is invalid or if the table already exists.
-     * @throws IOException    If an error occurs while creating the table files.
-     */
+	/**
+	 * Creates a new table in the system with the specified parameters.
+	 * 
+	 * @param strTableName           The name of the table.
+	 * @param strClusteringKeyColumn The name of the clustering key column.
+	 * @param htblColNameType        A Hashtable containing the name and data type
+	 *                               of each column in the table.
+	 * @param htblColNameMin         A Hashtable containing the name and minimum
+	 *                               value of each column in the table.
+	 * @param htblColNameMax         A Hashtable containing the name and maximum
+	 *                               value of each column in the table.
+	 * 
+	 * @throws DBAppException If the table name is invalid or if the table already
+	 *                        exists.
+	 * @throws IOException    If an error occurs while creating the table files.
+	 */
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
 			Hashtable<String, String> htblColNameMax) throws DBAppException, IOException {
 
-		Validator.validateTableCreation(myTables, strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
-		
+		// Validator.validateTableCreation(myTables, strTableName,
+		// strClusteringKeyColumn, htblColNameType, htblColNameMin,
+		// htblColNameMax);
+
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.put(strTableName, table);
 		writer.write(table);
 		table.createTableFiles();
+		Serializer.SerializeTable(table);
 	}
-	
-	   /**
-     * Inserts a new record into the specified table.
-     * 
-     * @param strTableName    The name of the table.
-     * @param htblColNameValue A Hashtable containing the name and value of each column in the record.
-     * 
-     * @throws DBAppException         If the table name is invalid, the record data is invalid or the record already exists.
-     * @throws CsvValidationException If the record fails CSV validation.
-     * @throws IOException            If an error occurs while inserting the record.
-     * @throws ClassNotFoundException If an error occurs while serializing or deserializing the table.
-     * @throws ParseException         If an error occurs while parsing the record data.
-     */
+
+	/**
+	 * Inserts a new record into the specified table.
+	 * 
+	 * @param strTableName     The name of the table.
+	 * @param htblColNameValue A Hashtable containing the name and value of each
+	 *                         column in the record.
+	 * 
+	 * @throws DBAppException         If the table name is invalid, the record data
+	 *                                is invalid or the record already exists.
+	 * @throws CsvValidationException If the record fails CSV validation.
+	 * @throws IOException            If an error occurs while inserting the record.
+	 * @throws ClassNotFoundException If an error occurs while serializing or
+	 *                                deserializing the table.
+	 * @throws ParseException         If an error occurs while parsing the record
+	 *                                data.
+	 */
 	@Override
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
@@ -101,19 +113,21 @@ public class DBApp implements IDatabase {
 		takeAction(Action.INSERT, strTableName, htblColNameValue);
 
 	}
-	
+
 	/**
 	 * Updates a record in a table.
 	 * 
-	 * @param strTableName the name of the table to update a record in.
-	 * @param strClusteringKeyValue the value of the clustering key for the record to be updated.
-	 * @param htblColNameValue the new values for the record.
+	 * @param strTableName          the name of the table to update a record in.
+	 * @param strClusteringKeyValue the value of the clustering key for the record
+	 *                              to be updated.
+	 * @param htblColNameValue      the new values for the record.
 	 * 
-	 * @throws DBAppException if there is an error with the database operations.
+	 * @throws DBAppException         if there is an error with the database
+	 *                                operations.
 	 * @throws CsvValidationException if there is an error with the CSV file.
-	 * @throws IOException if there is an error with file operations.
+	 * @throws IOException            if there is an error with file operations.
 	 * @throws ClassNotFoundException if there is an error with the serialization.
-	 * @throws ParseException if there is an error parsing the input.
+	 * @throws ParseException         if there is an error parsing the input.
 	 */
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
@@ -122,71 +136,65 @@ public class DBApp implements IDatabase {
 		this.clusteringKey = (Object) strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
 	}
-	
+
 	/**
 	 * Deletes records from a table.
 	 * 
-	 * @param strTableName the name of the table to delete records from.
+	 * @param strTableName     the name of the table to delete records from.
 	 * @param htblColNameValue the values to match records to be deleted.
 	 * 
-	 * @throws DBAppException if there is an error with the database operations.
+	 * @throws DBAppException         if there is an error with the database
+	 *                                operations.
 	 * @throws CsvValidationException if there is an error with the CSV file.
-	 * @throws IOException if there is an error with file operations.
+	 * @throws IOException            if there is an error with file operations.
 	 * @throws ClassNotFoundException if there is an error with the serialization.
-	 * @throws ParseException if there is an error parsing the input.
+	 * @throws ParseException         if there is an error parsing the input.
 	 */
 	@Override
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
 		takeAction(Action.DELETE, strTableName, htblColNameValue);
 	}
-	
+
 	/**
 	 * Performs an action (insert, delete, or update) on a table.
 	 * 
-	 * @param action the action to perform.
-	 * @param strTableName the name of the table to perform the action on.
+	 * @param action           the action to perform.
+	 * @param strTableName     the name of the table to perform the action on.
 	 * @param htblColNameValue the values to use for the action.
 	 * 
-	 * @throws DBAppException if there is an error with the database operations.
+	 * @throws DBAppException         if there is an error with the database
+	 *                                operations.
 	 * @throws CsvValidationException if there is an error with the CSV file.
-	 * @throws IOException if there is an error with file operations.
+	 * @throws IOException            if there is an error with file operations.
 	 * @throws ClassNotFoundException if there is an error with the serialization.
-	 * @throws ParseException if there is an error parsing the input.
+	 * @throws ParseException         if there is an error parsing the input.
 	 */
 	private void takeAction(Action action, String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
-		boolean validTable = Validator.validTable(strTableName, myTables);
 
-		if (!validTable) {
+		Validator.validateTable(strTableName, myTables);
 
-			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
+		Table table = Serializer.deserializeTable(strTableName);
 
+		if (action == Action.INSERT) {
+			Validator.validateInsertionInput(table, htblColNameValue);
+			table.insertTuple(htblColNameValue);
+		} else if (action == Action.DELETE) {
+			Validator.validateDeletionInput(table, htblColNameValue);
+			table.DeleteTuples(htblColNameValue);
 		} else {
-
-			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
-
-			if (!validTuple) {
-				throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
-
-			} else {
-
-				Table table = Serializer.deserializeTable(strTableName);
-
-				if (action == Action.INSERT)
-					table.insertTuple(htblColNameValue);
-				else if (action == Action.DELETE)
-					table.DeleteTuples(htblColNameValue);
-				else
-					table.updateRecordsInTaple(clusteringKey, htblColNameValue);
-
-				Serializer.SerializeTable(table);
-			}
+			Validator.validateUpdateInput(table, htblColNameValue);
+			table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 		}
+
+		Serializer.SerializeTable(table);
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
+
+
 
 }
