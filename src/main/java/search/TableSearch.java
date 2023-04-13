@@ -24,7 +24,7 @@ public class TableSearch {
 
 		while (low <= high) {
 
-			int mid = low + (high - low) / 2;
+			int mid = (low + high)  / 2;
 
             Page currPage = deserializePage(table.getName(), table.getPagesName().get(mid));
 
@@ -34,7 +34,7 @@ public class TableSearch {
 
 			if (compWithMax <= 0 && compareWithMin >= 0) {
 				return mid;
-			} else if (compWithMax < 0)
+			} else if (compWithMax > 0)
 				low = mid + 1;
 			else
 				high = mid - 1;

@@ -15,7 +15,7 @@ import filecontroller.Serializer;
 import search.TableSearch;
 
 public class Table implements Serializable {
-	
+
 	/**
 	 * 
 	 */
@@ -77,18 +77,18 @@ public class Table implements Serializable {
 	public void setColNameMax(Hashtable<String, String> colNameMax) {
 		this.colNameMax = colNameMax;
 	}
-	
+
 	public boolean isEmpty() {
 		return pagesName.size() == 0;
 	}
-	
+
 	public Vector<String> getPagesName() {
 		return pagesName;
 	}
 
 	public void insertTuple(Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, ClassNotFoundException, IOException, ParseException {
-
+		removeEmptyPages();
 		Tuple tuple = createTuple(htblColNameValue);
 		if (isEmpty()) {
 			insertNewPage(tuple);
@@ -102,7 +102,7 @@ public class Table implements Serializable {
 			}
 		}
 	}
-	
+
 	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
 
 		Tuple tuple = getPrototype();
@@ -119,7 +119,7 @@ public class Table implements Serializable {
 
 		return tuple;
 	}
-	
+
 	private Tuple getPrototype() {
 		if (this.prototype == null) {
 			TupleDirector tupDir = new TupleDirector(new TupleBuilder());
@@ -135,12 +135,12 @@ public class Table implements Serializable {
 		Page page = Serializer.deserializePage(this.getName(), pageName);
 		return page;
 	}
-	
+
 	public int tableBinarySearch(Object primaryKey)
 			throws ClassNotFoundException, DBAppException, ParseException, IOException {
 		return TableSearch.binarySearchPages(this, primaryKey);
 	}
-	
+
 	private void handleFullPageInsertion(Page currentPage, int position, Tuple tuple)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
 
@@ -212,16 +212,20 @@ public class Table implements Serializable {
 
 	private void iterateOverPageName(String colName, Object value)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
-		for (int i=0;i<pagesName.size();i++) {
-			String pageName = pagesName.get(i);
-			String path = Serializer.getPath(name, pageName);
-			File pageFile = new File(path);
-			if(pageFile.exists()) {
+		removeEmptyPages();
+		for (int i = 0; i < pagesName.size(); i++) {
 			Page page = Serializer.deserializePage(name, pagesName.get(i));
 			Vector<Tuple> toBeDeleted = page.linearSearch(colName, value);
 			deletePageRecords(toBeDeleted, page);
-			}
-			else {
+		}
+	}
+
+	private void removeEmptyPages() {
+		for (int i = 0; i < pagesName.size(); i++) {
+			String pageName = pagesName.get(i);
+			String path = Serializer.getPath(name, pageName);
+			File pageFile = new File(path);
+			if (!pageFile.exists()) {
 				pagesName.remove(i--);
 			}
 		}
@@ -249,8 +253,10 @@ public class Table implements Serializable {
 		FileCreator.createTableFolder(this);
 		FileCreator.createFile(this, FileType.TABLE);
 	}
-	
+
 	public void deleteTableFiles() {
 		FileDeleter.deleteFile(this, FileType.TABLE);
 	}
+
+
 }

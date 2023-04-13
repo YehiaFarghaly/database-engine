@@ -195,6 +195,4 @@ public class DBApp implements IDatabase {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
 
-	
-
 }
