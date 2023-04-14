@@ -32,7 +32,7 @@ public class DBAppTest {
 		int randomNumber1 = (int) (Math.random() * 100000) + 1;
 		int randomNumber2 = (int) (Math.random() * 100000) + 1;
 		newTableName = randomNumber1 + "" + randomNumber2;
-		while (engine.getMyTables().containsKey(newTableName)) {
+		while (engine.getMyTables().contains(newTableName)) {
 			randomNumber1 = (int) (Math.random() * 100000) + 1;
 			randomNumber2 = (int) (Math.random() * 100000) + 1;
 			newTableName = randomNumber1 + "" + randomNumber2;
@@ -70,7 +70,7 @@ public class DBAppTest {
 		engine.createTable(newTableName, Constants.ID, htblColNameType, htblColNameMin, htblColNameMax);
 
 		// Then
-		assertThat(engine.getMyTables().containsKey(newTableName));
+		assertThat(engine.getMyTables().contains(newTableName));
 	}
 	
 	private Hashtable<String,Object> createRow(int idInput, String nameInput, int ageInput){
