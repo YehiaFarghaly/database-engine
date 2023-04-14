@@ -136,13 +136,15 @@ public class Page implements Serializable {
 	}
 
 	protected void updateTuple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, ParseException {
+			throws DBAppException, ParseException, IOException {
 		int pkVectorPoition = pageBinarySearch(clusteringKeyValue);
 		Tuple tuple = tuples.get(pkVectorPoition);
 
 		for (Cell c : tuple.getCells()) {
-			c.setValue(htblColNameValue.get(c.getKey()));
+			if(htblColNameValue.get(c.getKey()) != null)
+				c.setValue(htblColNameValue.get(c.getKey()));
 		}
+		Serializer.SerializePage(name,this);
 
 	}
 }
