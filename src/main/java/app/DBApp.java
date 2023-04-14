@@ -2,9 +2,9 @@ package app;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.*;
 
+import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 
 import exceptions.DBAppException;
@@ -13,7 +13,6 @@ import storage.*;
 import validation.Validator;
 import search.*;
 import sql.SQLTerm;
-import constants.Constants;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
 
@@ -25,20 +24,22 @@ import datamanipulation.CsvWriter;
  */
 public class DBApp implements IDatabase {
 
-	private Hashtable<String, Table> myTables;
+	private HashSet<String> myTables;
 	private CsvReader reader;
 	private CsvWriter writer;
 	private Object clusteringKey;
 
 	public DBApp() {
-		this.myTables = new Hashtable<>();
+		this.myTables = new HashSet<>();
 		this.writer = new CsvWriter();
 		this.reader = new CsvReader();
 	}
 
-	public Hashtable<String, Table> getMyTables() {
+
+	public HashSet<String> getMyTables() {
 		return myTables;
 	}
+
 
 	public CsvReader getReader() {
 		return reader;
@@ -49,12 +50,13 @@ public class DBApp implements IDatabase {
 	}
 
 	/**
-	 * Initializes the database management system by reading all the tables from
-	 * \**** their CSV files ****\.
+	 * Initializes the database management system by reading all the tables from CSV file
+	 * 
 	 */
 	@Override
 	public void init() {
-		// TODO we need to load the tables with serialization not with csv
+		
+		this.myTables = reader.readAllTables();
 
 	}
 
@@ -84,7 +86,7 @@ public class DBApp implements IDatabase {
 		// htblColNameMax);
 
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
-		myTables.put(strTableName, table);
+		myTables.add(strTableName);
 		writer.write(table);
 		table.createTableFiles();
 		Serializer.SerializeTable(table);

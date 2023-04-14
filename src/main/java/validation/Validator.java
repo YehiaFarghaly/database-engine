@@ -2,8 +2,7 @@ package validation;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.*;
 
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -31,7 +30,7 @@ public class Validator {
 		return false;
 	}
 
-	public static void validateTableCreation(Hashtable<String, Table> appTables, String strTableName,
+	public static void validateTableCreation(HashSet<String> appTables, String strTableName,
 			String strClusteringKeyColumn, Hashtable<String, String> htblColNameType,
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) throws DBAppException {
 
@@ -39,36 +38,36 @@ public class Validator {
 
 			throw new DBAppException(Constants.ERROR_MESSAGE_REPEATED_TABLE_NAME);
 
-		} else if(!validClusteringKey(strClusteringKeyColumn)) {
-			
+		} else if (!validClusteringKey(strClusteringKeyColumn)) {
+
 			throw new DBAppException(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY);
-			
-		}else if (!validDataTypes(htblColNameType)) {
+
+		} else if (!validDataTypes(htblColNameType)) {
 
 			throw new DBAppException(Constants.ERROR_MESSAGE_DATATYPE);
 
 		} else if (!validMinAndMax(htblColNameType, htblColNameMin, htblColNameMax)) {
-			
+
 			throw new DBAppException(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
-			
+
 		}
 
 	}
-	
-	public static void validateTable(String tableName, Hashtable<String,Table> myTables) {
-		
+
+	public static void validateTable(String tableName, HashSet<String> myTables) {
+
 	}
-	
-	public static void validateInsertionInput(Table table,Hashtable<String, Object> htblColNameValue) {
-		
+
+	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue) {
+
 	}
-	
-	public static void validateDeletionInput(Table table,Hashtable<String, Object> htblColNameValue) {
-		
+
+	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue) {
+
 	}
-	
-	public static void validateUpdateInput(Table table,Hashtable<String, Object> htblColNameValue) {
-		
+
+	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue) {
+
 	}
 
 	private static boolean validClusteringKey(String strClusteringKeyColumn) {
@@ -89,18 +88,14 @@ public class Validator {
 
 	}
 
-	public static boolean validTable(String tableName, Hashtable<String, Table> myTables) {
-		if (myTables.containsKey(tableName)) {
-			return true;
-		}
-		return false;
+	public static boolean validTable(String tableName, HashSet<String> myTables) {
+		return myTables.contains(tableName);
 	}
 
 	public static int findRowPK() {
 		for (int i = 0; i < columns.length; i++) {
-			if (pk[i] == "TRUE")
+			if (pk[i].equals("True"))
 				return i;
-
 		}
 		return -1;
 	}
