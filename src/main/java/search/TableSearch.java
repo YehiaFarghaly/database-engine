@@ -28,9 +28,9 @@ public class TableSearch {
 
             Page currPage = deserializePage(table.getName(), table.getPagesName().get(mid));
 
-			int compareWithMin = Compare.compare(tuplePrimaryKey, currPage.getMinPK());
+			int compareWithMin = Compare.compare(tuplePrimaryKey.toString(), currPage.getMinPK().toString());
 
-			int compWithMax = Compare.compare(tuplePrimaryKey, currPage.getMaxPK());
+			int compWithMax = Compare.compare(tuplePrimaryKey.toString(), currPage.getMaxPK().toString());
 
 			if (compWithMax <= 0 && compareWithMin >= 0) {
 				return mid;
