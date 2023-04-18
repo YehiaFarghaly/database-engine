@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 
 import constants.Constants;
+import datamanipulation.CsvReader;
 import exceptions.DBAppException;
 import filecontroller.ConfigReader;
 import filecontroller.FileCreator;
@@ -21,7 +19,7 @@ import search.PageSearch;
 
 public class Page implements Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 2857345022460368698L;
 	private String name;
@@ -94,10 +92,10 @@ public class Page implements Serializable {
 
 	private void newMinMax() {
 		if(tuples.size()>0) {
-		minPK = tuples.get(0).getPrimaryKey();
-		maxPK = tuples.get(tuples.size() - 1).getPrimaryKey();
+			minPK = tuples.get(0).getPrimaryKey();
+			maxPK = tuples.get(tuples.size() - 1).getPrimaryKey();
 		}
-		}
+	}
 
 	private int pageBinarySearch(Object primaryKey) throws DBAppException, ParseException {
 		return PageSearch.binarySearch(this, primaryKey);
@@ -123,7 +121,7 @@ public class Page implements Serializable {
 		if (tuples.isEmpty()) {
 			deletePageFile();
 		}
-		
+
 	}
 
 	private void deletePageFile() {
@@ -146,5 +144,60 @@ public class Page implements Serializable {
 		}
 		Serializer.SerializePage(name,this);
 
+	}
+
+	public void printPage() throws IOException, ClassNotFoundException {
+		CsvReader m = new CsvReader();
+		ArrayList<String[]> colsInfo =  m.readTable(tableName);
+		ArrayList<String> colOrder = new ArrayList<>();
+		Table table = Serializer.deserializeTable(tableName);
+		System.out.print(completeString(table.getPKColumn())+"|");
+		colOrder.add(table.getPKColumn());
+		for (String [] i : colsInfo) {
+			if (!i[1].equals(table.getPKColumn())) {
+				System.out.print(completeString(i[1]) + "|");
+				colOrder.add(i[1]);
+			}
+		}
+
+		printData(colOrder);
+
+
+	}
+
+	public void printData(ArrayList<String> colOrder)
+	{
+		String line = createLine(colOrder.size());
+		println(line);
+
+		for(Tuple i : tuples) {
+			for(String j : colOrder) {
+				for (Cell k : i.getCells()) {
+					if (k.getKey().equals(j))
+						System.out.print(completeString(k.getValue().toString())+"|");
+				}
+			}
+			println(line);
+		}
+	}
+	public void println(String line)
+	{
+		System.out.println();
+		System.out.println(line);
+	}
+
+	public String createLine(int numOfCol) {
+		String line = "";
+		for(int i=0;i!= numOfCol;i++) {
+			for(int j=0;j!= 10;j++)
+				line+="-";
+		}
+		return line;
+	}
+
+	public String completeString(String data) {
+		while(data.length()<10)
+			data+=" ";
+		return data;
 	}
 }
