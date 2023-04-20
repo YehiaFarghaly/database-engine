@@ -7,6 +7,7 @@ import java.util.*;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 
+import constants.Constants;
 import exceptions.DBAppException;
 import filecontroller.Serializer;
 import storage.*;
@@ -28,6 +29,7 @@ public class DBApp implements IDatabase {
 	private CsvReader reader;
 	private CsvWriter writer;
 	private Object clusteringKey;
+	private String clusteringKeyValue;
 
 	public DBApp() {
 		this.myTables = new HashSet<>();
@@ -135,7 +137,7 @@ public class DBApp implements IDatabase {
 	public void updateTable(String strTableName, String strClusteringKeyValue,
 			Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
-		this.clusteringKey = (Object) strClusteringKeyValue;
+		this.clusteringKeyValue =  strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
 	}
 
@@ -187,14 +189,21 @@ public class DBApp implements IDatabase {
 			table.DeleteTuples(htblColNameValue);
 		} else {
 			Validator.validateUpdateInput(table, htblColNameValue);
+			castClusteringKeyType(table);
 			table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 		}
 
 		Serializer.SerializeTable(table);
 	}
+	
+	private void castClusteringKeyType(Table table) {
+		String primaryKeyType=table.getPrimaryKeyType();
+		if(primaryKeyType.equals(Constants.INTEGER_DATA_TYPE_NAME)) clusteringKey=Integer.parseInt(clusteringKeyValue);
+		else if(primaryKeyType.equals(Constants.DOUBLE_DATA_TYPE_NAME)) clusteringKey=Double.parseDouble(clusteringKeyValue);
+	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
-
+	
 }

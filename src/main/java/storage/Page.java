@@ -76,17 +76,23 @@ public class Page implements Serializable {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
+	
+	public boolean isEmpty() {
+		return tuples.size()==0;
+	}
 
 	public boolean isFull() {
 		return tuples.size() == maxRows;
 	}
 
-	protected Tuple removeLastTuple() {
-		return tuples.remove(tuples.size() - 1);
+	protected Tuple removeLastTuple() throws IOException {
+		Tuple ret = tuples.remove(tuples.size()-1);
+		Serializer.SerializePage(name, this);
+		return ret;
 	}
 
 	protected void insertIntoPage(Tuple tuple) throws IOException, DBAppException, ParseException {
-		int position = pageBinarySearch(tuple.getPrimaryKey());
+		int position = isEmpty()?0:pageBinarySearch(tuple.getPrimaryKey());
 		tuples.add(position, tuple);
 		newMinMax();
 		Serializer.SerializePage(name, this);

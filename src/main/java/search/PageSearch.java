@@ -30,7 +30,7 @@ public class PageSearch {
 
             Object PKValueOfCurrTuple = currTuple.getPrimaryKey();
 
-            int comp = Compare.compare(primaryKey.toString(),PKValueOfCurrTuple.toString());
+            int comp = Compare.compare(primaryKey,PKValueOfCurrTuple);
 
             if (comp == 0)
                 return mid;

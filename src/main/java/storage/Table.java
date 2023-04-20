@@ -25,6 +25,7 @@ public class Table implements Serializable {
 	private String name, PKColumn;
 	private Tuple prototype;
 	private Hashtable<String, String> colNameType, colNameMin, colNameMax;
+	private String primaryKeyType;
 
 	public Table(String name, String PK, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
 			Hashtable<String, String> colNameMax) {
@@ -35,7 +36,11 @@ public class Table implements Serializable {
 		this.colNameMin = colNameMin;
 		this.colNameMax = colNameMax;
 		pagesName = new Vector<String>();
-
+		primaryKeyType=colNameType.get(PKColumn);
+	}
+	
+	public String getPrimaryKeyType() {
+		return primaryKeyType;
 	}
 
 	public String getName() {
@@ -85,6 +90,7 @@ public class Table implements Serializable {
 	public Vector<String> getPagesName() {
 		return pagesName;
 	}
+	
 
 	public void insertTuple(Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, ClassNotFoundException, IOException, ParseException {
@@ -170,8 +176,8 @@ public class Table implements Serializable {
 		Page nextPage = getPageAtPosition(++position);
 		while (nextPage.isFull()) {
 			if (atLastPage(position)) {
-				Page newPage = new Page(name);
-				pagesName.add(newPage.getName());
+				Page newPage = initializePage();
+				Serializer.SerializePage(newPage.getName(), newPage);
 				return newPage;
 			}
 			nextPage = getPageAtPosition(++position);
@@ -181,18 +187,22 @@ public class Table implements Serializable {
 	}
 
 	private void newLastPage(Page currentPage, Tuple tuple) throws IOException, DBAppException, ParseException {
-
 		currentPage.insertIntoPage(tuple);
 		Tuple lastTuple = currentPage.removeLastTuple();
 		insertNewPage(lastTuple);
 	}
 
 	private void insertNewPage(Tuple tuple) throws IOException, DBAppException, ParseException {
+		Page page = initializePage();
+		page.insertIntoPage(tuple);
+	}
+	
+	private Page initializePage() throws IOException {
 		Page page = new Page(name);
 		page.setName((cntPage++) + "");
 		page.createPageFile();
-		page.insertIntoPage(tuple);
 		pagesName.add(page.getName());
+		return page;
 	}
 
 	private boolean atLastPage(int position) {
