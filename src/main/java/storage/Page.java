@@ -16,6 +16,7 @@ import filecontroller.FileDeleter;
 import filecontroller.FileType;
 import filecontroller.Serializer;
 import search.PageSearch;
+import util.printPage;
 
 public class Page implements Serializable {
 	/**
@@ -146,58 +147,9 @@ public class Page implements Serializable {
 
 	}
 
-	public void printPage() throws IOException, ClassNotFoundException {
-		CsvReader m = new CsvReader();
-		ArrayList<String[]> colsInfo =  m.readTable(tableName);
-		ArrayList<String> colOrder = new ArrayList<>();
-		Table table = Serializer.deserializeTable(tableName);
-		System.out.print(completeString(table.getPKColumn())+"|");
-		colOrder.add(table.getPKColumn());
-		for (String [] i : colsInfo) {
-			if (!i[1].equals(table.getPKColumn())) {
-				System.out.print(completeString(i[1]) + "|");
-				colOrder.add(i[1]);
-			}
-		}
 
-		printData(colOrder);
-
-
-	}
-
-	public void printData(ArrayList<String> colOrder)
-	{
-		String line = createLine(colOrder.size());
-		println(line);
-
-		for(Tuple i : tuples) {
-			for(String j : colOrder) {
-				for (Cell k : i.getCells()) {
-					if (k.getKey().equals(j))
-						System.out.print(completeString(k.getValue().toString())+"|");
-				}
-			}
-			println(line);
-		}
-	}
-	public void println(String line)
-	{
-		System.out.println();
-		System.out.println(line);
-	}
-
-	public String createLine(int numOfCol) {
-		String line = "";
-		for(int i=0;i!= numOfCol;i++) {
-			for(int j=0;j!= 10;j++)
-				line+="-";
-		}
-		return line;
-	}
-
-	public String completeString(String data) {
-		while(data.length()<10)
-			data+=" ";
-		return data;
+	public void print() throws IOException, ClassNotFoundException {
+		printPage print = new printPage(this);
+		print.printPage();
 	}
 }
