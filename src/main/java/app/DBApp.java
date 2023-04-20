@@ -11,6 +11,7 @@ import constants.Constants;
 import exceptions.DBAppException;
 import filecontroller.Serializer;
 import storage.*;
+import util.TypeCaster;
 import validation.Validator;
 import search.*;
 import sql.SQLTerm;
@@ -197,9 +198,7 @@ public class DBApp implements IDatabase {
 	}
 	
 	private void castClusteringKeyType(Table table) {
-		String primaryKeyType=table.getPrimaryKeyType();
-		if(primaryKeyType.equals(Constants.INTEGER_DATA_TYPE_NAME)) clusteringKey=Integer.parseInt(clusteringKeyValue);
-		else if(primaryKeyType.equals(Constants.DOUBLE_DATA_TYPE_NAME)) clusteringKey=Double.parseDouble(clusteringKeyValue);
+		TypeCaster.castClusteringKey(table, clusteringKey, clusteringKeyValue);
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {

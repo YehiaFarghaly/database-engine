@@ -16,7 +16,7 @@ import filecontroller.FileDeleter;
 import filecontroller.FileType;
 import filecontroller.Serializer;
 import search.PageSearch;
-import util.printPage;
+import util.PagePrinter;
 
 public class Page implements Serializable {
 	/**
@@ -155,7 +155,7 @@ public class Page implements Serializable {
 
 
 	public void print() throws IOException, ClassNotFoundException {
-		printPage print = new printPage(this);
+		PagePrinter print = new PagePrinter(this);
 		print.printPage();
 	}
 }

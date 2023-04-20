@@ -10,13 +10,13 @@ import storage.Tuple;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class printPage {
+public class PagePrinter {
 
     Page page;
     ArrayList<String> colOrder;
 
     String line ;
-    public printPage(Page page) throws IOException, ClassNotFoundException {
+    public PagePrinter(Page page) throws IOException, ClassNotFoundException {
         this.page = page;
         colOrder = getColOrder();
         line = createLine();
