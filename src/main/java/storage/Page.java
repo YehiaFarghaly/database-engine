@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 
 import constants.Constants;
+import datamanipulation.CsvReader;
 import exceptions.DBAppException;
 import filecontroller.ConfigReader;
 import filecontroller.FileCreator;
@@ -18,10 +16,11 @@ import filecontroller.FileDeleter;
 import filecontroller.FileType;
 import filecontroller.Serializer;
 import search.PageSearch;
+import util.printPage;
 
 public class Page implements Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 2857345022460368698L;
 	private String name;
@@ -100,10 +99,10 @@ public class Page implements Serializable {
 
 	private void newMinMax() {
 		if(tuples.size()>0) {
-		minPK = tuples.get(0).getPrimaryKey();
-		maxPK = tuples.get(tuples.size() - 1).getPrimaryKey();
+			minPK = tuples.get(0).getPrimaryKey();
+			maxPK = tuples.get(tuples.size() - 1).getPrimaryKey();
 		}
-		}
+	}
 
 	private int pageBinarySearch(Object primaryKey) throws DBAppException, ParseException {
 		return PageSearch.binarySearch(this, primaryKey);
@@ -129,7 +128,7 @@ public class Page implements Serializable {
 		if (tuples.isEmpty()) {
 			deletePageFile();
 		}
-		
+
 	}
 
 	private void deletePageFile() {
@@ -152,5 +151,11 @@ public class Page implements Serializable {
 		}
 		Serializer.SerializePage(name,this);
 
+	}
+
+
+	public void print() throws IOException, ClassNotFoundException {
+		printPage print = new printPage(this);
+		print.printPage();
 	}
 }
