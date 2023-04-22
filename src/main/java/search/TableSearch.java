@@ -1,40 +1,41 @@
 package search;
 
-import java.util.*;
-
+import java.io.IOException;
+import java.text.ParseException;
+import exceptions.DBAppException;
+import storage.Page;
 import storage.Table;
-import storage.Tuple;
+import static filecontroller.Serializer.deserializePage;
 
 public class TableSearch {
-    public static Vector<Tuple> search(Table table, String colName, String value) {
 
-        return new Vector<Tuple>();
-    }
+	public static int binarySearchPages(Table table, Object tuplePrimaryKey)
+			throws DBAppException, ParseException, IOException, ClassNotFoundException {
+		int n = table.getPagesName().size();
+		int low = 0;
+		int high = n - 1;
 
-    public static Vector<Tuple> searchGreaterThan(Table table, String colName, String value) {
+		while (low <= high) {
 
-        return new Vector<Tuple>();
-    }
+			int mid = (low + high)  / 2;
 
-    public static Vector<Tuple> searchGreaterThanOrEqual(Table table, String colName, String value) {
+            Page currPage = deserializePage(table.getName(), table.getPagesName().get(mid));
 
-        return new Vector<Tuple>();
-    }
+			int compareWithMin = Compare.compare(tuplePrimaryKey, currPage.getMinPK());
 
-    public static Vector<Tuple> searchLessThan(Table table, String colName, String value) {
-        return new Vector<Tuple>();
-    }
+			int compWithMax = Compare.compare(tuplePrimaryKey, currPage.getMaxPK());
 
-    public static Vector<Tuple> searchLessThanOrEqual(Table table, String colName, String value) {
-        return new Vector<Tuple>();
-    }
+			if (compWithMax <= 0 && compareWithMin >= 0) {
+				return mid;
+			} else if (compWithMax > 0)
+				low = mid + 1;
+			else
+				high = mid - 1;
 
-    public static Vector<Tuple> searchNotEqual(Table table, String colName, String value) {
-        return new Vector<Tuple>();
-    }
+		}
+		return Math.min(low, n - 1);
+	}
 
-    private int getColNumber(Table table, String colName) {
-        return 0;
-    }
+	
 
 }

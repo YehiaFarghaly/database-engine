@@ -1,4 +1,4 @@
-package dataManipulation;
+package datamanipulation;
 
 import java.io.*;
 import java.util.Map.Entry;
@@ -9,11 +9,11 @@ import com.opencsv.exceptions.CsvValidationException;
 import constants.Constants;
 import storage.Table;
 
-public class csvWriter {
+public class CsvWriter {
 
 	CSVWriter writer;
 
-	public csvWriter() {
+	public CsvWriter() {
 		try {
 			this.writer = new CSVWriter(new FileWriter(Constants.METADATA_PATH, true));
 		} catch (IOException e) {

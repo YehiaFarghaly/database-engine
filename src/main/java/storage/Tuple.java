@@ -17,13 +17,21 @@ public class Tuple implements Cloneable, ITuple, Serializable {
 	public void addCell(Cell c) {
 		this.cells.add(c);
 	}
+	
+	public Vector<Cell> getCells() {
+		return cells;
+	}
+
+	public Object getPrimaryKey() {
+		return primaryKey;
+	}
 
 	@Override
 	public void setPrimaryKey(Object PK) {
 		this.primaryKey = PK;
 	}
 
-	public Tuple getCopy() {
+	protected Tuple getCopy() {
 		Tuple copy = null;
 		try {
 			copy = (Tuple) this.clone();
@@ -33,14 +41,6 @@ public class Tuple implements Cloneable, ITuple, Serializable {
 		}
 
 		return copy;
-	}
-
-	public Vector<Cell> getCells() {
-		return cells;
-	}
-
-	public Object getPrimaryKey() {
-		return primaryKey;
 	}
 
 }

@@ -1,164 +1,208 @@
 package app;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Vector;
+import java.text.ParseException;
+import java.util.*;
 
-import Serializerium.Serializer;
+import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 
-import dataManipulation.csvReader;
-import dataManipulation.csvWriter;
+import constants.Constants;
 import exceptions.DBAppException;
+import filecontroller.Serializer;
 import storage.*;
+import util.TypeCaster;
 import validation.Validator;
 import search.*;
 import sql.SQLTerm;
-import constants.Constants;
+import datamanipulation.CsvReader;
+import datamanipulation.CsvWriter;
 
+/**
+ * The DBApp class represents a database management system. It implements the
+ * IDatabase interface and provides methods for initializing the system,
+ * creating tables, creating indices, inserting, updating and deleting records,
+ * and selecting records using SQL terms.
+ */
 public class DBApp implements IDatabase {
 
-	private Hashtable<String, Table> myTables;// contains table names and the corresponding table;
-	private csvReader reader;
-	private csvWriter writer;
+	private HashSet<String> myTables;
+	private CsvReader reader;
+	private CsvWriter writer;
+	private Object clusteringKey;
+	private String clusteringKeyValue;
 
-	public DBApp() throws IOException {
-		this.myTables = new Hashtable<>();
-		this.writer = new csvWriter();
-		this.reader = new csvReader();
+	public DBApp() {
+		this.myTables = new HashSet<>();
+		this.writer = new CsvWriter();
+		this.reader = new CsvReader();
 	}
 
+
+	public HashSet<String> getMyTables() {
+		return myTables;
+	}
+
+
+	public CsvReader getReader() {
+		return reader;
+	}
+
+	public CsvWriter getWriter() {
+		return writer;
+	}
+
+	/**
+	 * Initializes the database management system by reading all the tables from CSV file
+	 * 
+	 */
 	@Override
 	public void init() {
-		this.myTables = reader.readAll(); // to read all tables in the metadata file
+		
+		this.myTables = reader.readAllTables();
+
 	}
 
+	/**
+	 * Creates a new table in the system with the specified parameters.
+	 * 
+	 * @param strTableName           The name of the table.
+	 * @param strClusteringKeyColumn The name of the clustering key column.
+	 * @param htblColNameType        A Hashtable containing the name and data type
+	 *                               of each column in the table.
+	 * @param htblColNameMin         A Hashtable containing the name and minimum
+	 *                               value of each column in the table.
+	 * @param htblColNameMax         A Hashtable containing the name and maximum
+	 *                               value of each column in the table.
+	 * 
+	 * @throws DBAppException If the table name is invalid or if the table already
+	 *                        exists.
+	 * @throws IOException    If an error occurs while creating the table files.
+	 */
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException {
+			Hashtable<String, String> htblColNameMax) throws DBAppException, IOException {
+
+		// Validator.validateTableCreation(myTables, strTableName,
+		// strClusteringKeyColumn, htblColNameType, htblColNameMin,
+		// htblColNameMax);
 
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
-		getMyTables().put(strTableName, table);
-		getWriter().write(table);
+		myTables.add(strTableName);
+		writer.write(table);
+		table.createTableFiles();
+		Serializer.SerializeTable(table);
 	}
 
+	/**
+	 * Inserts a new record into the specified table.
+	 * 
+	 * @param strTableName     The name of the table.
+	 * @param htblColNameValue A Hashtable containing the name and value of each
+	 *                         column in the record.
+	 * 
+	 * @throws DBAppException         If the table name is invalid, the record data
+	 *                                is invalid or the record already exists.
+	 * @throws CsvValidationException If the record fails CSV validation.
+	 * @throws IOException            If an error occurs while inserting the record.
+	 * @throws ClassNotFoundException If an error occurs while serializing or
+	 *                                deserializing the table.
+	 * @throws ParseException         If an error occurs while parsing the record
+	 *                                data.
+	 */
 	@Override
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
-		// TODO Auto-generated method stub
-		boolean validTable = Validator.validTable(strTableName, myTables);
+			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
 
-		if (!validTable) {
-
-			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
-
-		} else {
-
-			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
-			
-			if (!validTuple) {
-				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
-
-			} else {
-
-				Table table = Serializer.deserializeTable(strTableName);
-				table.insertTuple(htblColNameValue);
-
-				Serializer.SerializeTable(table);
-			}
-		}
+		takeAction(Action.INSERT, strTableName, htblColNameValue);
 
 	}
 
+	/**
+	 * Updates a record in a table.
+	 * 
+	 * @param strTableName          the name of the table to update a record in.
+	 * @param strClusteringKeyValue the value of the clustering key for the record
+	 *                              to be updated.
+	 * @param htblColNameValue      the new values for the record.
+	 * 
+	 * @throws DBAppException         if there is an error with the database
+	 *                                operations.
+	 * @throws CsvValidationException if there is an error with the CSV file.
+	 * @throws IOException            if there is an error with file operations.
+	 * @throws ClassNotFoundException if there is an error with the serialization.
+	 * @throws ParseException         if there is an error parsing the input.
+	 */
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException, CsvValidationException, IOException, ClassNotFoundException {
-		boolean validTable = Validator.validTable(strTableName,myTables);
-		
-		if (!validTable) {
-
-			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
-
-		} else {
-			boolean validTupleUpdate = Validator.validTupleUpdate(myTables.get(strTableName),htblColNameValue);
-			if (!validTupleUpdate) {
-				
-				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
-			}else {
-				
-				Table table = Serializer.deserializeTable(strTableName);
-				upadteTuple(table,strClusteringKeyValue,htblColNameValue);
-
-				Serializer.SerializeTable(table);
-
-			}
-
-		}
-			
-
+			Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
+		this.clusteringKeyValue =  strClusteringKeyValue;
+		takeAction(Action.UPDATE, strTableName, htblColNameValue);
 	}
 
+	/**
+	 * Deletes records from a table.
+	 * 
+	 * @param strTableName     the name of the table to delete records from.
+	 * @param htblColNameValue the values to match records to be deleted.
+	 * 
+	 * @throws DBAppException         if there is an error with the database
+	 *                                operations.
+	 * @throws CsvValidationException if there is an error with the CSV file.
+	 * @throws IOException            if there is an error with file operations.
+	 * @throws ClassNotFoundException if there is an error with the serialization.
+	 * @throws ParseException         if there is an error parsing the input.
+	 */
 	@Override
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException {
-		// TODO I need to remove the duplicates in the following lines later
-		boolean validTable = Validator.validTable(strTableName, myTables);
-		if (!validTable) {
+			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
+		takeAction(Action.DELETE, strTableName, htblColNameValue);
+	}
 
-			System.out.println(Constants.ERROR_MESSAGE_TABLE_NAME);
+	/**
+	 * Performs an action (insert, delete, or update) on a table.
+	 * 
+	 * @param action           the action to perform.
+	 * @param strTableName     the name of the table to perform the action on.
+	 * @param htblColNameValue the values to use for the action.
+	 * 
+	 * @throws DBAppException         if there is an error with the database
+	 *                                operations.
+	 * @throws CsvValidationException if there is an error with the CSV file.
+	 * @throws IOException            if there is an error with file operations.
+	 * @throws ClassNotFoundException if there is an error with the serialization.
+	 * @throws ParseException         if there is an error parsing the input.
+	 */
+	private void takeAction(Action action, String strTableName, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
 
+		Validator.validateTable(strTableName, myTables);
+
+		Table table = Serializer.deserializeTable(strTableName);
+
+		if (action == Action.INSERT) {
+			Validator.validateInsertionInput(table, htblColNameValue);
+			table.insertTuple(htblColNameValue);
+		} else if (action == Action.DELETE) {
+			Validator.validateDeletionInput(table, htblColNameValue);
+			table.DeleteTuples(htblColNameValue);
 		} else {
-
-			boolean validTuple = Validator.validTuple(myTables.get(strTableName), htblColNameValue);
-
-			if (!validTuple) {
-
-				System.out.println(Constants.ERROR_MESSAGE_TUPLE_DATA);
-
-			} else {
-
-				Table TargetTable = myTables.get(strTableName);
-
-			}
+			Validator.validateUpdateInput(table, htblColNameValue);
+			castClusteringKeyType(table);
+			table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 		}
+
+		Serializer.SerializeTable(table);
+	}
+	
+	private void castClusteringKeyType(Table table) {
+		TypeCaster.castClusteringKey(table, clusteringKey, clusteringKeyValue);
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
-
-	public Hashtable<String, Table> getMyTables() {
-		return myTables;
-	}
-
-	public csvReader getReader() {
-		return reader;
-	}
-
-	public csvWriter getWriter() {
-		return writer;
-	}
 	
-	public static Page getPageToUpdate(String strClusteringKeyValue,Table table,Tuple tuple) throws ClassNotFoundException, IOException {
-		tuple.setPrimaryKey(strClusteringKeyValue);
-		int pkPagePosition = table.search(tuple);
-		return table.getPageAtPosition(pkPagePosition);
-	}
-	public static Tuple getTupleToUpdate(Tuple tuple,Page page) {
-		int pkVectorPoition = page.search(tuple);
-		return page.getTuples().get(pkVectorPoition);
-
-	}
-	public static void upadteTuple(Table table,String strClusteringKeyValue,Hashtable<String, Object> htblColNameValue) throws ClassNotFoundException, IOException {
-		Tuple tuple = new Tuple(); 
-		Page page = getPageToUpdate(strClusteringKeyValue, table, tuple);
-		tuple = getTupleToUpdate(tuple, page);
-		for (Cell c : tuple.getCells()) {
-			c.setValue(htblColNameValue.get(c.getKey()));    
-		}
-	}
 }
