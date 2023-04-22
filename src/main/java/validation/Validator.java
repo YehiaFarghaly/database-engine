@@ -55,28 +55,32 @@ public class Validator {
 	}
 
 	public static void validateTable(String tableName, HashSet<String> myTables) {
-
+		
 	}
 
 	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue) {
-
+		
 	}
 
 	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue) {
-
+		
 	}
 
 	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue) {
-
+		
 	}
 
 	private static boolean validClusteringKey(String strClusteringKeyColumn) {
-		// TODO Auto-generated method stub
+		if(strClusteringKeyColumn!=null) {
+			return true;
+		}
 		return false;
 	}
 
 	private static boolean validDataTypes(Hashtable<String, String> htblColNameType) {
-		// TODO Auto-generated method stub
+		for(String data:htblColNameType.values()) {
+			if(data.equals("java.lang.Integer")||)
+		}
 		return false;
 
 	}
