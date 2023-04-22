@@ -55,37 +55,46 @@ public class Validator {
 	}
 
 	public static void validateTable(String tableName, HashSet<String> myTables) {
-
+		
 	}
 
 	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue) {
-
+		
 	}
 
 	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue) {
-
+		
 	}
 
 	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue) {
-
+		
 	}
 
 	private static boolean validClusteringKey(String strClusteringKeyColumn) {
-		// TODO Auto-generated method stub
+		if(strClusteringKeyColumn!=null) {
+			return true;
+		}
 		return false;
 	}
 
 	private static boolean validDataTypes(Hashtable<String, String> htblColNameType) {
-		// TODO Auto-generated method stub
-		return false;
+		for(String data:htblColNameType.values()) {
+			if(!data.equals(Constants.INTEGER_DATA_TYPE_NAME)&&!data.equals(Constants.DOUBLE_DATA_TYPE_NAME)&&!data.equals(Constants.STRING_DATA_TYPE_NAME)&&!data.equals(Constants.DATE_DATA_TYPE_NAME)) {
+				return false;
+			}
+		}
+		return true;
 
 	}
 
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
-			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
-		// TODO Auto-generated method stub
-		return false;
-
+			Hashtable<String, String> htblColNameMin, Hashtable<String, String>htblColNameMax) {
+		Object minValue =  htblColNameMin.values().toArray()[0];
+		Object maxValue = htblColNameMax.values().toArray()[0];
+		if (isFirstLessThanSecond(maxValue, minValue)){
+			return false;
+		}		
+		return true;
 	}
 
 	public static boolean validTable(String tableName, HashSet<String> myTables) {
