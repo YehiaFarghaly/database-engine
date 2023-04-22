@@ -79,7 +79,7 @@ public class Validator {
 
 	private static boolean validDataTypes(Hashtable<String, String> htblColNameType) {
 		for(String data:htblColNameType.values()) {
-			if(!data.equals("java.lang.Integer")||!data.equals("java.lang.String")||!data.equals("java.lang.double")||!data.equals("java.util.Date")) {
+			if(!data.equals(Constants.INTEGER_DATA_TYPE_NAME)&&!data.equals(Constants.DOUBLE_DATA_TYPE_NAME)&&!data.equals(Constants.STRING_DATA_TYPE_NAME)&&!data.equals(Constants.DATE_DATA_TYPE_NAME)) {
 				return false;
 			}
 		}
@@ -90,9 +90,8 @@ public class Validator {
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String>htblColNameMax) {
 		Object minValue =  htblColNameMin.values().toArray()[0];
-		Object maxValue = htblColNameMin.values().toArray()[0];
-		if ((isFirstLessThanSecond(maxValue, minValue))
-				|| (isFirstGreaterThanSecond(minValue, maxValue))) {
+		Object maxValue = htblColNameMax.values().toArray()[0];
+		if (isFirstLessThanSecond(maxValue, minValue)){
 			return false;
 		}		
 		return true;
