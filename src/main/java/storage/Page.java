@@ -1,21 +1,17 @@
 package storage;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.*;
-
 import constants.Constants;
-import datamanipulation.CsvReader;
 import exceptions.DBAppException;
-import filecontroller.ConfigReader;
-import filecontroller.FileCreator;
-import filecontroller.FileDeleter;
-import filecontroller.FileType;
-import filecontroller.Serializer;
-import search.PageSearch;
+import util.filecontroller.ConfigReader;
+import util.filecontroller.FileCreator;
+import util.filecontroller.FileDeleter;
+import util.filecontroller.FileType;
+import util.filecontroller.Serializer;
+import util.search.PageSearch;
 import util.PagePrinter;
 
 public class Page implements Serializable {
@@ -86,7 +82,7 @@ public class Page implements Serializable {
 
 	protected Tuple removeLastTuple() throws IOException {
 		Tuple ret = tuples.remove(tuples.size()-1);
-		Serializer.SerializePage(name, this);
+		Serializer.serializePage(name, this);
 		return ret;
 	}
 
@@ -94,11 +90,11 @@ public class Page implements Serializable {
 		int position = isEmpty()?0:pageBinarySearch(tuple.getPrimaryKey());
 		tuples.add(position, tuple);
 		newMinMax();
-		Serializer.SerializePage(name, this);
+		Serializer.serializePage(name, this);
 	}
 
 	private void newMinMax() {
-		if(tuples.size()>0) {
+		if (tuples.size()>0) {
 			minPK = tuples.get(0).getPrimaryKey();
 			maxPK = tuples.get(tuples.size() - 1).getPrimaryKey();
 		}
@@ -112,12 +108,12 @@ public class Page implements Serializable {
 		return PageSearch.linearSearch(this, colName, value);
 	}
 
-	protected void DeleteFromPage(Tuple tuple) throws IOException, DBAppException, ParseException {
+	protected void deleteFromPage(Tuple tuple) throws IOException, DBAppException, ParseException {
 		int position = pageBinarySearch(tuple.getPrimaryKey());
 		if (position != -1) {
 			tuples.remove(position);
 			newMinMax();
-			Serializer.SerializePage(name, this);
+			Serializer.serializePage(name, this);
 			handleEmptyPage();
 		} else {
 			throw new DBAppException(Constants.ERROR_MESSAGE_SEARCH_NOT_FOUND);
@@ -132,7 +128,7 @@ public class Page implements Serializable {
 	}
 
 	private void deletePageFile() {
-		FileDeleter.deleteFile(this,FileType.PAGE);
+		FileDeleter.deleteFile(this, FileType.PAGE);
 	}
 
 	protected void createPageFile() throws IOException {
@@ -146,10 +142,10 @@ public class Page implements Serializable {
 		Tuple tuple = tuples.get(pkVectorPoition);
 
 		for (Cell c : tuple.getCells()) {
-			if(htblColNameValue.get(c.getKey()) != null)
+			if (htblColNameValue.get(c.getKey()) != null)
 				c.setValue(htblColNameValue.get(c.getKey()));
 		}
-		Serializer.SerializePage(name,this);
+		Serializer.serializePage(name, this);
 
 	}
 

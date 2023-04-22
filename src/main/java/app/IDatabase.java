@@ -1,4 +1,5 @@
 package app;
+
 import java.util.*;
 import exceptions.DBAppException;
 import sql.SQLTerm;
@@ -18,7 +19,7 @@ public interface IDatabase {
 	public void updateTable(String strTableName, String strClusteringKeyValue,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException;
 
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws  DBAppException;
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException;
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException;
 	

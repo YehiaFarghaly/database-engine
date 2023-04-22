@@ -1,14 +1,13 @@
-package search;
+package util.search;
+
 import java.util.Iterator;
 import java.util.Vector;
-
 import sql.SQLTerm;
 import storage.Tuple;
-import validation.*;
 
 public class Selector {
 
-    private Vector<Tuple> FinalResult;
+    private Vector<Tuple> finalResult;
 
     public Selector(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
         
@@ -18,6 +17,6 @@ public class Selector {
     }
 
     public Iterator<Tuple> getResult() {
-        return FinalResult.iterator();
+        return finalResult.iterator();
     }
 }

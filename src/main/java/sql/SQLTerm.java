@@ -1,15 +1,16 @@
 package sql;
-import validation.*;
-public class SQLTerm{
-String _strTableName, _strColumnName ,_strOperator;
-Object _objValue;
 
-    public SQLTerm(String _strTableName, String _strColumnName, String _strOperator, Object _objValue) {
-        this._strTableName = _strTableName;
-        this._strColumnName = _strColumnName;
-        this._strOperator = _strOperator;
-        this._objValue = _objValue;
+public class SQLTerm{
+String strTableName, strColumnName, strOperator;
+Object objValue;
+
+    public SQLTerm(String strTableName, String strColumnName, String strOperator, Object objValue) {
+        this.strTableName = strTableName;
+        this.strColumnName = strColumnName;
+        this.strOperator = strOperator;
+        this.objValue = objValue;
     }
+    
     public boolean isValid(){
         return false;
     }

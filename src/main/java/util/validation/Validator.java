@@ -1,18 +1,15 @@
-package validation;
+package util.validation;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
-
 import com.opencsv.exceptions.CsvValidationException;
-
 import constants.Constants;
 import datamanipulation.CsvReader;
 import exceptions.DBAppException;
-import search.Compare;
-import sql.SQLTerm;
 import storage.Table;
 import storage.Tuple;
+import util.Compare;
 
 public class Validator {
 
@@ -27,27 +24,23 @@ public class Validator {
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		if (validTable(strTableName, appTables)) {
-
 			throw new DBAppException(Constants.ERROR_MESSAGE_REPEATED_TABLE_NAME);
 
 		} else if (!validClusteringKey(strClusteringKeyColumn)) {
-
 			throw new DBAppException(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY);
 
 		} else if (!validDataTypes(htblColNameType)) {
-
 			throw new DBAppException(Constants.ERROR_MESSAGE_DATATYPE);
 
 		} else if (!validMinAndMax(htblColNameType, htblColNameMin, htblColNameMax)) {
-
 			throw new DBAppException(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
 
 		}
-
 	}
 
 	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue,
-			HashSet<String> appTables) throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
+			HashSet<String> appTables)
+			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
 
 		if (!validTable(table.getName(), appTables))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
@@ -55,15 +48,18 @@ public class Validator {
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
-	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue,HashSet<String> appTables) throws DBAppException {
+	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue,
+			HashSet<String> appTables) throws DBAppException {
 		if (!validTable(table.getName(), appTables))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
 	}
 
-	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue,HashSet<String> appTables) throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
+	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue,
+			HashSet<String> appTables)
+			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
 		if (!validTable(table.getName(), appTables))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
-		if(!validTupleUpdate(table, htblColNameValue))
+		if (!validTupleUpdate(table, htblColNameValue))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
