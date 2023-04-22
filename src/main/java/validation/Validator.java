@@ -22,14 +22,6 @@ public class Validator {
 	private static Object[] min;
 	private static Object[] max;
 
-	public static boolean validateOperatorInside(SQLTerm term) {
-		return false;
-	}
-
-	public static boolean validateOperatorBetween(String operator) {
-		return false;
-	}
-
 	public static void validateTableCreation(HashSet<String> appTables, String strTableName,
 			String strClusteringKeyColumn, Hashtable<String, String> htblColNameType,
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) throws DBAppException {
@@ -54,32 +46,38 @@ public class Validator {
 
 	}
 
-	public static void validateTable(String tableName, HashSet<String> myTables) {
-		
+	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue,
+			HashSet<String> appTables) throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
+
+		if (!validTable(table.getName(), appTables))
+			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
+		if (!validTuple(table, htblColNameValue))
+			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
-	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue) {
-		
+	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue,HashSet<String> appTables) throws DBAppException {
+		if (!validTable(table.getName(), appTables))
+			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
 	}
 
-	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue) {
-		
-	}
-
-	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue) {
-		
+	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue,HashSet<String> appTables) throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
+		if (!validTable(table.getName(), appTables))
+			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
+		if(!validTupleUpdate(table, htblColNameValue))
+			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
 	private static boolean validClusteringKey(String strClusteringKeyColumn) {
-		if(strClusteringKeyColumn!=null) {
+		if (strClusteringKeyColumn != null) {
 			return true;
 		}
 		return false;
 	}
 
 	private static boolean validDataTypes(Hashtable<String, String> htblColNameType) {
-		for(String data:htblColNameType.values()) {
-			if(!data.equals(Constants.INTEGER_DATA_TYPE_NAME)&&!data.equals(Constants.DOUBLE_DATA_TYPE_NAME)&&!data.equals(Constants.STRING_DATA_TYPE_NAME)&&!data.equals(Constants.DATE_DATA_TYPE_NAME)) {
+		for (String data : htblColNameType.values()) {
+			if (!data.equals(Constants.INTEGER_DATA_TYPE_NAME) && !data.equals(Constants.DOUBLE_DATA_TYPE_NAME)
+					&& !data.equals(Constants.STRING_DATA_TYPE_NAME) && !data.equals(Constants.DATE_DATA_TYPE_NAME)) {
 				return false;
 			}
 		}
@@ -88,12 +86,12 @@ public class Validator {
 	}
 
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
-			Hashtable<String, String> htblColNameMin, Hashtable<String, String>htblColNameMax) {
-		Object minValue =  htblColNameMin.values().toArray()[0];
+			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
+		Object minValue = htblColNameMin.values().toArray()[0];
 		Object maxValue = htblColNameMax.values().toArray()[0];
-		if (isFirstLessThanSecond(maxValue, minValue)){
+		if (isFirstLessThanSecond(maxValue, minValue)) {
 			return false;
-		}		
+		}
 		return true;
 	}
 
@@ -127,7 +125,8 @@ public class Validator {
 
 	public static boolean isTheSameDataType(Hashtable<String, Object> tuple) {
 		for (int i = 0; i < columns.length; i++) {
-			if (!tuple.get(columns[i]).getClass().equals(dataTypes[i]))
+			if (!tuple.get(columns[i]).getClass().toString().endsWith(dataTypes[i]))
+
 				return false;
 		}
 		return true;
@@ -173,18 +172,13 @@ public class Validator {
 
 	public static boolean validTuple(Table table, Hashtable<String, Object> tuple)
 			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
-//    	getTableInfo(table);
-//    	if( !isTheSameNumberOfColumns(tuple) ||
-//    		!containsAllColumns(tuple)       ||
-//    	    !isTheSameDataType(tuple) ||
-//    	    !checkMinMax(tuple)||
-//    	    foundPK(table,tuple)) {
-//    		return false;
-//    		}
-//    	else {
-//    		return true;
-//    	}
-		return true;
+		getTableInfo(table);
+		if (!isTheSameNumberOfColumns(tuple) || !containsAllColumns(tuple) || !isTheSameDataType(tuple)
+				|| !checkMinMax(tuple) || foundPK(table, tuple)) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	public static boolean containsAllColumnsUpdate(Hashtable<String, Object> tuple) {
@@ -205,16 +199,14 @@ public class Validator {
 		} else {
 			return true;
 		}
-
 	}
 
 	public static boolean checkMinMax(Hashtable<String, Object> tuple) {
-		for (int i = 0; i < columns.length; i++) {
 
+		for (int i = 0; i < columns.length; i++) {
 			Object insertedValue = tuple.get(columns[i]);
 			Object minValue = min[i];
 			Object maxValue = max[i];
-
 			if ((isFirstLessThanSecond(insertedValue, minValue))
 					|| (isFirstGreaterThanSecond(insertedValue, maxValue))) {
 				return false;

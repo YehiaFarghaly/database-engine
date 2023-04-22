@@ -11,10 +11,10 @@ public class Selector {
     private Vector<Tuple> FinalResult;
 
     public Selector(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
-        //for loop
+        
         arrSQLTerms[0].isValid();
-        //for loop
-        Validator.validateOperatorBetween(strarrOperators[0]);
+        
+       
     }
 
     public Iterator<Tuple> getResult() {

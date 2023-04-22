@@ -11,6 +11,6 @@ Object _objValue;
         this._objValue = _objValue;
     }
     public boolean isValid(){
-        return Validator.validateOperatorInside(this);
+        return false;
     }
 }

@@ -38,11 +38,9 @@ public class DBApp implements IDatabase {
 		this.reader = new CsvReader();
 	}
 
-
 	public HashSet<String> getMyTables() {
 		return myTables;
 	}
-
 
 	public CsvReader getReader() {
 		return reader;
@@ -53,12 +51,13 @@ public class DBApp implements IDatabase {
 	}
 
 	/**
-	 * Initializes the database management system by reading all the tables from CSV file
+	 * Initializes the database management system by reading all the tables from CSV
+	 * file
 	 * 
 	 */
 	@Override
 	public void init() {
-		
+
 		this.myTables = reader.readAllTables();
 
 	}
@@ -82,7 +81,7 @@ public class DBApp implements IDatabase {
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException, IOException {
+			Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		// Validator.validateTableCreation(myTables, strTableName,
 		// strClusteringKeyColumn, htblColNameType, htblColNameMin,
@@ -91,8 +90,12 @@ public class DBApp implements IDatabase {
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.add(strTableName);
 		writer.write(table);
-		table.createTableFiles();
-		Serializer.SerializeTable(table);
+		try {
+			table.createTableFiles();
+			Serializer.SerializeTable(table);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -113,7 +116,7 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
+			throws DBAppException {
 
 		takeAction(Action.INSERT, strTableName, htblColNameValue);
 
@@ -137,8 +140,8 @@ public class DBApp implements IDatabase {
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
 			Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
-		this.clusteringKeyValue =  strClusteringKeyValue;
+			throws DBAppException {
+		this.clusteringKeyValue = strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
 	}
 
@@ -157,7 +160,7 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
+			throws DBAppException {
 		takeAction(Action.DELETE, strTableName, htblColNameValue);
 	}
 
@@ -176,27 +179,31 @@ public class DBApp implements IDatabase {
 	 * @throws ParseException         if there is an error parsing the input.
 	 */
 	private void takeAction(Action action, String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
-
-		Validator.validateTable(strTableName, myTables);
+			throws DBAppException {
+		
+		try {
 
 		Table table = Serializer.deserializeTable(strTableName);
 
 		if (action == Action.INSERT) {
-			Validator.validateInsertionInput(table, htblColNameValue);
+			//Validator.validateInsertionInput(table, htblColNameValue,myTables);
 			table.insertTuple(htblColNameValue);
 		} else if (action == Action.DELETE) {
-			Validator.validateDeletionInput(table, htblColNameValue);
+			//Validator.validateDeletionInput(table, htblColNameValue,myTables);
 			table.DeleteTuples(htblColNameValue);
 		} else {
-			Validator.validateUpdateInput(table, htblColNameValue);
+			//Validator.validateUpdateInput(table, htblColNameValue,myTables);
 			castClusteringKeyType(table);
 			table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 		}
 
 		Serializer.SerializeTable(table);
-	}
-	
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		}
+
 	private void castClusteringKeyType(Table table) {
 		TypeCaster.castClusteringKey(table, clusteringKey, clusteringKeyValue);
 	}
@@ -204,5 +211,5 @@ public class DBApp implements IDatabase {
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
-	
+
 }
