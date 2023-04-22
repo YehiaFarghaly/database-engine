@@ -12,23 +12,23 @@ public class PageSearch {
 
 	public static int binarySearch(Page page, Object primaryKey) throws DBAppException, ParseException {
 		
-		int low = 0;
+		int LOW = 0;
 		int high = page.getSize() - 1;
 		
-		while (low <= high) {
-			int mid = low + (high - low) / 2;
+		while (LOW <= high) {
+			int mid = LOW + (high - LOW) / 2;
 			Tuple currTuple = page.getTuples().get(mid);
 			Object pkValueOfCurrTuple = currTuple.getPrimaryKey();
 			int comp = Compare.compare(primaryKey, pkValueOfCurrTuple);
 			if (comp == 0)
 				return mid;
 			else if (comp > 0)
-				low = mid + 1;
+				LOW = mid + 1;
 			else
 				high = mid - 1;
 		}
 		
-		return low;
+		return LOW;
 	}
 
 	public static Vector<Tuple> linearSearch(Page page, String colName, Object value)
