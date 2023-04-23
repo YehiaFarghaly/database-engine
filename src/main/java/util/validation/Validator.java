@@ -84,19 +84,19 @@ public class Validator {
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
 		int minMaxSize = htblColNameMin.values().size(); 
-		for(int i =0;i<minMaxSize;i++) {
-			Object minValue = htblColNameMin.values().toArray()[i];
-			Object maxValue = htblColNameMax.values().toArray()[i];
+		for (int i =0;i<minMaxSize;i++) {
+			Object minValue = htblColNameMin.values().toArray()[i]; 
+			Object maxValue = htblColNameMax.values().toArray()[i]; 
 			if (isFirstLessThanSecond(maxValue, minValue)||!minValue.getClass().equals(maxValue.getClass())) {
-				return false;
+				return false; 
 			}
 		}
 		
-		return true;
+		return true; 
 	}
 	
 	private static boolean samecolMinMax(Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
-		return htblColNameMin.keys().equals(htblColNameMax.keys());
+		return htblColNameMin.keys().equals(htblColNameMax.keys()); 
 		
 	}
 
