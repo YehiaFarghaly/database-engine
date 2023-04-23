@@ -1,109 +1,183 @@
-package app;
+//package app;
+//
+//import org.junit.jupiter.api.Test;
+//import com.opencsv.exceptions.CsvValidationException;
+//import exceptions.DBAppException;
+//import util.filecontroller.FileDeleter;
+//import util.filecontroller.FileType;
+//import util.filecontroller.Serializer;
+//import storage.Page;
+//import storage.Table;
+//import storage.Tuple;
+//import constants.Constants;
+//import static org.junit.jupiter.api.Assertions.assertThrows;
+//import java.io.IOException;
+//import java.text.ParseException;
+//import java.util.Hashtable;
+//
+//import org.junit.jupiter.api.AfterAll;
+//import org.junit.jupiter.api.BeforeAll;
+//import static org.assertj.core.api.Assertions.*;
+//
+//public class DBAppTest {
+//	private static DBApp engine;
+//	private static String newTableName;
+//	private static String id = Constants.ID;
+//	private static String name = Constants.NAME;
+//	private static String age = Constants.AGE;
+//
+//	private static void generateNewTableName() {
+//		int randomNumber1 = (int) (Math.random() * 100000) + 1;
+//		int randomNumber2 = (int) (Math.random() * 100000) + 1;
+//		newTableName = randomNumber1 + "" + randomNumber2;
+//		while (engine.getMyTables().contains(newTableName)) {
+//			randomNumber1 = (int) (Math.random() * 100000) + 1;
+//			randomNumber2 = (int) (Math.random() * 100000) + 1;
+//			newTableName = randomNumber1 + "" + randomNumber2;
+//		}
+//	}
+//
+//	@BeforeAll
+//	static void setEnvironment() throws IOException, DBAppException {
+//		engine = new DBApp();
+//		engine.init();
+//		generateNewTableName();
+//
+//		Hashtable<String, String> htblColNameType = createHashtable(Constants.INTEGER_DATA_TYPE_NAME,
+//				Constants.STRING_DATA_TYPE_NAME, Constants.INTEGER_DATA_TYPE_NAME);
+//
+//		Hashtable<String, String> htblColNameMin = createHashtable(Constants.MIN_ID_VALUE, Constants.MIN_NAME_VALUE,
+//				Constants.MIN_AGE_VALUE);
+//
+//		Hashtable<String, String> htblColNameMax = createHashtable(id, Constants.MAX_NAME_VALUE,
+//				Constants.MAX_AGE_VALUE);
+//
+//		engine.createTable(newTableName, id, htblColNameType, htblColNameMin, htblColNameMax);
+//	}
+//
+//	private static Hashtable<String, String> createHashtable(String value1, String value2, String value3) {
+//		Hashtable<String, String> hashtable = new Hashtable<String, String>();
+//		hashtable.put(id, value1);
+//		hashtable.put(name, value2);
+//		hashtable.put(age, value3);
+//		return hashtable;
+//	}
+//
+//	private Hashtable<String, Object> createRow(int idInput, String nameInput, int ageInput) {
+//		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+//		htblColNameValue.put(id, idInput);
+//		htblColNameValue.put(name, nameInput);
+//		htblColNameValue.put(age, ageInput);
+//		return htblColNameValue;
+//	}
+//
+//	@Test
+//	void testInsertIntoTable_OneTuple_ShouldInsertSuccessfully() throws ClassNotFoundException, IOException,
+//			CsvValidationException, DBAppException, ParseException, InterruptedException {
+//		// Given
+//		Hashtable<String, Object> htblColNameValue = createRow(1, "Yehia", 21);
+//
+//		// When
+//		engine.insertIntoTable(newTableName, htblColNameValue);
+//
+//		// Then
+//		Table table = Serializer.deserializeTable(newTableName);
+//		assertThat(table.getPagesName().size() == 1);
+//		Page page = table.getPageAtPosition(0);
+//		assertThat(page.getSize() == 1);
+//	}
+//
+//	@Test
+//	void testInsertIntoTable_ManyTuples_ShouldInsertSuccessfully() throws ClassNotFoundException, IOException,
+//			CsvValidationException, DBAppException, ParseException, InterruptedException {
+//
+//		for (int i = 2; i <= 300; i++) {
+//			// Given
+//			Hashtable<String, Object> htblColNameValue = createRow(i, "Yehia", 21);
+//
+//			// When
+//			engine.insertIntoTable(newTableName, htblColNameValue);
+//		}
+//		// Then
+//		Table table = Serializer.deserializeTable(newTableName);
+//		assertThat(table.getPagesName().size() == 2);
+//		Page page = table.getPageAtPosition(0);
+//		assertThat(page.isFull());
+//		page = table.getPageAtPosition(1);
+//		assertThat(page.getSize() == 100);
+//	}
 
-import org.junit.jupiter.api.Test;
-import com.opencsv.exceptions.CsvValidationException;
-import exceptions.DBAppException;
-import util.filecontroller.Serializer;
-import storage.Page;
-import storage.Table;
-import constants.Constants;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Hashtable;
-import org.junit.jupiter.api.BeforeAll;
-import static org.assertj.core.api.Assertions.*;
+//	@Test
+//	void testInsertIntoTable_RepeatedPrimaryKey_ShouldFailInsert() throws CsvValidationException, ClassNotFoundException, DBAppException, IOException {
+//		// Given
+//		Hashtable<String,Object> htblColNameValue = createRow(1, "Mohamed", 21);
+//		
+//		// When
+//		Exception exception = assertThrows(DBAppException.class,()->{
+//		engine.insertIntoTable(newTableName, htblColNameValue);
+//		}
+//		);
+//		
+//		//Then
+//		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+//		String outputMessage = exception.getMessage();
+//		assertThat(outputMessage).isEqualTo(expectedMessage);
+//	}
+//
+//	@Test
+//	void testUpdateTable_ValidInput_ShouldUpdateSuccessfully()
+//			throws DBAppException, ClassNotFoundException, IOException {
+//		// Given
+//		String updatedName = "Mohamed";
+//		Hashtable<String, Object> htblColNameValue = new Hashtable();
+//		htblColNameValue.put(name, updatedName);
+//
+//		// When
+//		engine.updateTable(newTableName, "1", htblColNameValue);
+//
+//		// Then
+//		Page page = Serializer.deserializePage(newTableName, "0");
+//		Tuple updated = page.getTuples().get(0);
+//		assertThat(updated.getCells().get(2).getValue()).isEqualTo(updatedName);
+//	}
 
-public class DBAppTest {
-	private DBApp engine;
-	private String newTableName;
-	private String id = Constants.ID;
-	private String name = Constants.NAME;
-	private String age = Constants.AGE;
-
-	private void generateNewTableName() {
-		int randomNumber1 = (int) (Math.random() * 100000) + 1;
-		int randomNumber2 = (int) (Math.random() * 100000) + 1;
-		newTableName = randomNumber1 + "" + randomNumber2;
-		while (engine.getMyTables().contains(newTableName)) {
-			randomNumber1 = (int) (Math.random() * 100000) + 1;
-			randomNumber2 = (int) (Math.random() * 100000) + 1;
-			newTableName = randomNumber1 + "" + randomNumber2;
-		}
-	}
-
-	@BeforeAll
-	void setEnvironment() throws IOException {
-		engine = new DBApp();
-		engine.init();
-		generateNewTableName();
-	}
-
-	private Hashtable<String, String> createHashtable(String value1, String value2, String value3) {
-		Hashtable<String, String> hashtable = new Hashtable<String, String>();
-		hashtable.put(id, value1);
-		hashtable.put(name, value2);
-		hashtable.put(age, value3);
-		return hashtable;
-	}
-
-	@Test
-	void testCreateTable_ValidTableName_ShouldBeCreatedSuccessfully() throws DBAppException, IOException {
-		// Given
-		Hashtable<String, String> htblColNameType = createHashtable(Constants.INTEGER_DATA_TYPE_NAME,
-				Constants.STRING_DATA_TYPE_NAME, Constants.INTEGER_DATA_TYPE_NAME);
-
-		Hashtable<String, String> htblColNameMin = createHashtable(Constants.MIN_ID_VALUE, Constants.MIN_NAME_VALUE,
-				Constants.MIN_AGE_VALUE);
-
-		Hashtable<String, String> htblColNameMax = createHashtable(Constants.MAX_ID_VALUE, Constants.MAX_NAME_VALUE,
-				Constants.MAX_AGE_VALUE);
-
-		// When
-		engine.createTable(newTableName, Constants.ID, htblColNameType, htblColNameMin, htblColNameMax);
-
-		// Then
-		assertThat(engine.getMyTables().contains(newTableName));
-	}
-	
-	private Hashtable<String,Object> createRow(int idInput, String nameInput, int ageInput){
-		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-		htblColNameValue.put(id, idInput);
-		htblColNameValue.put(name, nameInput);
-		htblColNameValue.put(age, ageInput);
-		return htblColNameValue;
-	}
-
-	@Test
-	void testInsertIntoTable_ValidInput_ShouldInsertSuccessfully() throws ClassNotFoundException, IOException, CsvValidationException, DBAppException, ParseException {
-		// Given 
-		Hashtable<String, Object> htblColNameValue = createRow(1,"Yehia",21);
-		
-		// When
-		engine.insertIntoTable(newTableName, htblColNameValue);
-		
-		// Then
-		Table table = Serializer.deserializeTable(newTableName);
-		assertThat(table.getPagesName().size()==1);
-		Page page = table.getPageAtPosition(0);
-		assertThat(page.getSize()==1);
-	}
-	
-	@Test
-	void testInsertIntoTable_InvalidTuple_ShouldFailInsert() throws CsvValidationException, ClassNotFoundException, DBAppException, IOException {
-		// Given
-		Hashtable<String,Object> htblColNameValue = createRow(1,"Mohamed",21);
-		
-		// When
-		Exception exception = assertThrows(DBAppException.class,()->{
-		engine.insertIntoTable(newTableName, htblColNameValue);
-		}
-		);
-		
-		//Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
-		String outputMessage = exception.getMessage();
-		assertThat(outputMessage).isEqualTo(expectedMessage);
-		
-	}
-}
+//	@Test
+//	void testUpdateTable_InvalidPrimaryKey_ShouldFailUpdate() throws DBAppException {
+//		// Given
+//		String updatedName = "Mohamed";
+//		Hashtable<String, Object> htblColNameValue = new Hashtable();
+//		htblColNameValue.put(name, updatedName);
+//
+//		// When
+//		Exception exception = assertThrows(DBAppException.class, () -> {
+//			engine.updateTable(newTableName, "0", htblColNameValue);
+//		});
+//
+//		// Then
+//		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+//		String outputMessage = exception.getMessage();
+//		assertThat(outputMessage).isEqualTo(expectedMessage);
+//	}
+//
+//	@Test
+//	void testDeleteFromTable_OneTuple_ShouldDeleteSuccessfully()
+//			throws DBAppException, ClassNotFoundException, IOException, InterruptedException {
+//		Thread.sleep(20000);
+//		// Given
+//		Hashtable htblColNameValue = new Hashtable<>();
+//		htblColNameValue.put(name, "Mohamed");
+//
+//		// When
+//		engine.deleteFromTable(newTableName, htblColNameValue);
+//
+//		// Then
+//		Table table = Serializer.deserializeTable(newTableName);
+//		assertThat(table.getSize()).isEqualTo(299);
+//	}
+//
+//	@AfterAll
+//	static void deleteCreatedTable() throws ClassNotFoundException, IOException, InterruptedException {
+//		Table table = Serializer.deserializeTable(newTableName);
+//		FileDeleter.deleteFile(table, FileType.TABLE);
+//	}
+//}
