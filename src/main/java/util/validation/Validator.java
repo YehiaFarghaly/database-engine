@@ -27,7 +27,7 @@ public class Validator {
 			throw new DBAppException(Constants.ERROR_MESSAGE_REPEATED_TABLE_NAME);
 
 		} else if (!validClusteringKey(strClusteringKeyColumn)) {
-			throw new DBAppException(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY);
+			throw new DBAppException(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY); 
 
 		} else if (!validDataTypes(htblColNameType)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_DATATYPE);
@@ -84,7 +84,7 @@ public class Validator {
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
 		int minMaxSize = htblColNameMin.values().size(); 
-		for (int i =0;i<minMaxSize;i++) {
+		for (int i =0; i<minMaxSize; i++) {
 			Object minValue = htblColNameMin.values().toArray()[i]; 
 			Object maxValue = htblColNameMax.values().toArray()[i]; 
 			if (isFirstLessThanSecond(maxValue, minValue)||!minValue.getClass().equals(maxValue.getClass())) {
