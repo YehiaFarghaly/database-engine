@@ -27,12 +27,12 @@ public class Validator {
 			throw new DBAppException(Constants.ERROR_MESSAGE_REPEATED_TABLE_NAME);
 
 		} else if (!validClusteringKey(strClusteringKeyColumn)) {
-			throw new DBAppException(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY);
+			throw new DBAppException(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY); 
 
 		} else if (!validDataTypes(htblColNameType)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_DATATYPE);
 
-		} else if (!validMinAndMax(htblColNameType, htblColNameMin, htblColNameMax)) {
+		} else if (!validMinAndMax(htblColNameType, htblColNameMin, htblColNameMax)||!samecolMinMax(htblColNameMin, htblColNameMax)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
 
 		}
@@ -83,12 +83,21 @@ public class Validator {
 
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
-		Object minValue = htblColNameMin.values().toArray()[0];
-		Object maxValue = htblColNameMax.values().toArray()[0];
-		if (isFirstLessThanSecond(maxValue, minValue)) {
-			return false;
+		int minMaxSize = htblColNameMin.values().size(); 
+		for (int i =0; i<minMaxSize; i++) {
+			Object minValue = htblColNameMin.values().toArray()[i]; 
+			Object maxValue = htblColNameMax.values().toArray()[i]; 
+			if (isFirstLessThanSecond(maxValue, minValue)||!minValue.getClass().equals(maxValue.getClass())) {
+				return false; 
+			}
 		}
-		return true;
+		
+		return true; 
+	}
+	
+	private static boolean samecolMinMax(Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
+		return htblColNameMin.keys().equals(htblColNameMax.keys()); 
+		
 	}
 
 	public static boolean validTable(String tableName, HashSet<String> myTables) {
