@@ -1,24 +1,17 @@
 package app;
 
 import org.junit.jupiter.api.Test;
-
 import com.opencsv.exceptions.CsvValidationException;
-
 import exceptions.DBAppException;
-import filecontroller.Serializer;
+import util.filecontroller.Serializer;
 import storage.Page;
 import storage.Table;
 import constants.Constants;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Hashtable;
-
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-
 import static org.assertj.core.api.Assertions.*;
 
 public class DBAppTest {

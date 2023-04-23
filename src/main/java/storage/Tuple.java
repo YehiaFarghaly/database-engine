@@ -1,7 +1,6 @@
 package storage;
 
 import java.io.Serializable;
-import java.util.Hashtable;
 import java.util.Vector;
 
 public class Tuple implements Cloneable, ITuple, Serializable {
@@ -27,8 +26,8 @@ public class Tuple implements Cloneable, ITuple, Serializable {
 	}
 
 	@Override
-	public void setPrimaryKey(Object PK) {
-		this.primaryKey = PK;
+	public void setPrimaryKey(Object pk) {
+		this.primaryKey = pk;
 	}
 
 	protected Tuple getCopy() {
