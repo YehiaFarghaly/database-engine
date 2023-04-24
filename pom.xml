@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-swing</artifactId>
-			<version>16</version>
+			<version>20.0.1</version>
 		</dependency>
 
 	</dependencies>
