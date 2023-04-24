@@ -3,7 +3,11 @@ package util.validation;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
+
+import com.ibm.icu.text.SimpleDateFormat;
 import com.opencsv.exceptions.CsvValidationException;
+
+import app.DBApp;
 import constants.Constants;
 import datamanipulation.CsvReader;
 import exceptions.DBAppException;
@@ -21,12 +25,13 @@ public class Validator {
 
 	public static void validateTableCreation(HashSet<String> appTables, String strTableName,
 			String strClusteringKeyColumn, Hashtable<String, String> htblColNameType,
-			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) throws DBAppException {
-
+			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) throws DBAppException, ParseException {
+		
 		if (validTable(strTableName, appTables)) {
+			System.out.print(appTables.toString());
 			throw new DBAppException(Constants.ERROR_MESSAGE_REPEATED_TABLE_NAME);
 
-		} else if (!validClusteringKey(strClusteringKeyColumn)) {
+		} else if (!validClusteringKey(strClusteringKeyColumn, htblColNameMax)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY); 
 
 		} else if (!validDataTypes(htblColNameType)) {
@@ -63,8 +68,8 @@ public class Validator {
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
-	private static boolean validClusteringKey(String strClusteringKeyColumn) {
-		if (strClusteringKeyColumn != null) {
+	private static boolean validClusteringKey(String strClusteringKeyColumn,Hashtable<String, String> htblColNameType) {
+		if (strClusteringKeyColumn != null&&htblColNameType.containsKey(strClusteringKeyColumn)) {
 			return true;
 		}
 		return false;
@@ -72,31 +77,54 @@ public class Validator {
 
 	private static boolean validDataTypes(Hashtable<String, String> htblColNameType) {
 		for (String data : htblColNameType.values()) {
-			if (!data.equals(Constants.INTEGER_DATA_TYPE_NAME) && !data.equals(Constants.DOUBLE_DATA_TYPE_NAME)
-					&& !data.equals(Constants.STRING_DATA_TYPE_NAME) && !data.equals(Constants.DATE_DATA_TYPE_NAME)) {
-				return false;
+			if (data.equals(Constants.INTEGER_DATA_TYPE_NAME)  || data.equals(Constants.DOUBLE_DATA_TYPE_NAME)
+					|| data.equals(Constants.STRING_DATA_TYPE_NAME) || data.equals(Constants.DATE_DATA_TYPE_NAME)) {
+				return true;
 			}
 		}
-		return true;
+		return false;
 
 	}
 
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
-			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
+			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) throws ParseException {
 		int minMaxSize = htblColNameMin.values().size(); 
 		for (int i =0; i<minMaxSize; i++) {
-			Object minValue = htblColNameMin.values().toArray()[i]; 
+			Object minValue = (String) htblColNameMin.values().toArray()[i]; 
+			String keyMinValue = (String) htblColNameMin.keySet().toArray()[i];
+			minValue = TypeParser(minValue,keyMinValue,htblColNameType); 
 			Object maxValue = htblColNameMax.values().toArray()[i]; 
+			String keyMaxValue = (String) htblColNameMax.keySet().toArray()[i];
+			maxValue = TypeParser(maxValue,keyMaxValue,htblColNameType); 
 			if (isFirstLessThanSecond(maxValue, minValue)||!minValue.getClass().equals(maxValue.getClass())) {
+			
 				return false; 
 			}
 		}
-		
 		return true; 
 	}
 	
+	private static Object TypeParser(Object data,String key,Hashtable<String, String> htblColNameType) {
+		String type = htblColNameType.get(key);		
+		if(type.equals(Constants.INTEGER_DATA_TYPE_NAME)) {
+			return Integer.parseInt(data.toString());
+		}else if (type.equals(Constants.DOUBLE_DATA_TYPE_NAME)) {
+			return Double.parseDouble(data.toString());
+		}else if (type.equals(Constants.DATE_DATA_TYPE_NAME)) {
+			SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
+			try {
+				return sdformat.parse(data.toString());
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+			return data.toString();
+		
+		
+	}
+	
 	private static boolean samecolMinMax(Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
-		return htblColNameMin.keys().equals(htblColNameMax.keys()); 
+		return htblColNameMin.keySet().equals(htblColNameMax.keySet()); 
 		
 	}
 
@@ -206,7 +234,7 @@ public class Validator {
 		}
 	}
 
-	public static boolean checkMinMax(Hashtable<String, Object> tuple) {
+	public static boolean checkMinMax(Hashtable<String, Object> tuple) throws ParseException {
 
 		for (int i = 0; i < columns.length; i++) {
 			Object insertedValue = tuple.get(columns[i]);
@@ -220,12 +248,29 @@ public class Validator {
 		return true;
 	}
 
-	private static boolean isFirstLessThanSecond(Object comp1, Object comp2) {
+	private static boolean isFirstLessThanSecond(Object comp1, Object comp2) throws ParseException {	
 		return Compare.compare(comp1, comp2) < 0;
 	}
 
 	private static boolean isFirstGreaterThanSecond(Object comp1, Object comp2) {
 		return Compare.compare(comp1, comp2) > 0;
+	}
+	
+	public static void main(String[] args) throws DBAppException, ParseException {
+		DBApp dbApp = new DBApp();
+		Hashtable htblColNameType = new Hashtable( );
+		htblColNameType.put("id", "java.lang.Integer");
+		htblColNameType.put("name", "java.lang.String");
+		htblColNameType.put("gpa", "java.lang.Double");
+		Hashtable htblColNameMin = new Hashtable( );
+		htblColNameMin.put("id", "1");
+		htblColNameMin.put("name", "A");
+		htblColNameMin.put("gpa", "2.0");
+		Hashtable htblColNameMax = new Hashtable( );
+		htblColNameMax.put("id", "100000000");
+		htblColNameMax.put("name", "Z");
+		htblColNameMax.put("gpa", "10.0");
+		dbApp.createTable( "test", "id", htblColNameType, htblColNameMin, htblColNameMax);
 	}
 
 }

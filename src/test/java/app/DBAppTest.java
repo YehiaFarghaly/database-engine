@@ -48,7 +48,7 @@ public class DBAppTest {
 	}
 
 	@Test
-	void testCreateTable_ValidTableName_ShouldBeCreatedSuccessfully() throws DBAppException, IOException {
+	void testCreateTable_ValidTableName_ShouldBeCreatedSuccessfully() throws DBAppException, IOException, ParseException {
 		// Given
 		Hashtable<String, String> htblColNameType = createHashtable(Constants.INTEGER_DATA_TYPE_NAME,
 				Constants.STRING_DATA_TYPE_NAME, Constants.INTEGER_DATA_TYPE_NAME);

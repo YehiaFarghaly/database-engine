@@ -119,7 +119,7 @@ public class DatabaseManager extends Application {
 		return borderPane;
 	}
 
-	public static void main(String[] args) {
-		launch(args);
-	}
+//	public static void main(String[] args) {
+//		launch(args);
+//	}
 }
