@@ -149,7 +149,7 @@ public class DBAppTest {
 		// Then
 		Page page = Serializer.deserializePage(newTableName, "0");
 		Tuple updated = page.getTuples().get(0);
-		assertThat(updated.getCells().get(2).getValue()).isEqualTo(updatedName);
+		assertThat(updated.getCells().get(1).getValue()).isEqualTo(updatedName);
 	}
 
 //	@Test
