@@ -82,10 +82,11 @@ public class DBApp implements IDatabase {
 		 util.validation.Validator.validateTableCreation(myTables, strTableName,
 		 strClusteringKeyColumn, htblColNameType, htblColNameMin,
 		 htblColNameMax);
-		
+		System.out.println(myTables.toString());
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.add(strTableName);
 		writer.write(table);
+		System.out.println(myTables.toString());
 		try {
 			table.createTableFiles();
 			Serializer.serializeTable(table);

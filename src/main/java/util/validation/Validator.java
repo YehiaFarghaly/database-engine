@@ -92,10 +92,10 @@ public class Validator {
 		for (int i =0; i<minMaxSize; i++) {
 			Object minValue = (String) htblColNameMin.values().toArray()[i]; 
 			String keyMinValue = (String) htblColNameMin.keySet().toArray()[i];
-			minValue = TypeParser(minValue,keyMinValue,htblColNameType); 
+			minValue = util.TypeParser.typeParser(minValue,keyMinValue,htblColNameType); 
 			Object maxValue = htblColNameMax.values().toArray()[i]; 
 			String keyMaxValue = (String) htblColNameMax.keySet().toArray()[i];
-			maxValue = TypeParser(maxValue,keyMaxValue,htblColNameType); 
+			maxValue = util.TypeParser.typeParser(maxValue,keyMaxValue,htblColNameType); 
 			if (isFirstLessThanSecond(maxValue, minValue)||!minValue.getClass().equals(maxValue.getClass())) {
 			
 				return false; 
@@ -104,24 +104,7 @@ public class Validator {
 		return true; 
 	}
 	
-	private static Object TypeParser(Object data,String key,Hashtable<String, String> htblColNameType) {
-		String type = htblColNameType.get(key);		
-		if(type.equals(Constants.INTEGER_DATA_TYPE_NAME)) {
-			return Integer.parseInt(data.toString());
-		}else if (type.equals(Constants.DOUBLE_DATA_TYPE_NAME)) {
-			return Double.parseDouble(data.toString());
-		}else if (type.equals(Constants.DATE_DATA_TYPE_NAME)) {
-			SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
-			try {
-				return sdformat.parse(data.toString());
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		}
-			return data.toString();
-		
-		
-	}
+	
 	
 	private static boolean samecolMinMax(Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
 		return htblColNameMin.keySet().equals(htblColNameMax.keySet()); 
@@ -256,21 +239,22 @@ public class Validator {
 		return Compare.compare(comp1, comp2) > 0;
 	}
 	
-	public static void main(String[] args) throws DBAppException, ParseException {
-		DBApp dbApp = new DBApp();
-		Hashtable htblColNameType = new Hashtable( );
-		htblColNameType.put("id", "java.lang.Integer");
-		htblColNameType.put("name", "java.lang.String");
-		htblColNameType.put("gpa", "java.lang.Double");
-		Hashtable htblColNameMin = new Hashtable( );
-		htblColNameMin.put("id", "1");
-		htblColNameMin.put("name", "A");
-		htblColNameMin.put("gpa", "2.0");
-		Hashtable htblColNameMax = new Hashtable( );
-		htblColNameMax.put("id", "100000000");
-		htblColNameMax.put("name", "Z");
-		htblColNameMax.put("gpa", "10.0");
-		dbApp.createTable( "test", "id", htblColNameType, htblColNameMin, htblColNameMax);
-	}
+//	public static void main(String[] args) throws DBAppException, ParseException {
+//		DBApp dbApp = new DBApp();
+//		dbApp.init();
+//		Hashtable htblColNameType = new Hashtable( );
+//		htblColNameType.put("id", "java.lang.Integer");
+//		htblColNameType.put("name", "java.lang.String");
+//		htblColNameType.put("gpa", "java.lang.Double");
+//		Hashtable htblColNameMin = new Hashtable( );
+//		htblColNameMin.put("id", "1");
+//		htblColNameMin.put("name", "A");
+//		htblColNameMin.put("gpa", "2.0");
+//		Hashtable htblColNameMax = new Hashtable( );
+//		htblColNameMax.put("id", "100000000");
+//		htblColNameMax.put("name", "Z");
+//		htblColNameMax.put("gpa", "10.0");
+//		dbApp.createTable( "test", "id", htblColNameType, htblColNameMin, htblColNameMax);
+//	}
 
 }
