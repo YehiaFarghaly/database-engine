@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-media</artifactId>
-			<version>16</version>
+			<version>20.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
