@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
-import com.ibm.icu.text.SimpleDateFormat;
 import com.opencsv.exceptions.CsvValidationException;
 
-import app.DBApp;
 import constants.Constants;
 import datamanipulation.CsvReader;
 import exceptions.DBAppException;
@@ -71,9 +69,9 @@ public class Validator {
 
 	private static boolean validClusteringKey(String strClusteringKeyColumn,Hashtable<String, String> htblColNameType) {
 		if (strClusteringKeyColumn != null&&htblColNameType.containsKey(strClusteringKeyColumn)) {
-			return true;
+			return true; 
 		}
-		return false;
+		return false; 
 	}
 
 	private static boolean validDataTypes(Hashtable<String, String> htblColNameType) {
@@ -84,7 +82,6 @@ public class Validator {
 			}
 		}
 		return false;
-
 	}
 
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
@@ -95,10 +92,9 @@ public class Validator {
 			String keyMinValue = (String) htblColNameMin.keySet().toArray()[i];
 			minValue = util.TypeParser.typeParser(minValue,keyMinValue,htblColNameType); 
 			Object maxValue = htblColNameMax.values().toArray()[i]; 
-			String keyMaxValue = (String) htblColNameMax.keySet().toArray()[i];
+			String keyMaxValue = (String) htblColNameMax.keySet().toArray()[i]; 
 			maxValue = util.TypeParser.typeParser(maxValue,keyMaxValue,htblColNameType); 
 			if (isFirstLessThanSecond(maxValue, minValue)||!minValue.getClass().equals(maxValue.getClass())) {
-			
 				return false; 
 			}
 		}

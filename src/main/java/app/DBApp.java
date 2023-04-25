@@ -177,13 +177,13 @@ public class DBApp implements IDatabase {
 		try {
 			Table table = Serializer.deserializeTable(strTableName);
 			if (action == Action.INSERT) {
-				util.validation.Validator.validateInsertionInput(table, htblColNameValue,myTables);
+				util.validation.Validator.validateInsertionInput(table, htblColNameValue, myTables); 
 				table.insertTuple(htblColNameValue);
 			} else if (action == Action.DELETE) {
-				util.validation.Validator.validateDeletionInput(table, htblColNameValue,myTables);
+				util.validation.Validator.validateDeletionInput(table, htblColNameValue, myTables); 
 				table.deleteTuples(htblColNameValue);
 			} else {
-				util.validation.Validator.validateUpdateInput(table, htblColNameValue,myTables);
+				util.validation.Validator.validateUpdateInput(table, htblColNameValue, myTables); 
 				castClusteringKeyType(table);
 				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 			}

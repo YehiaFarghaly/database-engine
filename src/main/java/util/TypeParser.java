@@ -8,9 +8,9 @@ import com.ibm.icu.text.SimpleDateFormat;
 import constants.Constants;
 
 public class TypeParser {
-	public static Object typeParser(Object data,String key,Hashtable<String, String> htblColNameType) {
+	public static Object typeParser(Object data, String key, Hashtable<String, String> htblColNameType) {
 		String type = htblColNameType.get(key);		
-		if(type.equals(Constants.INTEGER_DATA_TYPE_NAME)) {
+		if (type.equals(Constants.INTEGER_DATA_TYPE_NAME)) {
 			return Integer.parseInt(data.toString());
 		}else if (type.equals(Constants.DOUBLE_DATA_TYPE_NAME)) {
 			return Double.parseDouble(data.toString());
@@ -26,9 +26,10 @@ public class TypeParser {
 		
 		
 	}
+	
 	public static Object typeParser(Object data) {
 		String type = data.getClass().toString(); 
-		if(type.equals(Constants.INTEGER_DATA_TYPE_NAME)) {
+		if (type.equals(Constants.INTEGER_DATA_TYPE_NAME)) {
 			return Integer.parseInt(data.toString());
 		}else if (type.equals(Constants.DOUBLE_DATA_TYPE_NAME)) {
 			return Double.parseDouble(data.toString());
