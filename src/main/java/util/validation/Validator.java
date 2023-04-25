@@ -10,9 +10,11 @@ import com.opencsv.exceptions.CsvValidationException;
 import constants.Constants;
 import datamanipulation.CsvReader;
 import exceptions.DBAppException;
+import storage.Page;
 import storage.Table;
 import storage.Tuple;
 import util.Compare;
+import util.TypeParser;
 
 public class Validator {
 
@@ -27,7 +29,6 @@ public class Validator {
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) throws DBAppException, ParseException {
 		
 		if (validTable(strTableName, appTables)) {
-			System.out.print(appTables.toString());
 			throw new DBAppException(Constants.ERROR_MESSAGE_REPEATED_TABLE_NAME);
 
 		} else if (!validClusteringKey(strClusteringKeyColumn, htblColNameMax)) {
@@ -55,7 +56,7 @@ public class Validator {
 	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue,
 			HashSet<String> appTables) throws DBAppException {
 		getTableInfo(table);
-		if (!validTable(table.getName(), appTables)||!isTheSameDataType(htblColNameValue))
+		if (!validTable(table.getName(), appTables)||!isTheSameDataTypeMissingCol(htblColNameValue))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
 	}
 
@@ -91,18 +92,17 @@ public class Validator {
 		for (int i =0; i<minMaxSize; i++) {
 			Object minValue = (String) htblColNameMin.values().toArray()[i]; 
 			String keyMinValue = (String) htblColNameMin.keySet().toArray()[i];
-			minValue = util.TypeParser.typeParser(minValue, keyMinValue, htblColNameType); 
+			minValue = TypeParser.typeParser(minValue, keyMinValue, htblColNameType); 
 			Object maxValue = htblColNameMax.values().toArray()[i]; 
 			String keyMaxValue = (String) htblColNameMax.keySet().toArray()[i]; 
-			maxValue = util.TypeParser.typeParser(maxValue, keyMaxValue, htblColNameType); 
+			
+			maxValue = TypeParser.typeParser(maxValue, keyMaxValue, htblColNameType); 
 			if (isFirstLessThanSecond(maxValue, minValue)||!minValue.getClass().equals(maxValue.getClass())) {
 				return false; 
 			}
 		}
 		return true; 
 	}
-	
-	
 	
 	private static boolean samecolMinMax(Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
 		return htblColNameMin.keySet().equals(htblColNameMax.keySet()); 
@@ -146,22 +146,40 @@ public class Validator {
 		return true;
 	}
 
-	public static boolean isTheSameDataTypeUpdate(Hashtable<String, Object> tuple) {
-		int pkIndex = findRowPK();
-		for (int i = 0; i < columns.length && i != pkIndex; i++) {
-			if (!tuple.get(columns[i]).getClass().toString().endsWith(dataTypes[i]))
-				return false;
+	public static boolean isTheSameDataTypeMissingCol(Hashtable<String, Object> tuple) {
+		int counter =0;
+		for(String s:columns) {
+			if(tuple.containsKey(s)) {
+				if (!tuple.get(s).getClass().toString().endsWith(dataTypes[counter]))
+					return false;
+			}
+			counter++;
 		}
 		return true;
 	}
 
 	public static boolean foundPK(Table table, Hashtable<String, Object> tuple)
 			throws ClassNotFoundException, DBAppException, ParseException, IOException {
-		int pkIndex = findRowPK();
-		Tuple t = table.createTuple(tuple);
-		if (table.tableBinarySearch(t.getPrimaryKey()) == -1)
+		if(!table.isEmpty()) {
+		Tuple tupleToFind = table.createTuple(tuple);
+		Object pk = tupleToFind.getPrimaryKey();
+		int pageNum = table.tableBinarySearch(pk);
+		if (pageNum<table.getPagesName().size()) {
+		Page page = table.getPageAtPosition(pageNum);
+		int position = page.pageBinarySearch(pk);
+		if (checkPKExistance(page, position, pk))
+			return true;
+		}
+		}
 			return false;
-		return true;
+	}
+	
+	private static boolean checkPKExistance(Page page, int position, Object pk) {
+		if (position<page.getSize()) {
+		Tuple tuple = page.getTuples().get(position);
+		return tuple.getPrimaryKey().equals(pk);
+		}
+		return false;
 	}
 
 	private static void getTableInfo(Table table) {
@@ -187,13 +205,10 @@ public class Validator {
 	public static boolean validTuple(Table table, Hashtable<String, Object> tuple)
 			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
 		getTableInfo(table);
-		
 		if (!isTheSameNumberOfColumns(tuple) || !containsAllColumns(tuple) || !isTheSameDataType(tuple)
 				|| !checkMinMax(tuple) || foundPK(table, tuple)) {
-			System.out.println(checkMinMax(tuple));
 			return false;
 		} else {
-			System.out.println("it was ok");
 			return true;
 			
 		}
@@ -212,7 +227,7 @@ public class Validator {
 	public static boolean validTupleUpdate(Table table, Hashtable<String, Object> tuple)
 			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
 		getTableInfo(table);
-		if (!isTheSameDataTypeUpdate(tuple) || !foundPK(table, tuple) || !checkMinMax(tuple)) {
+		if (!isTheSameDataTypeMissingCol(tuple) || !foundPK(table, tuple) || !checkMinMaxMissingCol(tuple)) {
 			return false;
 		} else {
 			return true;
@@ -225,9 +240,9 @@ public class Validator {
 			Object minValue = min[i];
 			Object maxValue = max[i];
 			String dataType = dataTypes[i];
-			insertedValue = util.TypeParser.typeParser(insertedValue, dataType);
-			minValue = util.TypeParser.typeParser(minValue, dataType);
-			maxValue = util.TypeParser.typeParser(maxValue, dataType);
+			insertedValue = TypeParser.typeParser(insertedValue, dataType);
+			minValue = TypeParser.typeParser(minValue, dataType);
+			maxValue = TypeParser.typeParser(maxValue, dataType);
 			if ((isFirstLessThanSecond(insertedValue, minValue))
 					|| (isFirstGreaterThanSecond(insertedValue, maxValue))) {
 				return false;
@@ -236,39 +251,32 @@ public class Validator {
 		return true;
 	}
 
+	public static boolean checkMinMaxMissingCol(Hashtable<String, Object> tuple) throws ParseException {
+		int index = 0;
+		for (String s : columns) {
+			if(tuple.containsKey(s)) {
+			Object insertedValue = tuple.get(s);
+			Object minValue = min[index];
+			Object maxValue = max[index];
+			String dataType = dataTypes[index];
+			insertedValue = TypeParser.typeParser(insertedValue, dataType);
+			minValue = TypeParser.typeParser(minValue, dataType);
+			maxValue = TypeParser.typeParser(maxValue, dataType);
+			if ((isFirstLessThanSecond(insertedValue, minValue))
+					|| (isFirstGreaterThanSecond(insertedValue, maxValue))) {
+				return false;
+			}
+			}
+			index++;
+		}
+		return true;
+	}
 	private static boolean isFirstLessThanSecond(Object comp1, Object comp2) throws ParseException {	
 		return Compare.compare(comp1, comp2) < 0;
 	}
 
 	private static boolean isFirstGreaterThanSecond(Object comp1, Object comp2) {
 		return Compare.compare(comp1, comp2) > 0;
-	}
-	
-	public static void main(String[] args) throws DBAppException, ParseException {
-//		DBApp dbApp = new DBApp();
-//		dbApp.init();
-//		Hashtable htblColNameType = new Hashtable( );
-//		htblColNameType.put("id", "java.lang.Integer");
-//		htblColNameType.put("name", "java.lang.String");
-//		htblColNameType.put("gpa", "java.lang.Double");
-//		Hashtable htblColNameMin = new Hashtable( );
-//		htblColNameMin.put("id", "0");
-//		htblColNameMin.put("name", "A");
-//		htblColNameMin.put("gpa", "2.0");
-//		Hashtable htblColNameMax = new Hashtable( );
-//		htblColNameMax.put("id", "1000");
-//		htblColNameMax.put("gpa", "10.0");
-//		htblColNameMax.put("name", "Z");
-//		Hashtable htblColNameValue = new Hashtable( );
-//		htblColNameValue.put("id",  78);
-//		htblColNameValue.put("name", new String("Ahmed abdullah" ) );
-//		htblColNameValue.put("gpa", new Double( 3 ) );
-//		dbApp.insertIntoTable( "test" , htblColNameValue );
-//		
-//		System.out.print("done");
-//		
-	
-//		dbApp.createTable( "test", "id", htblColNameType, htblColNameMin, htblColNameMax);
 	}
 
 }

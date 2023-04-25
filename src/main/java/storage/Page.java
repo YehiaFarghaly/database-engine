@@ -100,7 +100,7 @@ public class Page implements Serializable {
 		}
 	}
 
-	private int pageBinarySearch(Object primaryKey) throws DBAppException, ParseException {
+	public int pageBinarySearch(Object primaryKey) throws DBAppException, ParseException {
 		return PageSearch.binarySearch(this, primaryKey);
 	}
 

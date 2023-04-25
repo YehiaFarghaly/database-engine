@@ -10,6 +10,7 @@ import constants.Constants;
 public class TypeParser {
 	public static Object typeParser(Object data, String key, Hashtable<String, String> htblColNameType) {
 		String type = htblColNameType.get(key);		
+		
 		if (type.equals(Constants.INTEGER_DATA_TYPE_NAME)) {
 			return Integer.parseInt(data.toString());
 		}else if (type.equals(Constants.DOUBLE_DATA_TYPE_NAME)) {

@@ -52,7 +52,7 @@ public class DBAppTest {
 		Hashtable<String, String> htblColNameMin = createHashtable(Constants.MIN_ID_VALUE, Constants.MIN_NAME_VALUE,
 				Constants.MIN_AGE_VALUE);
 
-		Hashtable<String, String> htblColNameMax = createHashtable(id, Constants.MAX_NAME_VALUE,
+		Hashtable<String, String> htblColNameMax = createHashtable(Constants.MAX_ID_VALUE, Constants.MAX_NAME_VALUE,
 				Constants.MAX_AGE_VALUE);
 
 		engine.createTable(newTableName, id, htblColNameType, htblColNameMin, htblColNameMax);

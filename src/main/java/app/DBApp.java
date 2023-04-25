@@ -12,6 +12,7 @@ import util.search.*;
 import sql.SQLTerm;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
+import util.validation.Validator;
 
 /**
  * The DBApp class represents a database management system. It implements the
@@ -79,7 +80,7 @@ public class DBApp implements IDatabase {
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
 			Hashtable<String, String> htblColNameMax) throws DBAppException, ParseException {
 
-		 util.validation.Validator.validateTableCreation(myTables, strTableName,
+			Validator.validateTableCreation(myTables, strTableName,
 		 strClusteringKeyColumn, htblColNameType, htblColNameMin,
 		 htblColNameMax);
 
@@ -177,14 +178,15 @@ public class DBApp implements IDatabase {
 		try {
 			Table table = Serializer.deserializeTable(strTableName);
 			if (action == Action.INSERT) {
-				util.validation.Validator.validateInsertionInput(table, htblColNameValue, myTables); 
+				Validator.validateInsertionInput(table, htblColNameValue, myTables); 
 				table.insertTuple(htblColNameValue);
 			} else if (action == Action.DELETE) {
-				util.validation.Validator.validateDeletionInput(table, htblColNameValue, myTables); 
+				Validator.validateDeletionInput(table, htblColNameValue, myTables); 
 				table.deleteTuples(htblColNameValue);
 			} else {
-				util.validation.Validator.validateUpdateInput(table, htblColNameValue, myTables); 
 				castClusteringKeyType(table);
+				htblColNameValue.put(table.getPKColumn(),clusteringKey);
+				Validator.validateUpdateInput(table, htblColNameValue, myTables); 
 				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 			}
 			Serializer.serializeTable(table);
