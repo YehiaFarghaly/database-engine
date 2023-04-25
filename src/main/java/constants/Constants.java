@@ -63,7 +63,7 @@ public final class Constants {
 	public static final String QUERY_BOX_STYLE = "-fx-background-color: " + HEADER_COLOR
 			+ "; -fx-control-inner-background:#000000; -fx-text-fill: #4CAF50;";
 
-	public static final String QUERY_LABEL = "SQL Query:";
+	public static final String QUERY_LABEL = "Write your SQL query:";
 
 	public static final int DEFAULT_PADDING = 10;
 
@@ -74,7 +74,7 @@ public final class Constants {
 
 	public static final String EXECUTE_BUTTON_LABEL = "Execute";
 
-	public static final String TABLE_BUTTON_LABEL = "Tables";
+	public static final String TABLE_BUTTON_LABEL = "View existing tables";
 
 	public static final double SCENE_WIDTH = 900;
 

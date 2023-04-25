@@ -25,10 +25,12 @@ public class Table implements Serializable {
 	private Tuple prototype;
 	private Hashtable<String, String> colNameType, colNameMin, colNameMax;
 	private String primaryKeyType;
+	private int size;
 
 	public Table(String name, String pkColumn, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
 			Hashtable<String, String> colNameMax) {
 		cntPage = 0;
+		size = 0;
 		this.name = name;
 		this.pkColumn = pkColumn;
 		this.colNameType = colNameType;
@@ -81,6 +83,10 @@ public class Table implements Serializable {
 	public void setColNameMax(Hashtable<String, String> colNameMax) {
 		this.colNameMax = colNameMax;
 	}
+	
+	public int getSize() {
+		return size;
+	}
 
 	public boolean isEmpty() {
 		return pagesName.size() == 0;
@@ -106,6 +112,7 @@ public class Table implements Serializable {
 				page.insertIntoPage(tuple);
 			}
 		}
+		size++;
 	}
 
 	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
@@ -242,8 +249,10 @@ public class Table implements Serializable {
 
 	private void deletePageRecords(Vector<Tuple> toBeDeleted, Page page)
 			throws IOException, DBAppException, ParseException {
-		for (Tuple tuple : toBeDeleted)
+		for (Tuple tuple : toBeDeleted) {
 			page.deleteFromPage(tuple);
+		    size--;	
+		}
 	}
 
 	public void updateRecordsInTaple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue)
