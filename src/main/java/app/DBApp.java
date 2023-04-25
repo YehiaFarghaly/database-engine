@@ -82,11 +82,11 @@ public class DBApp implements IDatabase {
 		 util.validation.Validator.validateTableCreation(myTables, strTableName,
 		 strClusteringKeyColumn, htblColNameType, htblColNameMin,
 		 htblColNameMax);
-		System.out.println(myTables.toString());
+
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.add(strTableName);
 		writer.write(table);
-		System.out.println(myTables.toString());
+	
 		try {
 			table.createTableFiles();
 			Serializer.serializeTable(table);
@@ -177,13 +177,13 @@ public class DBApp implements IDatabase {
 		try {
 			Table table = Serializer.deserializeTable(strTableName);
 			if (action == Action.INSERT) {
-				// Validator.validateInsertionInput(table, htblColNameValue,myTables);
+				util.validation.Validator.validateInsertionInput(table, htblColNameValue,myTables);
 				table.insertTuple(htblColNameValue);
 			} else if (action == Action.DELETE) {
-				// Validator.validateDeletionInput(table, htblColNameValue,myTables);
+				util.validation.Validator.validateDeletionInput(table, htblColNameValue,myTables);
 				table.deleteTuples(htblColNameValue);
 			} else {
-				// Validator.validateUpdateInput(table, htblColNameValue,myTables);
+				util.validation.Validator.validateUpdateInput(table, htblColNameValue,myTables);
 				castClusteringKeyType(table);
 				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 			}
