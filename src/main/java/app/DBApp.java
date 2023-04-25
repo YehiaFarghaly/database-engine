@@ -194,7 +194,7 @@ public class DBApp implements IDatabase {
 	}
 
 	private void castClusteringKeyType(Table table) {
-		TypeCaster.castClusteringKey(table, clusteringKey, clusteringKeyValue);
+		clusteringKey = TypeCaster.castClusteringKey(table, clusteringKeyValue);
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
