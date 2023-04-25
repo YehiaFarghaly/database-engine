@@ -67,7 +67,7 @@ public class Validator {
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
-	private static boolean validClusteringKey(String strClusteringKeyColumn,Hashtable<String, String> htblColNameType) {
+	private static boolean validClusteringKey(String strClusteringKeyColumn, Hashtable<String, String> htblColNameType) {
 		if (strClusteringKeyColumn != null&&htblColNameType.containsKey(strClusteringKeyColumn)) {
 			return true; 
 		}
@@ -76,7 +76,7 @@ public class Validator {
 
 	private static boolean validDataTypes(Hashtable<String, String> htblColNameType) {
 		for (String data : htblColNameType.values()) {
-			if (data.equals(Constants.INTEGER_DATA_TYPE_NAME)  || data.equals(Constants.DOUBLE_DATA_TYPE_NAME)
+			if (data.equals(Constants.INTEGER_DATA_TYPE_NAME) || data.equals(Constants.DOUBLE_DATA_TYPE_NAME)
 					|| data.equals(Constants.STRING_DATA_TYPE_NAME) || data.equals(Constants.DATE_DATA_TYPE_NAME)) {
 				return true;
 			}
@@ -90,10 +90,10 @@ public class Validator {
 		for (int i =0; i<minMaxSize; i++) {
 			Object minValue = (String) htblColNameMin.values().toArray()[i]; 
 			String keyMinValue = (String) htblColNameMin.keySet().toArray()[i];
-			minValue = util.TypeParser.typeParser(minValue,keyMinValue,htblColNameType); 
+			minValue = util.TypeParser.typeParser(minValue, keyMinValue, htblColNameType); 
 			Object maxValue = htblColNameMax.values().toArray()[i]; 
 			String keyMaxValue = (String) htblColNameMax.keySet().toArray()[i]; 
-			maxValue = util.TypeParser.typeParser(maxValue,keyMaxValue,htblColNameType); 
+			maxValue = util.TypeParser.typeParser(maxValue, keyMaxValue, htblColNameType); 
 			if (isFirstLessThanSecond(maxValue, minValue)||!minValue.getClass().equals(maxValue.getClass())) {
 				return false; 
 			}
