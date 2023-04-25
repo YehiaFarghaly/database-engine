@@ -38,14 +38,14 @@ public class DBAppTest {
 	}
 
 	@BeforeEach
-	void setEnvironment() throws IOException, DBAppException {
+	void setEnvironment() throws IOException, DBAppException, ParseException {
 		engine = new DBApp();
 		engine.init();
 		generateNewTableName();
 		createTable();
 	}
 
-	private static void createTable() throws DBAppException {
+	private static void createTable() throws DBAppException, ParseException {
 		Hashtable<String, String> htblColNameType = createHashtable(Constants.INTEGER_DATA_TYPE_NAME,
 				Constants.STRING_DATA_TYPE_NAME, Constants.INTEGER_DATA_TYPE_NAME);
 
