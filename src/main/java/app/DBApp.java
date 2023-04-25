@@ -71,20 +71,22 @@ public class DBApp implements IDatabase {
 	 * 
 	 * @throws DBAppException If the table name is invalid or if the table already
 	 *                        exists.
+	 * @throws ParseException 
 	 * @throws IOException    If an error occurs while creating the table files.
 	 */
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException {
+			Hashtable<String, String> htblColNameMax) throws DBAppException, ParseException {
 
-		// Validator.validateTableCreation(myTables, strTableName,
-		// strClusteringKeyColumn, htblColNameType, htblColNameMin,
-		// htblColNameMax);
-
+		 util.validation.Validator.validateTableCreation(myTables, strTableName,
+		 strClusteringKeyColumn, htblColNameType, htblColNameMin,
+		 htblColNameMax);
+		System.out.println(myTables.toString());
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.add(strTableName);
 		writer.write(table);
+		System.out.println(myTables.toString());
 		try {
 			table.createTableFiles();
 			Serializer.serializeTable(table);
