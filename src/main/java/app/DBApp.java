@@ -180,10 +180,10 @@ public class DBApp implements IDatabase {
 				util.validation.Validator.validateInsertionInput(table, htblColNameValue,myTables);
 				table.insertTuple(htblColNameValue);
 			} else if (action == Action.DELETE) {
-				// Validator.validateDeletionInput(table, htblColNameValue,myTables);
+				util.validation.Validator.validateDeletionInput(table, htblColNameValue,myTables);
 				table.deleteTuples(htblColNameValue);
 			} else {
-				// Validator.validateUpdateInput(table, htblColNameValue,myTables);
+				util.validation.Validator.validateUpdateInput(table, htblColNameValue,myTables);
 				castClusteringKeyType(table);
 				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 			}
