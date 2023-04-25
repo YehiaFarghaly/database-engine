@@ -6,6 +6,7 @@ import java.util.*;
 
 import com.opencsv.exceptions.CsvValidationException;
 
+import app.DBApp;
 import constants.Constants;
 import datamanipulation.CsvReader;
 import exceptions.DBAppException;
@@ -171,8 +172,8 @@ public class Validator {
 		columns = new String[size];
 		dataTypes = new String[size];
 		pk = new String[size];
-		min = new String[size];
-		max = new String[size];
+		min = new Object[size];
+		max = new Object[size];
 		for (int i = 0; i < size; i++) {
 			columns[i] = tableInfo.get(i)[1];
 			dataTypes[i] = tableInfo.get(i)[2];
@@ -189,6 +190,7 @@ public class Validator {
 		
 		if (!isTheSameNumberOfColumns(tuple) || !containsAllColumns(tuple) || !isTheSameDataType(tuple)
 				|| !checkMinMax(tuple) || foundPK(table, tuple)) {
+			System.out.println(checkMinMax(tuple));
 			return false;
 		} else {
 			System.out.println("it was ok");
@@ -218,14 +220,14 @@ public class Validator {
 	}
 
 	public static boolean checkMinMax(Hashtable<String, Object> tuple) throws ParseException {
-
 		for (int i = 0; i < columns.length; i++) {
 			Object insertedValue = tuple.get(columns[i]);
 			Object minValue = min[i];
 			Object maxValue = max[i];
-			insertedValue = util.TypeParser.typeParser(insertedValue);
-			minValue = util.TypeParser.typeParser(minValue);
-			maxValue = util.TypeParser.typeParser(maxValue);
+			String dataType = dataTypes[i];
+			insertedValue = util.TypeParser.typeParser(insertedValue,dataType);
+			minValue = util.TypeParser.typeParser(minValue,dataType);
+			maxValue = util.TypeParser.typeParser(maxValue,dataType);
 			if ((isFirstLessThanSecond(insertedValue, minValue))
 					|| (isFirstGreaterThanSecond(insertedValue, maxValue))) {
 				return false;
@@ -242,31 +244,31 @@ public class Validator {
 		return Compare.compare(comp1, comp2) > 0;
 	}
 	
-//	public static void main(String[] args) throws DBAppException, ParseException {
+	public static void main(String[] args) throws DBAppException, ParseException {
 //		DBApp dbApp = new DBApp();
 //		dbApp.init();
-////		Hashtable htblColNameType = new Hashtable( );
-////		htblColNameType.put("id", "java.lang.Integer");
-////		htblColNameType.put("name", "java.lang.String");
-////		htblColNameType.put("gpa", "java.lang.Double");
-////		Hashtable htblColNameMin = new Hashtable( );
-////		htblColNameMin.put("id", "0");
-////		htblColNameMin.put("name", "A");
-////		htblColNameMin.put("gpa", "2.0");
-////		Hashtable htblColNameMax = new Hashtable( );
-////		htblColNameMax.put("id", "1000");
-////		htblColNameMax.put("gpa", "10.0");
-////		htblColNameMax.put("name", "Z");
+//		Hashtable htblColNameType = new Hashtable( );
+//		htblColNameType.put("id", "java.lang.Integer");
+//		htblColNameType.put("name", "java.lang.String");
+//		htblColNameType.put("gpa", "java.lang.Double");
+//		Hashtable htblColNameMin = new Hashtable( );
+//		htblColNameMin.put("id", "0");
+//		htblColNameMin.put("name", "A");
+//		htblColNameMin.put("gpa", "2.0");
+//		Hashtable htblColNameMax = new Hashtable( );
+//		htblColNameMax.put("id", "1000");
+//		htblColNameMax.put("gpa", "10.0");
+//		htblColNameMax.put("name", "Z");
 //		Hashtable htblColNameValue = new Hashtable( );
 //		htblColNameValue.put("id",  78);
 //		htblColNameValue.put("name", new String("Ahmed abdullah" ) );
-//		htblColNameValue.put("gpa", new Double( 0.95 ) );
-//		dbApp.updateTable( "test","" , htblColNameValue );
-////		
+//		htblColNameValue.put("gpa", new Double( 3 ) );
+//		dbApp.insertIntoTable( "test" , htblColNameValue );
+//		
 //		System.out.print("done");
-////		
-//	
-////		dbApp.createTable( "test", "id", htblColNameType, htblColNameMin, htblColNameMax);
-//	}
+//		
+	
+//		dbApp.createTable( "test", "id", htblColNameType, htblColNameMin, htblColNameMax);
+	}
 
 }
