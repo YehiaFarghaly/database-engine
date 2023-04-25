@@ -189,11 +189,14 @@ public class Validator {
 	public static boolean validTuple(Table table, Hashtable<String, Object> tuple)
 			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
 		getTableInfo(table);
+		
 		if (!isTheSameNumberOfColumns(tuple) || !containsAllColumns(tuple) || !isTheSameDataType(tuple)
 				|| !checkMinMax(tuple) || foundPK(table, tuple)) {
 			return false;
 		} else {
+			System.out.println("it was ok");
 			return true;
+			
 		}
 	}
 
@@ -223,6 +226,9 @@ public class Validator {
 			Object insertedValue = tuple.get(columns[i]);
 			Object minValue = min[i];
 			Object maxValue = max[i];
+			insertedValue = util.TypeParser.typeParser(insertedValue);
+			minValue = util.TypeParser.typeParser(minValue);
+			maxValue = util.TypeParser.typeParser(maxValue);
 			if ((isFirstLessThanSecond(insertedValue, minValue))
 					|| (isFirstGreaterThanSecond(insertedValue, maxValue))) {
 				return false;
@@ -239,22 +245,31 @@ public class Validator {
 		return Compare.compare(comp1, comp2) > 0;
 	}
 	
-//	public static void main(String[] args) throws DBAppException, ParseException {
-//		DBApp dbApp = new DBApp();
-//		dbApp.init();
+	public static void main(String[] args) throws DBAppException, ParseException {
+		DBApp dbApp = new DBApp();
+		dbApp.init();
 //		Hashtable htblColNameType = new Hashtable( );
 //		htblColNameType.put("id", "java.lang.Integer");
 //		htblColNameType.put("name", "java.lang.String");
 //		htblColNameType.put("gpa", "java.lang.Double");
 //		Hashtable htblColNameMin = new Hashtable( );
-//		htblColNameMin.put("id", "1");
+//		htblColNameMin.put("id", "0");
 //		htblColNameMin.put("name", "A");
 //		htblColNameMin.put("gpa", "2.0");
 //		Hashtable htblColNameMax = new Hashtable( );
-//		htblColNameMax.put("id", "100000000");
-//		htblColNameMax.put("name", "Z");
+//		htblColNameMax.put("id", "1000");
 //		htblColNameMax.put("gpa", "10.0");
+//		htblColNameMax.put("name", "Z");
+		Hashtable htblColNameValue = new Hashtable( );
+		htblColNameValue.put("id",  2434);
+		htblColNameValue.put("name", new String("Ahmed abdullah" ) );
+		htblColNameValue.put("gpa", new Double( 0.95 ) );
+		dbApp.insertIntoTable( "test" , htblColNameValue );
+		
+		System.out.print("done");
+//		
+	
 //		dbApp.createTable( "test", "id", htblColNameType, htblColNameMin, htblColNameMax);
-//	}
+	}
 
 }
