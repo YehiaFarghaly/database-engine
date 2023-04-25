@@ -225,9 +225,9 @@ public class Validator {
 			Object minValue = min[i];
 			Object maxValue = max[i];
 			String dataType = dataTypes[i];
-			insertedValue = util.TypeParser.typeParser(insertedValue,dataType);
-			minValue = util.TypeParser.typeParser(minValue,dataType);
-			maxValue = util.TypeParser.typeParser(maxValue,dataType);
+			insertedValue = util.TypeParser.typeParser(insertedValue, dataType);
+			minValue = util.TypeParser.typeParser(minValue, dataType);
+			maxValue = util.TypeParser.typeParser(maxValue, dataType);
 			if ((isFirstLessThanSecond(insertedValue, minValue))
 					|| (isFirstGreaterThanSecond(insertedValue, maxValue))) {
 				return false;
