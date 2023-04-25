@@ -43,11 +43,11 @@ public final class Constants {
 
 	public static final String MIN_ID_VALUE = "0";
 	public static final String MIN_AGE_VALUE = "1";
-	public static final String MIN_NAME_VALUE = "1";
+	public static final String MIN_NAME_VALUE = "A";
 
 	public static final String MAX_ID_VALUE = "100000";
 	public static final String MAX_AGE_VALUE = "100";
-	public static final String MAX_NAME_VALUE = "20";
+	public static final String MAX_NAME_VALUE = "zzzzzzzzzzzzz";
 
 	public static final String MAX_ROWS_IN_PAGE = "MaximumRowsCountinTablePage";
 

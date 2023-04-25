@@ -12,6 +12,7 @@ import util.search.*;
 import sql.SQLTerm;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
+import util.validation.Validator;
 
 /**
  * The DBApp class represents a database management system. It implements the
@@ -71,20 +72,22 @@ public class DBApp implements IDatabase {
 	 * 
 	 * @throws DBAppException If the table name is invalid or if the table already
 	 *                        exists.
+	 * @throws ParseException 
 	 * @throws IOException    If an error occurs while creating the table files.
 	 */
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException {
+			Hashtable<String, String> htblColNameMax) throws DBAppException, ParseException {
 
-		// Validator.validateTableCreation(myTables, strTableName,
-		// strClusteringKeyColumn, htblColNameType, htblColNameMin,
-		// htblColNameMax);
+			Validator.validateTableCreation(myTables, strTableName,
+		 strClusteringKeyColumn, htblColNameType, htblColNameMin,
+		 htblColNameMax);
 
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.add(strTableName);
 		writer.write(table);
+	
 		try {
 			table.createTableFiles();
 			Serializer.serializeTable(table);
@@ -175,14 +178,15 @@ public class DBApp implements IDatabase {
 		try {
 			Table table = Serializer.deserializeTable(strTableName);
 			if (action == Action.INSERT) {
-				// Validator.validateInsertionInput(table, htblColNameValue,myTables);
+				Validator.validateInsertionInput(table, htblColNameValue, myTables); 
 				table.insertTuple(htblColNameValue);
 			} else if (action == Action.DELETE) {
-				// Validator.validateDeletionInput(table, htblColNameValue,myTables);
+				Validator.validateDeletionInput(table, htblColNameValue, myTables); 
 				table.deleteTuples(htblColNameValue);
 			} else {
-				// Validator.validateUpdateInput(table, htblColNameValue,myTables);
 				castClusteringKeyType(table);
+				htblColNameValue.put(table.getPKColumn(), clusteringKey);
+				Validator.validateUpdateInput(table, htblColNameValue, myTables); 
 				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 			}
 			Serializer.serializeTable(table);

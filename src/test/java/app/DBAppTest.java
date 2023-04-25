@@ -38,21 +38,21 @@ public class DBAppTest {
 	}
 
 	@BeforeEach
-	void setEnvironment() throws IOException, DBAppException {
+	void setEnvironment() throws IOException, DBAppException, ParseException {
 		engine = new DBApp();
 		engine.init();
 		generateNewTableName();
 		createTable();
 	}
 
-	private static void createTable() throws DBAppException {
+	private static void createTable() throws DBAppException, ParseException {
 		Hashtable<String, String> htblColNameType = createHashtable(Constants.INTEGER_DATA_TYPE_NAME,
 				Constants.STRING_DATA_TYPE_NAME, Constants.INTEGER_DATA_TYPE_NAME);
 
 		Hashtable<String, String> htblColNameMin = createHashtable(Constants.MIN_ID_VALUE, Constants.MIN_NAME_VALUE,
 				Constants.MIN_AGE_VALUE);
 
-		Hashtable<String, String> htblColNameMax = createHashtable(id, Constants.MAX_NAME_VALUE,
+		Hashtable<String, String> htblColNameMax = createHashtable(Constants.MAX_ID_VALUE, Constants.MAX_NAME_VALUE,
 				Constants.MAX_AGE_VALUE);
 
 		engine.createTable(newTableName, id, htblColNameType, htblColNameMin, htblColNameMax);
