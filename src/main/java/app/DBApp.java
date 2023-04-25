@@ -185,7 +185,7 @@ public class DBApp implements IDatabase {
 				table.deleteTuples(htblColNameValue);
 			} else {
 				castClusteringKeyType(table);
-				htblColNameValue.put(table.getPKColumn(),clusteringKey);
+				htblColNameValue.put(table.getPKColumn(), clusteringKey);
 				Validator.validateUpdateInput(table, htblColNameValue, myTables); 
 				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 			}

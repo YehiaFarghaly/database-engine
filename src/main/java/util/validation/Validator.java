@@ -148,8 +148,8 @@ public class Validator {
 
 	public static boolean isTheSameDataTypeMissingCol(Hashtable<String, Object> tuple) {
 		int counter =0;
-		for(String s:columns) {
-			if(tuple.containsKey(s)) {
+		for (String s:columns) {
+			if (tuple.containsKey(s)) {
 				if (!tuple.get(s).getClass().toString().endsWith(dataTypes[counter]))
 					return false;
 			}
@@ -160,7 +160,7 @@ public class Validator {
 
 	public static boolean foundPK(Table table, Hashtable<String, Object> tuple)
 			throws ClassNotFoundException, DBAppException, ParseException, IOException {
-		if(!table.isEmpty()) {
+		if (!table.isEmpty()) {
 		Tuple tupleToFind = table.createTuple(tuple);
 		Object pk = tupleToFind.getPrimaryKey();
 		int pageNum = table.tableBinarySearch(pk);
@@ -254,7 +254,7 @@ public class Validator {
 	public static boolean checkMinMaxMissingCol(Hashtable<String, Object> tuple) throws ParseException {
 		int index = 0;
 		for (String s : columns) {
-			if(tuple.containsKey(s)) {
+			if (tuple.containsKey(s)) {
 			Object insertedValue = tuple.get(s);
 			Object minValue = min[index];
 			Object maxValue = max[index];
@@ -271,6 +271,7 @@ public class Validator {
 		}
 		return true;
 	}
+	
 	private static boolean isFirstLessThanSecond(Object comp1, Object comp2) throws ParseException {	
 		return Compare.compare(comp1, comp2) < 0;
 	}
