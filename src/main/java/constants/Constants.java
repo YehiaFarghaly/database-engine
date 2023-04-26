@@ -36,6 +36,11 @@ public final class Constants {
 	public static final int INDEX_NAME_INDEX = 4;
 
 	public static final int INDEX_TYPE_INDEX = 5;
+	
+	public static final int COL_MIN_VALUE_INDEX = 6;
+	
+	public static final int COL_MAX_VALUE_INDEX = 7;
+	
 
 	public static final String ID = "id";
 	public static final String NAME = "name";

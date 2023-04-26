@@ -78,7 +78,7 @@ public class DBApp implements IDatabase {
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException, ParseException {
+			Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 			Validator.validateTableCreation(myTables, strTableName,
 		 strClusteringKeyColumn, htblColNameType, htblColNameMin,

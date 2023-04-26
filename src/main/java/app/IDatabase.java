@@ -11,7 +11,7 @@ public interface IDatabase {
 
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException, ParseException;
+			Hashtable<String, String> htblColNameMax) throws DBAppException;
 
 //	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException;
 
