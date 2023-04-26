@@ -10,7 +10,7 @@ import constants.Constants;
 public class TypeParser {
 	public static Object typeParser(Object data, String key, Hashtable<String, String> htblColNameType) {
 		String type = htblColNameType.get(key);		
-		return typeParser(data,type);
+		return typeParser(data, type);
 	}
 	
 	public static Object typeParser(Object data, String type) {
