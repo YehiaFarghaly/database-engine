@@ -25,10 +25,10 @@ public class Validator {
 			String strClusteringKeyColumn, Hashtable<String, String> htblColNameType,
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) throws DBAppException {
 
-		if (validTable(strTableName, appTables)) {
+		if (isValidTable(strTableName, appTables)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_REPEATED_TABLE_NAME);
 
-		} else if (!validClusteringKey(strClusteringKeyColumn, htblColNameMax)) {
+		} else if (!validClusteringKey(strClusteringKeyColumn, htblColNameType)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY);
 
 		} else if (!validDataTypes(htblColNameType)) {
@@ -38,6 +38,12 @@ public class Validator {
 				|| !sameColMinMax(htblColNameMin, htblColNameMax)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
 
+		}
+	}
+
+	public static void validateTable(String tableName, HashSet<String> myTables) throws DBAppException {
+		if (!isValidTable(tableName, myTables)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
 		}
 	}
 
@@ -87,9 +93,6 @@ public class Validator {
 	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue,
 			HashSet<String> appTables)
 			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
-
-		if (!validTable(table.getName(), appTables))
-			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
 		if (!validTuple(table, htblColNameValue))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
@@ -97,22 +100,18 @@ public class Validator {
 	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue,
 			HashSet<String> appTables) throws DBAppException {
 		getTableInfo(table);
-		if (!validTable(table.getName(), appTables))
-			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
-		else if (!validTupleDelete(htblColNameValue))
+		if (!validTupleDelete(htblColNameValue))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
 	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue,
 			HashSet<String> appTables)
 			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
-		if (!validTable(table.getName(), appTables))
-			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
 		if (!validTupleUpdate(table, htblColNameValue))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
-	private static boolean validTable(String tableName, HashSet<String> myTables) {
+	private static boolean isValidTable(String tableName, HashSet<String> myTables) {
 		return myTables.contains(tableName);
 	}
 
@@ -210,16 +209,15 @@ public class Validator {
 	private static boolean isTheSameDataType(Hashtable<String, Object> tuple) {
 		for (int i = 0; i < columns.length; i++) {
 			if (!sameSuffix(tuple, columns[i], i))
-				
+
 				return false;
 		}
 		return true;
 	}
-	
+
 	private static boolean validTupleDelete(Hashtable<String, Object> htblColNameValue) {
-		if (!isTheSameDataTypeMissingCol(htblColNameValue) ||
-			!checkTupleSize(htblColNameValue) ||
-		    !containsAllColumns(htblColNameValue))
+		if (!isTheSameDataTypeMissingCol(htblColNameValue) || !checkTupleSize(htblColNameValue)
+				|| !containsAllColumns(htblColNameValue))
 			return false;
 		return true;
 	}
@@ -227,7 +225,7 @@ public class Validator {
 	private static boolean checkTupleSize(Hashtable<String, Object> tuple) {
 		return tuple.size() <= columns.length;
 	}
-	
+
 	private static boolean isTheSameDataTypeMissingCol(Hashtable<String, Object> tuple) {
 		int index = 0;
 		for (String column : columns) {
@@ -262,7 +260,7 @@ public class Validator {
 		int index = 0;
 		for (String s : columns) {
 			if (tuple.containsKey(s)) {
-				parseMinMax(tuple, s, index);
+				return parseMinMax(tuple, s, index);
 			}
 			index++;
 		}

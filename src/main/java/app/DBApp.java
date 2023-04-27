@@ -72,7 +72,7 @@ public class DBApp implements IDatabase {
 	 * 
 	 * @throws DBAppException If the table name is invalid or if the table already
 	 *                        exists.
-	 * @throws ParseException 
+	 * @throws ParseException
 	 * @throws IOException    If an error occurs while creating the table files.
 	 */
 	@Override
@@ -80,14 +80,13 @@ public class DBApp implements IDatabase {
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
 			Hashtable<String, String> htblColNameMax) throws DBAppException {
 
-			Validator.validateTableCreation(myTables, strTableName,
-		 strClusteringKeyColumn, htblColNameType, htblColNameMin,
-		 htblColNameMax);
+		Validator.validateTableCreation(myTables, strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin,
+				htblColNameMax);
 
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.add(strTableName);
 		writer.write(table);
-	
+
 		try {
 			table.createTableFiles();
 			Serializer.serializeTable(table);
@@ -176,22 +175,22 @@ public class DBApp implements IDatabase {
 	private void takeAction(Action action, String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException {
 		try {
+			Validator.validateTable(strTableName, myTables);
 			Table table = Serializer.deserializeTable(strTableName);
 			if (action == Action.INSERT) {
-				Validator.validateInsertionInput(table, htblColNameValue, myTables); 
+				Validator.validateInsertionInput(table, htblColNameValue, myTables);
 				table.insertTuple(htblColNameValue);
 			} else if (action == Action.DELETE) {
-				Validator.validateDeletionInput(table, htblColNameValue, myTables); 
+				Validator.validateDeletionInput(table, htblColNameValue, myTables);
 				table.deleteTuples(htblColNameValue);
 			} else {
 				castClusteringKeyType(table);
 				htblColNameValue.put(table.getPKColumn(), clusteringKey);
-				Validator.validateUpdateInput(table, htblColNameValue, myTables); 
+				Validator.validateUpdateInput(table, htblColNameValue, myTables);
 				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 			}
 			Serializer.serializeTable(table);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (CsvValidationException | ClassNotFoundException | IOException | ParseException e1) {
 		}
 	}
 
@@ -201,5 +200,24 @@ public class DBApp implements IDatabase {
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
+	}
+
+	public static void main(String[] args) throws DBAppException {
+		DBApp engine = new DBApp();
+		engine.init();
+		Hashtable<String, String> htblColNameType = new Hashtable<>();
+		htblColNameType.put("course_id", "java.lang.String");
+		htblColNameType.put("courseName", "java.lang.String");
+
+		Hashtable<String, String> htblColNameMin = new Hashtable<>();
+		htblColNameMin.put("course_id", "9999");
+		htblColNameMin.put("courseName", "AAAAA");
+
+		Hashtable<String, String> htblColNameMax = new Hashtable<>();
+		htblColNameMax.put("course_id", "0000");
+		htblColNameMax.put("courseName", "zzzz");
+
+		engine.createTable("newTable", "course_id", htblColNameType, htblColNameMin, htblColNameMax);
+
 	}
 }

@@ -59,6 +59,72 @@ public class DBAppTest {
 		engine.createTable(newTableName, id, htblColNameType, htblColNameMin, htblColNameMax);
 	}
 
+	@Test
+	void testCreateTable_AlreadyExistingName_ShouldFailCreation() throws DBAppException {
+		// Given
+		Hashtable<String, String> htblColNameType = new Hashtable<>();
+		htblColNameType.put("id", "java.lang.String");
+		htblColNameType.put("courseName", "java.lang.String");
+
+		Hashtable<String, String> htblColNameMin = new Hashtable<>();
+		htblColNameMin.put("id", "0000");
+		htblColNameMin.put("courseName", "AAAAA");
+
+		Hashtable<String, String> htblColNameMax = new Hashtable<>();
+		htblColNameMin.put("id", "9999");
+		htblColNameMin.put("courseName", "zzzz");
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.createTable(newTableName, "id", htblColNameType, htblColNameMin, htblColNameMax);
+		});
+		// Then
+		assertThat(exception.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_REPEATED_TABLE_NAME);
+	}
+
+	@Test
+	void testCreateTable_InvalidPrimaryKeyColumn_ShouldFailCreation() throws DBAppException {
+		// Given
+		Hashtable<String, String> htblColNameType = new Hashtable<>();
+		htblColNameType.put("id", "java.lang.String");
+		htblColNameType.put("courseName", "java.lang.String");
+
+		Hashtable<String, String> htblColNameMin = new Hashtable<>();
+		htblColNameMin.put("id", "0000");
+		htblColNameMin.put("courseName", "AAAAA");
+
+		Hashtable<String, String> htblColNameMax = new Hashtable<>();
+		htblColNameMin.put("id", "9999");
+		htblColNameMin.put("courseName", "zzzz");
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.createTable("newTable", "price", htblColNameType, htblColNameMin, htblColNameMax);
+		});
+		// Then
+		assertThat(exception.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY);
+	}
+
+	@Test
+	void testCreateTable_InvalidMinMax_ShouldFailCreation() throws DBAppException {
+		// Given
+		Hashtable<String, String> htblColNameType = new Hashtable<>();
+		htblColNameType.put("course_id", "java.lang.String");
+		htblColNameType.put("courseName", "java.lang.String");
+
+		Hashtable<String, String> htblColNameMin = new Hashtable<>();
+		htblColNameMin.put("course_id", "9999");
+		htblColNameMin.put("courseName", "AAAAA");
+
+		Hashtable<String, String> htblColNameMax = new Hashtable<>();
+		htblColNameMax.put("course_id", "0000");
+		htblColNameMax.put("courseName", "zzzz");
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.createTable("newTable", "course_id", htblColNameType, htblColNameMin, htblColNameMax);
+		});
+		// Then
+		assertThat(exception.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
+	}
+
 	private static void insertRow(int id) throws DBAppException {
 
 		Hashtable<String, Object> htblColNameValue = createRow(id, TEST_NAME, TEST_AGE);
@@ -118,20 +184,61 @@ public class DBAppTest {
 		assertThat(page.getSize() == 100);
 	}
 
-//	@Test
-//	void testInsertIntoTable_RepeatedPrimaryKey_ShouldFailInsert() throws CsvValidationException, ClassNotFoundException, DBAppException, IOException {
-//		// Given
-//		insertRow(1);
-//		Hashtable<String,Object> htblColNameValue = createRow(1, "Mohamed", TEST_AGE);
-//		
-//		// When
-//		try {
-//		    engine.insertIntoTable(newTableName, htblColNameValue);
-//		    fail("Expected DBAppException but no exception was thrown");
-//		} catch (DBAppException e) {
-//		    System.out.println(e.getMessage());
-//		}
-//	}
+	@Test
+	void testInsertIntoTable_RepeatedPrimaryKey_ShouldFailInsert()
+			throws CsvValidationException, ClassNotFoundException, DBAppException, IOException {
+		// Given
+		insertRow(1);
+		Hashtable<String, Object> htblColNameValue = createRow(1, "Mohamed", TEST_AGE);
+
+		// When
+		try {
+			engine.insertIntoTable(newTableName, htblColNameValue);
+			fail("Expected DBAppException but no exception was thrown");
+		} catch (DBAppException e) {
+
+			// Then
+			assertThat(e.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_TUPLE_DATA);
+		}
+	}
+
+	@Test
+	void testInsertIntoTable_InvalidDataType_ShouldFailInsertion() throws DBAppException {
+		// Given
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(name, "Foo");
+		htblColNameValue.put(age, "boo");
+		htblColNameValue.put(id, 55);
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.insertIntoTable(newTableName, htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testInsertIntoTable_InvalidTableName_ShouldFailInsertion() {
+		// Given
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(name, "Foo");
+		htblColNameValue.put(age, TEST_AGE);
+		htblColNameValue.put(id, 55);
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.insertIntoTable("someRandomTableName", htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TABLE_NAME;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
 
 	@Test
 	void testUpdateTable_ValidInput_ShouldUpdateSuccessfully()
@@ -151,30 +258,69 @@ public class DBAppTest {
 		assertThat(updated.getCells().get(2).getValue()).isEqualTo(updatedName);
 	}
 
-//	@Test
-//	void testUpdateTable_InvalidPrimaryKey_ShouldFailUpdate() throws DBAppException {
-//		// Given
-//		String updatedName = "Mohamed";
-//		Hashtable<String, Object> htblColNameValue = new Hashtable();
-//		htblColNameValue.put(name, updatedName);
-//
-//		// When
-//		Exception exception = assertThrows(DBAppException.class, () -> {
-//			engine.updateTable(newTableName, "0", htblColNameValue);
-//		});
-//
-//		// Then
-//		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
-//		String outputMessage = exception.getMessage();
-//		assertThat(outputMessage).isEqualTo(expectedMessage);
-//	}
+	@Test
+	void testUpdateTable_InvalidPrimaryKey_ShouldFailUpdate() throws DBAppException {
+		// Given
+		insertRow(1);
+		String updatedName = "Mohamed";
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(name, updatedName);
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.updateTable(newTableName, "0", htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testUpdateTable_ExtraInput_ShouldFailUpdate() throws DBAppException {
+		// Given
+		insertRow(1);
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(name, "Foo");
+		htblColNameValue.put(age, 25);
+		htblColNameValue.put("University", "GUC");
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.updateTable(newTableName, "0", htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testUpdateTable_MoreThanMax_ShouldFailUpdate() throws DBAppException {
+		// Given
+		insertRow(1);
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(age, 2500);
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.updateTable(newTableName, "1", htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
 
 	@Test
 	void testDeleteFromTable_OneTuple_ShouldDeleteSuccessfully()
 			throws DBAppException, ClassNotFoundException, IOException, InterruptedException {
 		// Given
 		insertRow(1);
-		Hashtable<String,Object> htblColNameValue = new Hashtable<>();
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
 		htblColNameValue.put(id, 1);
 
 		// When
@@ -191,34 +337,55 @@ public class DBAppTest {
 		// Given
 		for (int i = 0; i < 100; i++)
 			insertRow(i);
-		Hashtable<String,Object> htblColNameValue = new Hashtable<>();
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
 		htblColNameValue.put(name, TEST_NAME);
+		htblColNameValue.put(id, 0);
 
 		// When
 		engine.deleteFromTable(newTableName, htblColNameValue);
 
 		// Then
 		Table table = Serializer.deserializeTable(newTableName);
-		assertThat(table.isEmpty());
+		assertThat(table.getSize()).isEqualTo(99);
 	}
 
-//	@Test
-//	void testDeleteFromTable_InvalidName_ShouldFailDelete() throws DBAppException, ClassNotFoundException, IOException {
-//		// Given
-//		insertRow(1);
-//		Hashtable<String,Object> htblColNameValue = new Hashtable<>();
-//		htblColNameValue.put(name, "Mohamed");
-//
-//		// When
-//		Exception exception = assertThrows(DBAppException.class, () -> {
-//			engine.deleteFromTable(newTableName, htblColNameValue);
-//		});
-//
-//		// Then
-//		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
-//		String outputMessage = exception.getMessage();
-//		assertThat(outputMessage).isEqualTo(expectedMessage);
-//	}
+	@Test
+	void testDeleteFromTable_InvalidColumnName_ShouldFailDelete()
+			throws DBAppException, ClassNotFoundException, IOException {
+		// Given
+		insertRow(1);
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put("middle_name", "Mohamed");
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.deleteFromTable(newTableName, htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testDeleteFromTable_InvalidDataType_ShouldFailDelete() throws DBAppException {
+		// Given
+		insertRow(1);
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(id, 1);
+		htblColNameValue.put("age", "Foo");
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.deleteFromTable(newTableName, htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
 
 	@AfterEach
 	void deleteCreatedTable() throws ClassNotFoundException, IOException, InterruptedException {
