@@ -206,15 +206,16 @@ public class Validator {
 		for (String s:tuple.keySet()) {
 			boolean colFound = false;
 			for (int i = 0; i<columns.length; i++) {
-				if(columns[i].equals(s)) {
+				if (columns[i].equals(s)) {
 					colFound = true;
 				}
 			}
-			if(!colFound) return false;
+			if (!colFound) return false;
 		}
 		
 		return true;
 	}
+	
 	private static boolean checkTupleSize(Hashtable<String, Object> tuple) {
 		return tuple.size()<=columns.length;
 	}
@@ -231,7 +232,8 @@ public class Validator {
 	private static boolean validTupleUpdate(Table table, Hashtable<String, Object> tuple)
 			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
 		getTableInfo(table);
-		if (checkTupleSize(tuple) || !isTheSameDataTypeMissingCol(tuple) || !foundPK(table, tuple) || !checkMinMaxMissingCol(tuple) || !containsAllColumns(tuple)) {
+		if (checkTupleSize(tuple) || !isTheSameDataTypeMissingCol(tuple) || !foundPK(table, tuple)
+				|| !checkMinMaxMissingCol(tuple) || !containsAllColumns(tuple)) {
 			return false;
 		} else {
 			return true;
