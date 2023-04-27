@@ -253,7 +253,6 @@ public class Validator {
 		Object minValue = min[index];
 		Object maxValue = max[index];
 		String dataType = dataTypes[index];
-		insertedValue = TypeParser.typeParser(insertedValue, dataType);
 		minValue = TypeParser.typeParser(minValue, dataType);
 		maxValue = TypeParser.typeParser(maxValue, dataType);
 		if ((isFirstLessThanSecond(insertedValue, minValue)) || (isFirstGreaterThanSecond(insertedValue, maxValue))) {
