@@ -1,6 +1,6 @@
 package app;
 
-import java.text.ParseException;
+
 import java.util.*;
 import exceptions.DBAppException;
 import sql.SQLTerm;
