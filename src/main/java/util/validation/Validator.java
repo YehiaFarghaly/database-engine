@@ -185,7 +185,7 @@ public class Validator {
 
 		getTableInfo(table);
 
-		if (!isTheSameNumberOfColumns(tuple) || !containsAllColumns(tuple) || !isTheSameDataType(tuple)
+		if (checkTupleSize(tuple) || !isTheSameNumberOfColumns(tuple) || !containsAllColumns(tuple) || !isTheSameDataType(tuple)
 				|| !checkMinMax(tuple) || foundPK(table, tuple)) {
 			return false;
 		} else {
@@ -202,12 +202,21 @@ public class Validator {
 	}
 
 	private static boolean containsAllColumns(Hashtable<String, Object> tuple) {
-		for (int i = 0; i < columns.length; i++) {
-			if (!tuple.containsKey(columns[i])) {
-				return false;
+		
+		for (String s:tuple.keySet()) {
+			boolean colFound = false;
+			for (int i = 0; i<columns.length; i++) {
+				if(columns[i].equals(s)) {
+					colFound = true;
+				}
 			}
+			if(!colFound) return false;
 		}
+		
 		return true;
+	}
+	private static boolean checkTupleSize(Hashtable<String, Object> tuple) {
+		return tuple.size()<=columns.length;
 	}
 
 	private static boolean isTheSameDataType(Hashtable<String, Object> tuple) {
@@ -222,7 +231,7 @@ public class Validator {
 	private static boolean validTupleUpdate(Table table, Hashtable<String, Object> tuple)
 			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
 		getTableInfo(table);
-		if (!isTheSameDataTypeMissingCol(tuple) || !foundPK(table, tuple) || !checkMinMaxMissingCol(tuple)) {
+		if (checkTupleSize(tuple) || !isTheSameDataTypeMissingCol(tuple) || !foundPK(table, tuple) || !checkMinMaxMissingCol(tuple) || !containsAllColumns(tuple)) {
 			return false;
 		} else {
 			return true;
