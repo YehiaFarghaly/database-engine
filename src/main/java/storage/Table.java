@@ -1,17 +1,18 @@
 package storage;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.text.ParseException;
-import java.util.Hashtable;
-import java.util.Vector;
 import exceptions.DBAppException;
 import util.filecontroller.FileCreator;
 import util.filecontroller.FileDeleter;
 import util.filecontroller.FileType;
 import util.filecontroller.Serializer;
 import util.search.TableSearch;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.text.ParseException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class Table implements Serializable {
 
@@ -218,12 +219,12 @@ public class Table implements Serializable {
 	public void deleteTuples(Hashtable<String, Object> htblColNameValue)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
 
-		for (String colName : htblColNameValue.keySet()) {
-
-			Object value = htblColNameValue.get(colName);
-			iterateOverPageName(colName, value);
-
+		for (int i = 0; i < pagesName.size(); i++) {
+			Page page = Serializer.deserializePage(name, pagesName.get(i));
+			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
+			deletePageRecords(toBeDeleted, page);
 		}
+
 	}
 
 	private void iterateOverPageName(String colName, Object value)
