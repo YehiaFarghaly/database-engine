@@ -16,6 +16,7 @@ import java.util.Hashtable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DBAppTest {
 	private static DBApp engine;
@@ -120,18 +121,16 @@ public class DBAppTest {
 //	@Test
 //	void testInsertIntoTable_RepeatedPrimaryKey_ShouldFailInsert() throws CsvValidationException, ClassNotFoundException, DBAppException, IOException {
 //		// Given
+//		insertRow(1);
 //		Hashtable<String,Object> htblColNameValue = createRow(1, "Mohamed", TEST_AGE);
 //		
 //		// When
-//		Exception exception = assertThrows(DBAppException.class,()->{
-//		engine.insertIntoTable(newTableName, htblColNameValue);
+//		try {
+//		    engine.insertIntoTable(newTableName, htblColNameValue);
+//		    fail("Expected DBAppException but no exception was thrown");
+//		} catch (DBAppException e) {
+//		    System.out.println(e.getMessage());
 //		}
-//		);
-//		
-//		//Then
-//		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
-//		String outputMessage = exception.getMessage();
-//		assertThat(outputMessage).isEqualTo(expectedMessage);
 //	}
 
 	@Test

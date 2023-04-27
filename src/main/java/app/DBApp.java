@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import com.opencsv.exceptions.CsvValidationException;
-import com.sun.prism.Image.Serial;
-
 import exceptions.DBAppException;
 import util.filecontroller.Serializer;
 import storage.*;
@@ -204,5 +202,4 @@ public class DBApp implements IDatabase {
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
-	
 }
