@@ -216,9 +216,9 @@ public class Validator {
 		return true;
 	}
 	
-	private static boolean validTupleDelete(Hashtable<String,Object> htblColNameValue) {
+	private static boolean validTupleDelete(Hashtable<String, Object> htblColNameValue) {
 		if (!isTheSameDataTypeMissingCol(htblColNameValue) ||
-			!checkTupleSize(htblColNameValue)             ||
+			!checkTupleSize(htblColNameValue) ||
 		    !containsAllColumns(htblColNameValue))
 			return false;
 		return true;
