@@ -62,8 +62,8 @@ public class Validator {
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
 			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
 		int length = htblColNameMin.values().size();
-		for (int i = 0; i < length; i++) {
 
+		for (int i = 0; i < length; i++) {
 			Object minValue = (String) htblColNameMin.values().toArray()[i];
 			String keyMinValue = (String) htblColNameMin.keySet().toArray()[i];
 			minValue = TypeParser.typeParser(minValue, keyMinValue, htblColNameType);
@@ -99,7 +99,7 @@ public class Validator {
 		getTableInfo(table);
 		if (!validTable(table.getName(), appTables))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
-		else if (!isTheSameDataTypeMissingCol(htblColNameValue))
+		else if (!validTupleDelete(htblColNameValue))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
@@ -114,18 +114,6 @@ public class Validator {
 
 	private static boolean validTable(String tableName, HashSet<String> myTables) {
 		return myTables.contains(tableName);
-	}
-
-	private static boolean isTheSameDataTypeMissingCol(Hashtable<String, Object> tuple) {
-		int index = 0;
-		for (String column : columns) {
-			if (tuple.containsKey(column)) {
-				if (!sameSuffix(tuple, column, index))
-					return false;
-			}
-			index++;
-		}
-		return true;
 	}
 
 	private static boolean sameSuffix(Hashtable<String, Object> tuple, String first, int index) {
@@ -184,7 +172,7 @@ public class Validator {
 			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
 
 		getTableInfo(table);
-		if (!checkTupleSize(tuple) || !isTheSameNumberOfColumns(tuple) || !containsAllColumns(tuple) || !isTheSameDataType(tuple)
+		if (!isTheSameNumberOfColumns(tuple) || !containsAllColumns(tuple) || !isTheSameDataType(tuple)
 				|| !checkMinMax(tuple) || foundPK(table, tuple)) {
 			return false;
 		} else {
@@ -201,28 +189,53 @@ public class Validator {
 	}
 
 	private static boolean containsAllColumns(Hashtable<String, Object> tuple) {
-		for (String s:tuple.keySet()) {
-			boolean colFound = false;
-			for (int i = 0; i<columns.length; i++) {
-				if (columns[i].equals(s)) {
-					colFound = true;
-				}
-			}
-			if (!colFound) return false;
+		for (String attribute : tuple.keySet()) {
+			boolean colFound = checkAttributeExistence(attribute);
+			if (!colFound)
+				return false;
 		}
-		
+
 		return true;
 	}
-	
-	private static boolean checkTupleSize(Hashtable<String, Object> tuple) {
-		return tuple.size()<=columns.length;
+
+	private static boolean checkAttributeExistence(String attribute) {
+		for (int i = 0; i < columns.length; i++) {
+			if (columns[i].equals(attribute)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static boolean isTheSameDataType(Hashtable<String, Object> tuple) {
 		for (int i = 0; i < columns.length; i++) {
 			if (!sameSuffix(tuple, columns[i], i))
-
+				
 				return false;
+		}
+		return true;
+	}
+	
+	private static boolean validTupleDelete(Hashtable<String,Object> htblColNameValue) {
+		if (!isTheSameDataTypeMissingCol(htblColNameValue) ||
+			!checkTupleSize(htblColNameValue)             ||
+		    !containsAllColumns(htblColNameValue))
+			return false;
+		return true;
+	}
+
+	private static boolean checkTupleSize(Hashtable<String, Object> tuple) {
+		return tuple.size() <= columns.length;
+	}
+	
+	private static boolean isTheSameDataTypeMissingCol(Hashtable<String, Object> tuple) {
+		int index = 0;
+		for (String column : columns) {
+			if (tuple.containsKey(column)) {
+				if (!sameSuffix(tuple, column, index))
+					return false;
+			}
+			index++;
 		}
 		return true;
 	}
