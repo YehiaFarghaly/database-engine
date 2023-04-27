@@ -2,10 +2,7 @@ package datamanipulation;
 
 import java.io.*;
 import java.util.Map.Entry;
-
 import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvValidationException;
-
 import constants.Constants;
 import storage.Table;
 

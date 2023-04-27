@@ -1,18 +1,17 @@
 package storage;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Hashtable;
 import java.util.Vector;
 import exceptions.DBAppException;
-import filecontroller.FileCreator;
-import filecontroller.FileDeleter;
-import filecontroller.FileType;
-import filecontroller.Serializer;
-import search.TableSearch;
+import util.filecontroller.FileCreator;
+import util.filecontroller.FileDeleter;
+import util.filecontroller.FileType;
+import util.filecontroller.Serializer;
+import util.search.TableSearch;
 
 public class Table implements Serializable {
 
@@ -22,21 +21,23 @@ public class Table implements Serializable {
 	private static final long serialVersionUID = 994119161960187256L;
 	private int cntPage;
 	private Vector<String> pagesName;
-	private String name, PKColumn;
+	private String name, pkColumn;
 	private Tuple prototype;
 	private Hashtable<String, String> colNameType, colNameMin, colNameMax;
 	private String primaryKeyType;
+	private int size;
 
-	public Table(String name, String PK, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
+	public Table(String name, String pkColumn, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
 			Hashtable<String, String> colNameMax) {
 		cntPage = 0;
+		size = 0;
 		this.name = name;
-		this.PKColumn = PK;
+		this.pkColumn = pkColumn;
 		this.colNameType = colNameType;
 		this.colNameMin = colNameMin;
 		this.colNameMax = colNameMax;
 		pagesName = new Vector<String>();
-		primaryKeyType=colNameType.get(PKColumn);
+		primaryKeyType=colNameType.get(pkColumn);
 	}
 	
 	public String getPrimaryKeyType() {
@@ -52,11 +53,11 @@ public class Table implements Serializable {
 	}
 
 	public String getPKColumn() {
-		return PKColumn;
+		return pkColumn;
 	}
 
 	public void setPKColumn(String pKColumn) {
-		PKColumn = pKColumn;
+		pkColumn = pKColumn;
 	}
 
 	public Hashtable<String, String> getColNameType() {
@@ -81,6 +82,10 @@ public class Table implements Serializable {
 
 	public void setColNameMax(Hashtable<String, String> colNameMax) {
 		this.colNameMax = colNameMax;
+	}
+	
+	public int getSize() {
+		return size;
 	}
 
 	public boolean isEmpty() {
@@ -107,6 +112,7 @@ public class Table implements Serializable {
 				page.insertIntoPage(tuple);
 			}
 		}
+		size++;
 	}
 
 	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
@@ -177,7 +183,7 @@ public class Table implements Serializable {
 		while (nextPage.isFull()) {
 			if (atLastPage(position)) {
 				Page newPage = initializePage();
-				Serializer.SerializePage(newPage.getName(), newPage);
+				Serializer.serializePage(newPage.getName(), newPage);
 				return newPage;
 			}
 			nextPage = getPageAtPosition(++position);
@@ -209,7 +215,7 @@ public class Table implements Serializable {
 		return position == pagesName.size() - 1;
 	}
 
-	public void DeleteTuples(Hashtable<String, Object> htblColNameValue)
+	public void deleteTuples(Hashtable<String, Object> htblColNameValue)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
 
 		for (String colName : htblColNameValue.keySet()) {
@@ -243,8 +249,10 @@ public class Table implements Serializable {
 
 	private void deletePageRecords(Vector<Tuple> toBeDeleted, Page page)
 			throws IOException, DBAppException, ParseException {
-		for (Tuple tuple : toBeDeleted)
-			page.DeleteFromPage(tuple);
+		for (Tuple tuple : toBeDeleted) {
+			page.deleteFromPage(tuple);
+		    size--;	
+		}
 	}
 
 	public void updateRecordsInTaple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue)

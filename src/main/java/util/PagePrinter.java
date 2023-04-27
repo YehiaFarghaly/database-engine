@@ -1,7 +1,7 @@
 package util;
 
 import datamanipulation.CsvReader;
-import filecontroller.Serializer;
+import util.filecontroller.Serializer;
 import storage.Cell;
 import storage.Page;
 import storage.Table;
@@ -14,8 +14,8 @@ public class PagePrinter {
 
     Page page;
     ArrayList<String> colOrder;
-
-    String line ;
+    String line;
+    
     public PagePrinter(Page page) throws IOException, ClassNotFoundException {
         this.page = page;
         colOrder = getColOrder();
@@ -32,7 +32,7 @@ public class PagePrinter {
 
     public ArrayList<String> getColOrder() throws IOException, ClassNotFoundException {
         CsvReader readInfo = new CsvReader();
-        ArrayList<String[]> colsInfo =  readInfo.readTable(page.getTableName());
+        ArrayList<String[]> colsInfo = readInfo.readTable(page.getTableName());
         Table table = Serializer.deserializeTable(page.getTableName());
 
         ArrayList<String> colOrder = new ArrayList<>();
@@ -44,24 +44,21 @@ public class PagePrinter {
         return colOrder;
     }
 
-    public void printColName()
-    {
-        for(String colName:colOrder)
+    public void printColName() {
+        for (String colName:colOrder)
             System.out.print(completeString(colName)+'|');
-
     }
-    public void printData()
-    {
-
-        for(Tuple tuple : page.getTuples()) {
+    
+    public void printData() {
+        for (Tuple tuple : page.getTuples()) {
             printDataOrdered(tuple);
             println();
         }
     }
 
     private void printDataOrdered(Tuple tuple) {
-        for(String col : colOrder) {
-            printcell(col,tuple);
+        for (String col : colOrder) {
+            printcell(col, tuple);
         }
     }
 
@@ -72,23 +69,22 @@ public class PagePrinter {
         }
     }
 
-    public void println()
-    {
+    public void println() {
         System.out.println();
         System.out.println(line);
     }
 
     public String createLine() {
         String line = "----------";
-        for(int i=1;i!= colOrder.size();i++) {
-            for(int j=0;j!= 10;j++)
+        for (int i=1; i!= colOrder.size(); i++) {
+            for (int j=0; j!= 10; j++)
                 line+="-";
         }
         return line;
     }
 
     public String completeString(String data) {
-        while(data.length()<10)
+        while (data.length()<10)
             data+=" ";
         return data;
     }

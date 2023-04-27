@@ -4,11 +4,12 @@ import constants.Constants;
 import storage.Table;
 
 public class TypeCaster {
-	public static void castClusteringKey(Table table, Object clusteringKey,String clusteringKeyValue) {
+	public static Object castClusteringKey(Table table, String clusteringKeyValue) {
 		String primaryKeyType = table.getPrimaryKeyType();
 		if (primaryKeyType.equals(Constants.INTEGER_DATA_TYPE_NAME))
-			clusteringKey = Integer.parseInt(clusteringKeyValue);
+			return Integer.parseInt(clusteringKeyValue);
 		else if (primaryKeyType.equals(Constants.DOUBLE_DATA_TYPE_NAME))
-			clusteringKey = Double.parseDouble(clusteringKeyValue);
+			return Double.parseDouble(clusteringKeyValue);
+		return clusteringKeyValue;
 	}
 }

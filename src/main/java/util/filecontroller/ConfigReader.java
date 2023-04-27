@@ -1,4 +1,4 @@
-package filecontroller;
+package util.filecontroller;
 
 import java.io.IOException;
 import java.io.InputStream;

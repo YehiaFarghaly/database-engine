@@ -3,20 +3,18 @@ package app;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
-
-import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
+import com.sun.prism.Image.Serial;
 
-import constants.Constants;
 import exceptions.DBAppException;
-import filecontroller.Serializer;
+import util.filecontroller.Serializer;
 import storage.*;
 import util.TypeCaster;
-import validation.Validator;
-import search.*;
+import util.search.*;
 import sql.SQLTerm;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
+import util.validation.Validator;
 
 /**
  * The DBApp class represents a database management system. It implements the
@@ -38,11 +36,9 @@ public class DBApp implements IDatabase {
 		this.reader = new CsvReader();
 	}
 
-
 	public HashSet<String> getMyTables() {
 		return myTables;
 	}
-
 
 	public CsvReader getReader() {
 		return reader;
@@ -53,12 +49,13 @@ public class DBApp implements IDatabase {
 	}
 
 	/**
-	 * Initializes the database management system by reading all the tables from CSV file
+	 * Initializes the database management system by reading all the tables from CSV
+	 * file
 	 * 
 	 */
 	@Override
 	public void init() {
-		
+
 		this.myTables = reader.readAllTables();
 
 	}
@@ -77,22 +74,28 @@ public class DBApp implements IDatabase {
 	 * 
 	 * @throws DBAppException If the table name is invalid or if the table already
 	 *                        exists.
+	 * @throws ParseException 
 	 * @throws IOException    If an error occurs while creating the table files.
 	 */
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException, IOException {
+			Hashtable<String, String> htblColNameMax) throws DBAppException {
 
-		// Validator.validateTableCreation(myTables, strTableName,
-		// strClusteringKeyColumn, htblColNameType, htblColNameMin,
-		// htblColNameMax);
+			Validator.validateTableCreation(myTables, strTableName,
+		 strClusteringKeyColumn, htblColNameType, htblColNameMin,
+		 htblColNameMax);
 
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.add(strTableName);
 		writer.write(table);
-		table.createTableFiles();
-		Serializer.SerializeTable(table);
+	
+		try {
+			table.createTableFiles();
+			Serializer.serializeTable(table);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -112,8 +115,7 @@ public class DBApp implements IDatabase {
 	 *                                data.
 	 */
 	@Override
-	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
+	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
 		takeAction(Action.INSERT, strTableName, htblColNameValue);
 
@@ -136,9 +138,8 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
-		this.clusteringKeyValue =  strClusteringKeyValue;
+			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+		this.clusteringKeyValue = strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
 	}
 
@@ -156,8 +157,7 @@ public class DBApp implements IDatabase {
 	 * @throws ParseException         if there is an error parsing the input.
 	 */
 	@Override
-	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
+	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		takeAction(Action.DELETE, strTableName, htblColNameValue);
 	}
 
@@ -176,29 +176,29 @@ public class DBApp implements IDatabase {
 	 * @throws ParseException         if there is an error parsing the input.
 	 */
 	private void takeAction(Action action, String strTableName, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, IOException, ClassNotFoundException, ParseException {
-
-		Validator.validateTable(strTableName, myTables);
-
-		Table table = Serializer.deserializeTable(strTableName);
-
-		if (action == Action.INSERT) {
-			Validator.validateInsertionInput(table, htblColNameValue);
-			table.insertTuple(htblColNameValue);
-		} else if (action == Action.DELETE) {
-			Validator.validateDeletionInput(table, htblColNameValue);
-			table.DeleteTuples(htblColNameValue);
-		} else {
-			Validator.validateUpdateInput(table, htblColNameValue);
-			castClusteringKeyType(table);
-			table.updateRecordsInTaple(clusteringKey, htblColNameValue);
+			throws DBAppException {
+		try {
+			Table table = Serializer.deserializeTable(strTableName);
+			if (action == Action.INSERT) {
+				Validator.validateInsertionInput(table, htblColNameValue, myTables); 
+				table.insertTuple(htblColNameValue);
+			} else if (action == Action.DELETE) {
+				Validator.validateDeletionInput(table, htblColNameValue, myTables); 
+				table.deleteTuples(htblColNameValue);
+			} else {
+				castClusteringKeyType(table);
+				htblColNameValue.put(table.getPKColumn(), clusteringKey);
+				Validator.validateUpdateInput(table, htblColNameValue, myTables); 
+				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
+			}
+			Serializer.serializeTable(table);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		Serializer.SerializeTable(table);
 	}
-	
+
 	private void castClusteringKeyType(Table table) {
-		TypeCaster.castClusteringKey(table, clusteringKey, clusteringKeyValue);
+		clusteringKey = TypeCaster.castClusteringKey(table, clusteringKeyValue);
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
