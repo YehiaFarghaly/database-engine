@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public class Cell implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6329920811762568469L;
 	private Object key, value;
 
 	public Cell(Object key, Object value) {

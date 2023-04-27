@@ -1,20 +1,23 @@
 package util.search;
 
-import java.text.ParseException;
-import java.util.Vector;
 import exceptions.DBAppException;
 import storage.Cell;
 import storage.Page;
 import storage.Tuple;
 import util.Compare;
 
+import java.text.ParseException;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Vector;
+
 public class PageSearch {
 
 	public static int binarySearch(Page page, Object primaryKey) throws DBAppException, ParseException {
-		
+
 		int low = 0;
 		int high = page.getSize() - 1;
-		
+
 		while (low <= high) {
 			int mid = low + (high - low) / 2;
 			Tuple currTuple = page.getTuples().get(mid);
@@ -27,23 +30,44 @@ public class PageSearch {
 			else
 				high = mid - 1;
 		}
-		
+
 		return low;
 	}
 
 	public static Vector<Tuple> linearSearch(Page page, String colName, Object value)
 			throws DBAppException, ParseException {
-		
+
 		Vector<Tuple> results = new Vector<Tuple>();
-		
+
 		for (Tuple currTuple : page.getTuples()) {
-			
+
 			Object currValue = getValueOfColInTuple(currTuple, colName);
 			int comp = Compare.compare(currValue, value);
 			if (comp == 0)
 				results.add(currTuple);
 		}
-		
+
+		return results;
+	}
+
+	public static Vector<Tuple> linearSearch(Page page, Hashtable<String, Object> colNameValue)
+			throws DBAppException, ParseException {
+		Vector<Tuple> results = new Vector<Tuple>();
+		for (Tuple currTuple : page.getTuples()) {
+			boolean isValid = true;
+			for (Map.Entry<String, Object> curr : colNameValue.entrySet()) {
+				String colName = curr.getKey();
+				Object value = curr.getValue();
+				Object currValue = getValueOfColInTuple(currTuple, colName);
+				int comp = Compare.compare(currValue, value);
+				if (comp != 0) {
+					isValid = false;
+					break;
+				}
+			}
+			if (isValid)
+				results.add(currTuple);
+		}
 		return results;
 	}
 
