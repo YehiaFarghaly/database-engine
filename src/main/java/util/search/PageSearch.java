@@ -1,12 +1,15 @@
 package util.search;
 
-import java.text.ParseException;
-import java.util.Vector;
 import exceptions.DBAppException;
 import storage.Cell;
 import storage.Page;
 import storage.Tuple;
 import util.Compare;
+
+import java.text.ParseException;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Vector;
 
 public class PageSearch {
 
@@ -47,6 +50,29 @@ public class PageSearch {
 		return results;
 	}
 
+	public static Vector<Tuple> linearSearch(Page page, Hashtable<String,Object> colNameValue)
+			throws DBAppException, ParseException {
+
+		Vector<Tuple> results = new Vector<Tuple>();
+
+		for (Tuple currTuple : page.getTuples()) {
+			boolean valid = true;
+			for (Map.Entry<String , Object> curr :colNameValue.entrySet()) {
+				String colName = curr.getKey();
+				Object value = curr.getValue();
+				Object currValue = getValueOfColInTuple(currTuple, colName);
+				int comp = Compare.compare(currValue, value);
+				if (comp != 0) {
+					valid = false;
+					break;
+				}
+			}
+			if(valid)
+				results.add(currTuple);
+		}
+
+		return results;
+	}
 	private static Object getValueOfColInTuple(Tuple currTuple, String colName) {
 		Object ret = null;
 		for (Cell currCellInTuple : currTuple.getCells())
