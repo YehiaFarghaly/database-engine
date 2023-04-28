@@ -61,8 +61,8 @@ public class Validator {
 			if (data.equals(Constants.INTEGER_DATA_TYPE_NAME) || data.equals(Constants.DOUBLE_DATA_TYPE_NAME)
 					|| data.equals(Constants.STRING_DATA_TYPE_NAME) || data.equals(Constants.DATE_DATA_TYPE_NAME)) {
 				valid &= true;
-			}
-			else valid &= false;
+			} else
+				valid &= false;
 		}
 		return valid;
 	}
