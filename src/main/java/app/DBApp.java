@@ -201,23 +201,4 @@ public class DBApp implements IDatabase {
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
-
-	public static void main(String[] args) throws DBAppException {
-		DBApp engine = new DBApp();
-		engine.init();
-		Hashtable<String, String> htblColNameType = new Hashtable<>();
-		htblColNameType.put("course_id", "java.lang.String");
-		htblColNameType.put("courseName", "java.lang.String");
-
-		Hashtable<String, String> htblColNameMin = new Hashtable<>();
-		htblColNameMin.put("course_id", "9999");
-		htblColNameMin.put("courseName", "AAAAA");
-
-		Hashtable<String, String> htblColNameMax = new Hashtable<>();
-		htblColNameMax.put("course_id", "0000");
-		htblColNameMax.put("courseName", "zzzz");
-
-		engine.createTable("newTable", "course_id", htblColNameType, htblColNameMin, htblColNameMax);
-
-	}
 }

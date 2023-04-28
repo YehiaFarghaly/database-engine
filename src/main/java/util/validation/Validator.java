@@ -56,13 +56,15 @@ public class Validator {
 	}
 
 	private static boolean validDataTypes(Hashtable<String, String> htblColNameType) {
+		boolean valid = true;
 		for (String data : htblColNameType.values()) {
 			if (data.equals(Constants.INTEGER_DATA_TYPE_NAME) || data.equals(Constants.DOUBLE_DATA_TYPE_NAME)
 					|| data.equals(Constants.STRING_DATA_TYPE_NAME) || data.equals(Constants.DATE_DATA_TYPE_NAME)) {
-				return true;
+				valid &= true;
 			}
+			else valid &= false;
 		}
-		return false;
+		return valid;
 	}
 
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
@@ -250,21 +252,23 @@ public class Validator {
 	}
 
 	private static boolean checkMinMax(Hashtable<String, Object> tuple) throws ParseException {
+		boolean valid = true;
 		for (int i = 0; i < columns.length; i++) {
-			parseMinMax(tuple, columns[i], i);
+			valid &= parseMinMax(tuple, columns[i], i);
 		}
-		return true;
+		return valid;
 	}
 
 	private static boolean checkMinMaxMissingCol(Hashtable<String, Object> tuple) throws ParseException {
 		int index = 0;
+		boolean valid = true;
 		for (String s : columns) {
 			if (tuple.containsKey(s)) {
-				return parseMinMax(tuple, s, index);
+				valid &= parseMinMax(tuple, s, index);
 			}
 			index++;
 		}
-		return true;
+		return valid;
 	}
 
 	private static boolean parseMinMax(Hashtable<String, Object> tuple, String value, int index) {

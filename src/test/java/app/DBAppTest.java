@@ -71,8 +71,8 @@ public class DBAppTest {
 		htblColNameMin.put("courseName", "AAAAA");
 
 		Hashtable<String, String> htblColNameMax = new Hashtable<>();
-		htblColNameMin.put("id", "9999");
-		htblColNameMin.put("courseName", "zzzz");
+		htblColNameMax.put("id", "9999");
+		htblColNameMax.put("courseName", "zzzz");
 		// When
 		Exception exception = assertThrows(DBAppException.class, () -> {
 			engine.createTable(newTableName, "id", htblColNameType, htblColNameMin, htblColNameMax);
@@ -93,14 +93,36 @@ public class DBAppTest {
 		htblColNameMin.put("courseName", "AAAAA");
 
 		Hashtable<String, String> htblColNameMax = new Hashtable<>();
-		htblColNameMin.put("id", "9999");
-		htblColNameMin.put("courseName", "zzzz");
+		htblColNameMax.put("id", "9999");
+		htblColNameMax.put("courseName", "zzzz");
 		// When
 		Exception exception = assertThrows(DBAppException.class, () -> {
 			engine.createTable("newTable", "price", htblColNameType, htblColNameMin, htblColNameMax);
 		});
 		// Then
 		assertThat(exception.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_INVALID_CLUSTERINGKEY);
+	}
+	
+	@Test
+	void testCreateTable_InvalidDataType_ShouldFailCreation() throws DBAppException {
+		// Given
+		Hashtable<String, String> htblColNameType = new Hashtable<>();
+		htblColNameType.put("id", "java.lang.Byte");
+		htblColNameType.put("courseName", "java.lang.String");
+
+		Hashtable<String, String> htblColNameMin = new Hashtable<>();
+		htblColNameMin.put("id", "0");
+		htblColNameMin.put("courseName", "AAAAA");
+
+		Hashtable<String, String> htblColNameMax = new Hashtable<>();
+		htblColNameMax.put("id", "50");
+		htblColNameMax.put("courseName", "zzzz");
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.createTable("newTable", "id", htblColNameType, htblColNameMin, htblColNameMax);
+		});
+		// Then
+		assertThat(exception.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_DATATYPE);
 	}
 
 	@Test
@@ -123,29 +145,6 @@ public class DBAppTest {
 		});
 		// Then
 		assertThat(exception.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
-	}
-
-	private static void insertRow(int id) throws DBAppException {
-
-		Hashtable<String, Object> htblColNameValue = createRow(id, TEST_NAME, TEST_AGE);
-
-		engine.insertIntoTable(newTableName, htblColNameValue);
-	}
-
-	private static Hashtable<String, String> createHashtable(String value1, String value2, String value3) {
-		Hashtable<String, String> hashtable = new Hashtable<String, String>();
-		hashtable.put(id, value1);
-		hashtable.put(name, value2);
-		hashtable.put(age, value3);
-		return hashtable;
-	}
-
-	private static Hashtable<String, Object> createRow(int idInput, String nameInput, int ageInput) {
-		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-		htblColNameValue.put(id, idInput);
-		htblColNameValue.put(name, nameInput);
-		htblColNameValue.put(age, ageInput);
-		return htblColNameValue;
 	}
 
 	@Test
@@ -236,6 +235,63 @@ public class DBAppTest {
 
 		// Then
 		String expectedMessage = Constants.ERROR_MESSAGE_TABLE_NAME;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+	
+	@Test
+	void testInsertIntoTable_LessThanMin_ShouldFailInsertion() {
+		// Given
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(name, "0abc");
+		htblColNameValue.put(age, TEST_AGE);
+		htblColNameValue.put(id, 3);
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.insertIntoTable(newTableName, htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+	
+	@Test
+	void testInsertIntoTable_MissingColumn_ShouldFailInsertion() {
+		// Given
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(age, TEST_AGE);
+		htblColNameValue.put(id, 5);
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.insertIntoTable(newTableName, htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+	
+	@Test
+	void testInsertIntoTable_ExtraColumn_ShouldFailInsertion() {
+		// Given
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(name, "Foo");
+		htblColNameValue.put("salary", 10000);
+		htblColNameValue.put(age, TEST_AGE);
+		htblColNameValue.put(id, 3);
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.insertIntoTable(newTableName, htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -386,6 +442,30 @@ public class DBAppTest {
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
+	
+	private static void insertRow(int id) throws DBAppException {
+
+		Hashtable<String, Object> htblColNameValue = createRow(id, TEST_NAME, TEST_AGE);
+
+		engine.insertIntoTable(newTableName, htblColNameValue);
+	}
+
+	private static Hashtable<String, String> createHashtable(String value1, String value2, String value3) {
+		Hashtable<String, String> hashtable = new Hashtable<String, String>();
+		hashtable.put(id, value1);
+		hashtable.put(name, value2);
+		hashtable.put(age, value3);
+		return hashtable;
+	}
+
+	private static Hashtable<String, Object> createRow(int idInput, String nameInput, int ageInput) {
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(id, idInput);
+		htblColNameValue.put(name, nameInput);
+		htblColNameValue.put(age, ageInput);
+		return htblColNameValue;
+	}
+
 
 	@AfterEach
 	void deleteCreatedTable() throws ClassNotFoundException, IOException, InterruptedException {
