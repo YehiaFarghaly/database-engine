@@ -37,15 +37,7 @@ public class DBAppTest {
 			newTableName = randomNumber1 + "" + randomNumber2;
 		}
 	}
-
-	@BeforeEach
-	void setEnvironment() throws IOException, DBAppException {
-		engine = new DBApp();
-		engine.init();
-		generateNewTableName();
-		createTable();
-	}
-
+	
 	private static void createTable() throws DBAppException {
 		Hashtable<String, String> htblColNameType = createHashtable(Constants.INTEGER_DATA_TYPE_NAME,
 				Constants.STRING_DATA_TYPE_NAME, Constants.INTEGER_DATA_TYPE_NAME);
@@ -57,6 +49,14 @@ public class DBAppTest {
 				Constants.MAX_AGE_VALUE);
 
 		engine.createTable(newTableName, id, htblColNameType, htblColNameMin, htblColNameMax);
+	}
+
+	@BeforeEach
+	void setEnvironment() throws IOException, DBAppException {
+		engine = new DBApp();
+		engine.init();
+		generateNewTableName();
+		createTable();
 	}
 
 	@Test
@@ -170,8 +170,7 @@ public class DBAppTest {
 	}
 
 	@Test
-	void testInsertIntoTable_OneTuple_ShouldInsertSuccessfully() throws ClassNotFoundException, IOException,
-			CsvValidationException, DBAppException, ParseException, InterruptedException {
+	void testInsertIntoTable_OneTuple_ShouldInsertSuccessfully() throws DBAppException, ClassNotFoundException, IOException{
 		// Given
 		Hashtable<String, Object> htblColNameValue = createRow(1, TEST_NAME, TEST_AGE);
 

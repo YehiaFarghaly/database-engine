@@ -224,17 +224,6 @@ public class Table implements Serializable {
 			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
 			deletePageRecords(toBeDeleted, page);
 		}
-
-	}
-
-	private void iterateOverPageName(String colName, Object value)
-			throws ClassNotFoundException, IOException, DBAppException, ParseException {
-		removeEmptyPages();
-		for (int i = 0; i < pagesName.size(); i++) {
-			Page page = Serializer.deserializePage(name, pagesName.get(i));
-			Vector<Tuple> toBeDeleted = page.linearSearch(colName, value);
-			deletePageRecords(toBeDeleted, page);
-		}
 	}
 
 	private void removeEmptyPages() {
