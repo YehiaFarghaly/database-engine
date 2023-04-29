@@ -178,20 +178,37 @@ public class DBApp implements IDatabase {
 			Validator.validateTable(strTableName, myTables);
 			Table table = Serializer.deserializeTable(strTableName);
 			if (action == Action.INSERT) {
-				Validator.validateInsertionInput(table, htblColNameValue, myTables);
-				table.insertTuple(htblColNameValue);
+				takeInsertAction(table, htblColNameValue);
 			} else if (action == Action.DELETE) {
-				Validator.validateDeletionInput(table, htblColNameValue, myTables);
-				table.deleteTuples(htblColNameValue);
+				takeDeleteAction(table, htblColNameValue);
 			} else {
-				castClusteringKeyType(table);
-				htblColNameValue.put(table.getPKColumn(), clusteringKey);
-				Validator.validateUpdateInput(table, htblColNameValue, myTables);
-				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
+				takeUpdateAction(table, htblColNameValue);
 			}
 			Serializer.serializeTable(table);
 		} catch (CsvValidationException | ClassNotFoundException | IOException | ParseException e1) {
+			throw new DBAppException();
 		}
+	}
+
+	private void takeInsertAction(Table table, Hashtable<String, Object> htblColNameValue)
+			throws ClassNotFoundException, DBAppException, IOException, ParseException, CsvValidationException {
+		Validator.validateInsertionInput(table, htblColNameValue, myTables);
+		table.insertTuple(htblColNameValue);
+	}
+
+	private void takeDeleteAction(Table table, Hashtable<String, Object> htblColNameValue)
+			throws ClassNotFoundException, DBAppException, IOException, ParseException, CsvValidationException {
+		Validator.validateDeletionInput(table, htblColNameValue, myTables);
+		table.deleteTuples(htblColNameValue);
+	}
+
+	private void takeUpdateAction(Table table, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
+		castClusteringKeyType(table);
+		Validator.checkNoClusteringKey(htblColNameValue, table);
+		htblColNameValue.put(table.getPKColumn(), clusteringKey);
+		Validator.validateUpdateInput(table, htblColNameValue, myTables);
+		table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 	}
 
 	private void castClusteringKeyType(Table table) {

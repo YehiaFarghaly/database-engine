@@ -34,8 +34,8 @@ public class Validator {
 		} else if (!validDataTypes(htblColNameType)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_DATATYPE);
 
-		} else if (!validMinAndMax(htblColNameType, htblColNameMin, htblColNameMax)
-				|| !sameColMinMax(htblColNameMin, htblColNameMax)) {
+		} else if (!sameCol(htblColNameMin, htblColNameMax, htblColNameType)
+				|| !validMinAndMax(htblColNameType, htblColNameMin, htblColNameMax)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
 
 		}
@@ -86,9 +86,10 @@ public class Validator {
 		return true;
 	}
 
-	private static boolean sameColMinMax(Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) {
-		return htblColNameMin.keySet().equals(htblColNameMax.keySet());
+	private static boolean sameCol(Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax,
+			Hashtable<String, String> htblColNameType) {
+		return htblColNameMin.keySet().equals(htblColNameMax.keySet())
+				&& htblColNameMin.keySet().equals(htblColNameType.keySet());
 
 	}
 
@@ -111,6 +112,13 @@ public class Validator {
 			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
 		if (!validTupleUpdate(table, htblColNameValue))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
+	}
+
+	public static void checkNoClusteringKey(Hashtable<String, Object> htblColNameValue, Table table)
+			throws DBAppException {
+		if (htblColNameValue.containsKey(table.getPKColumn()))
+			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
+
 	}
 
 	private static boolean isValidTable(String tableName, HashSet<String> myTables) {
@@ -292,5 +300,4 @@ public class Validator {
 	private static boolean isFirstGreaterThanSecond(Object comp1, Object comp2) {
 		return Compare.compare(comp1, comp2) > 0;
 	}
-
 }
