@@ -224,6 +224,7 @@ public class Table implements Serializable {
 			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
 			deletePageRecords(toBeDeleted, page);
 		}
+		removeEmptyPages();
 	}
 
 	private void removeEmptyPages() {
