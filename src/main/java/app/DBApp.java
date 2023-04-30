@@ -7,7 +7,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import exceptions.DBAppException;
 import util.filecontroller.Serializer;
 import storage.*;
-import util.TypeCaster;
+import util.TypeParser;
 import util.search.*;
 import sql.SQLTerm;
 import datamanipulation.CsvReader;
@@ -208,11 +208,12 @@ public class DBApp implements IDatabase {
 		Validator.checkNoClusteringKey(htblColNameValue, table);
 		htblColNameValue.put(table.getPKColumn(), clusteringKey);
 		Validator.validateUpdateInput(table, htblColNameValue, myTables);
+		if (Validator.foundPK(table, htblColNameValue))
 		table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 	}
 
 	private void castClusteringKeyType(Table table) {
-		clusteringKey = TypeCaster.castClusteringKey(table, clusteringKeyValue);
+		clusteringKey = TypeParser.castClusteringKey(table, clusteringKeyValue);
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {

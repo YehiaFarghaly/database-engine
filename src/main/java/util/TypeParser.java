@@ -6,8 +6,19 @@ import java.util.Hashtable;
 import com.ibm.icu.text.SimpleDateFormat;
 
 import constants.Constants;
+import storage.Table;
 
 public class TypeParser {
+
+	public static Object castClusteringKey(Table table, String clusteringKeyValue) {
+		String primaryKeyType = table.getPrimaryKeyType();
+		if (primaryKeyType.equals(Constants.INTEGER_DATA_TYPE_NAME))
+			return Integer.parseInt(clusteringKeyValue);
+		else if (primaryKeyType.equals(Constants.DOUBLE_DATA_TYPE_NAME))
+			return Double.parseDouble(clusteringKeyValue);
+		return clusteringKeyValue;
+	}
+
 	public static Object typeParser(Object data, String key, Hashtable<String, String> htblColNameType) {
 		String type = htblColNameType.get(key);
 		return typeParser(data, type);
@@ -19,7 +30,7 @@ public class TypeParser {
 		} else if (type.equals(Constants.DOUBLE_DATA_TYPE_NAME)) {
 			return Double.parseDouble(data.toString());
 		} else if (type.equals(Constants.DATE_DATA_TYPE_NAME)) {
-			String[] patterns = { "yyyy-MM-dd", "dd/MM/yyyy" };
+			String[] patterns = { "yyyy-MM-dd", "MM/dd/yyyy", "dd-MMM-yyyy", "yyyy/MM/dd" };
 			for (String pattern : patterns) {
 				SimpleDateFormat sdformat = new SimpleDateFormat(pattern);
 				try {

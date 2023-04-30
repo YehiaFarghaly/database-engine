@@ -420,25 +420,6 @@ public class DBAppTest {
 	}
 
 	@Test
-	void testUpdateTable_InvalidPrimaryKey_ShouldFailUpdate() throws DBAppException {
-		// Given
-		insertRow(1);
-		String updatedName = "Mohamed";
-		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-		htblColNameValue.put(name, updatedName);
-
-		// When
-		Exception exception = assertThrows(DBAppException.class, () -> {
-			engine.updateTable(newTableName, "0", htblColNameValue);
-		});
-
-		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
-		String outputMessage = exception.getMessage();
-		assertThat(outputMessage).isEqualTo(expectedMessage);
-	}
-
-	@Test
 	void testUpdateTable_PrimaryKeyUpdate_ShouldFailUpdate()
 			throws DBAppException, ClassNotFoundException, IOException {
 		// Given

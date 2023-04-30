@@ -129,7 +129,7 @@ public class Validator {
 		return tuple.get(first).getClass().toString().endsWith(dataTypes[index]);
 	}
 
-	private static boolean foundPK(Table table, Hashtable<String, Object> tuple)
+	public static boolean foundPK(Table table, Hashtable<String, Object> tuple)
 			throws ClassNotFoundException, DBAppException, ParseException, IOException {
 		if (!table.isEmpty()) {
 			Tuple tupleToFind = table.createTuple(tuple);
@@ -242,8 +242,8 @@ public class Validator {
 	private static boolean validTupleUpdate(Table table, Hashtable<String, Object> tuple)
 			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
 		getTableInfo(table);
-		if (!checkTupleSize(tuple) || !isTheSameDataTypeMissingCol(tuple) || !foundPK(table, tuple)
-				|| !checkMinMaxMissingCol(tuple) || !containsAllColumns(tuple)) {
+		if (!checkTupleSize(tuple) || !isTheSameDataTypeMissingCol(tuple) || !checkMinMaxMissingCol(tuple)
+				|| !containsAllColumns(tuple)) {
 			return false;
 		} else {
 			return true;
