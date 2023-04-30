@@ -5,7 +5,7 @@ public final class Constants {
 
 	public static final String ERROR_MESSAGE_REPEATED_TABLE_NAME = "Table name already exists, please enter another one";
 
-	public static final String ERROR_MESSAGE_TUPLE_DATA = "Can't insert this tuple, please insert a valid data";
+	public static final String ERROR_MESSAGE_TUPLE_DATA = "The input row contains invalid data, please insert a valid one";
 
 	public static final String ERROR_MESSAGE_SEARCH_NOT_FOUND = "Tuple is not found in the table";
 

@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import com.opencsv.exceptions.CsvValidationException;
-import com.sun.prism.Image.Serial;
-
 import exceptions.DBAppException;
 import util.filecontroller.Serializer;
 import storage.*;
@@ -74,7 +72,7 @@ public class DBApp implements IDatabase {
 	 * 
 	 * @throws DBAppException If the table name is invalid or if the table already
 	 *                        exists.
-	 * @throws ParseException 
+	 * @throws ParseException
 	 * @throws IOException    If an error occurs while creating the table files.
 	 */
 	@Override
@@ -82,14 +80,13 @@ public class DBApp implements IDatabase {
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
 			Hashtable<String, String> htblColNameMax) throws DBAppException {
 
-			Validator.validateTableCreation(myTables, strTableName,
-		 strClusteringKeyColumn, htblColNameType, htblColNameMin,
-		 htblColNameMax);
+		Validator.validateTableCreation(myTables, strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin,
+				htblColNameMax);
 
 		Table table = new Table(strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin, htblColNameMax);
 		myTables.add(strTableName);
 		writer.write(table);
-	
+
 		try {
 			table.createTableFiles();
 			Serializer.serializeTable(table);
@@ -178,23 +175,40 @@ public class DBApp implements IDatabase {
 	private void takeAction(Action action, String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException {
 		try {
+			Validator.validateTable(strTableName, myTables);
 			Table table = Serializer.deserializeTable(strTableName);
 			if (action == Action.INSERT) {
-				Validator.validateInsertionInput(table, htblColNameValue, myTables); 
-				table.insertTuple(htblColNameValue);
+				takeInsertAction(table, htblColNameValue);
 			} else if (action == Action.DELETE) {
-				Validator.validateDeletionInput(table, htblColNameValue, myTables); 
-				table.deleteTuples(htblColNameValue);
+				takeDeleteAction(table, htblColNameValue);
 			} else {
-				castClusteringKeyType(table);
-				htblColNameValue.put(table.getPKColumn(), clusteringKey);
-				Validator.validateUpdateInput(table, htblColNameValue, myTables); 
-				table.updateRecordsInTaple(clusteringKey, htblColNameValue);
+				takeUpdateAction(table, htblColNameValue);
 			}
 			Serializer.serializeTable(table);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (CsvValidationException | ClassNotFoundException | IOException | ParseException e1) {
+			throw new DBAppException();
 		}
+	}
+
+	private void takeInsertAction(Table table, Hashtable<String, Object> htblColNameValue)
+			throws ClassNotFoundException, DBAppException, IOException, ParseException, CsvValidationException {
+		Validator.validateInsertionInput(table, htblColNameValue, myTables);
+		table.insertTuple(htblColNameValue);
+	}
+
+	private void takeDeleteAction(Table table, Hashtable<String, Object> htblColNameValue)
+			throws ClassNotFoundException, DBAppException, IOException, ParseException, CsvValidationException {
+		Validator.validateDeletionInput(table, htblColNameValue, myTables);
+		table.deleteTuples(htblColNameValue);
+	}
+
+	private void takeUpdateAction(Table table, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
+		castClusteringKeyType(table);
+		Validator.checkNoClusteringKey(htblColNameValue, table);
+		htblColNameValue.put(table.getPKColumn(), clusteringKey);
+		Validator.validateUpdateInput(table, htblColNameValue, myTables);
+		table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 	}
 
 	private void castClusteringKeyType(Table table) {
@@ -204,5 +218,4 @@ public class DBApp implements IDatabase {
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
-	
 }

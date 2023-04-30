@@ -1,18 +1,17 @@
 package storage;
 
+import constants.Constants;
+import exceptions.DBAppException;
+import util.PagePrinter;
+import util.filecontroller.*;
+import util.search.PageSearch;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.*;
-import constants.Constants;
-import exceptions.DBAppException;
-import util.filecontroller.ConfigReader;
-import util.filecontroller.FileCreator;
-import util.filecontroller.FileDeleter;
-import util.filecontroller.FileType;
-import util.filecontroller.Serializer;
-import util.search.PageSearch;
-import util.PagePrinter;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Vector;
 
 public class Page implements Serializable {
 	/**
@@ -71,9 +70,9 @@ public class Page implements Serializable {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
-	
+
 	public boolean isEmpty() {
-		return tuples.size()==0;
+		return tuples.size() == 0;
 	}
 
 	public boolean isFull() {
@@ -81,20 +80,20 @@ public class Page implements Serializable {
 	}
 
 	protected Tuple removeLastTuple() throws IOException {
-		Tuple ret = tuples.remove(tuples.size()-1);
+		Tuple ret = tuples.remove(tuples.size() - 1);
 		Serializer.serializePage(name, this);
 		return ret;
 	}
 
 	protected void insertIntoPage(Tuple tuple) throws IOException, DBAppException, ParseException {
-		int position = isEmpty()?0:pageBinarySearch(tuple.getPrimaryKey());
+		int position = isEmpty() ? 0 : pageBinarySearch(tuple.getPrimaryKey());
 		tuples.add(position, tuple);
 		newMinMax();
 		Serializer.serializePage(name, this);
 	}
 
 	private void newMinMax() {
-		if (tuples.size()>0) {
+		if (tuples.size() > 0) {
 			minPK = tuples.get(0).getPrimaryKey();
 			maxPK = tuples.get(tuples.size() - 1).getPrimaryKey();
 		}
@@ -104,8 +103,8 @@ public class Page implements Serializable {
 		return PageSearch.binarySearch(this, primaryKey);
 	}
 
-	protected Vector<Tuple> linearSearch(String colName, Object value) throws DBAppException, ParseException {
-		return PageSearch.linearSearch(this, colName, value);
+	protected Vector<Tuple> linearSearch(Hashtable<String, Object> colNameValue) throws DBAppException, ParseException {
+		return PageSearch.linearSearch(this, colNameValue);
 	}
 
 	protected void deleteFromPage(Tuple tuple) throws IOException, DBAppException, ParseException {

@@ -1,17 +1,18 @@
 package storage;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.text.ParseException;
-import java.util.Hashtable;
-import java.util.Vector;
 import exceptions.DBAppException;
 import util.filecontroller.FileCreator;
 import util.filecontroller.FileDeleter;
 import util.filecontroller.FileType;
 import util.filecontroller.Serializer;
 import util.search.TableSearch;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.text.ParseException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class Table implements Serializable {
 
@@ -27,8 +28,8 @@ public class Table implements Serializable {
 	private String primaryKeyType;
 	private int size;
 
-	public Table(String name, String pkColumn, Hashtable<String, String> colNameType, Hashtable<String, String> colNameMin,
-			Hashtable<String, String> colNameMax) {
+	public Table(String name, String pkColumn, Hashtable<String, String> colNameType,
+			Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) {
 		cntPage = 0;
 		size = 0;
 		this.name = name;
@@ -37,9 +38,9 @@ public class Table implements Serializable {
 		this.colNameMin = colNameMin;
 		this.colNameMax = colNameMax;
 		pagesName = new Vector<String>();
-		primaryKeyType=colNameType.get(pkColumn);
+		primaryKeyType = colNameType.get(pkColumn);
 	}
-	
+
 	public String getPrimaryKeyType() {
 		return primaryKeyType;
 	}
@@ -83,7 +84,7 @@ public class Table implements Serializable {
 	public void setColNameMax(Hashtable<String, String> colNameMax) {
 		this.colNameMax = colNameMax;
 	}
-	
+
 	public int getSize() {
 		return size;
 	}
@@ -95,7 +96,6 @@ public class Table implements Serializable {
 	public Vector<String> getPagesName() {
 		return pagesName;
 	}
-	
 
 	public void insertTuple(Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, ClassNotFoundException, IOException, ParseException {
@@ -116,19 +116,14 @@ public class Table implements Serializable {
 	}
 
 	public Tuple createTuple(Hashtable<String, Object> htblColNameValue) {
-
 		Tuple tuple = getPrototype();
 
 		for (Cell c : tuple.getCells()) {
-
 			c.setValue(htblColNameValue.get(c.getKey()));
-
 			if (c.getKey().equals(getPKColumn())) {
 				tuple.setPrimaryKey(c.getValue());
 			}
-
 		}
-
 		return tuple;
 	}
 
@@ -142,7 +137,6 @@ public class Table implements Serializable {
 	}
 
 	public Page getPageAtPosition(int position) throws ClassNotFoundException, IOException {
-
 		String pageName = pagesName.get(position);
 		Page page = Serializer.deserializePage(this.getName(), pageName);
 		return page;
@@ -155,14 +149,15 @@ public class Table implements Serializable {
 
 	private void handleFullPageInsertion(Page currentPage, int position, Tuple tuple)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
-
 		if (atLastPage(position)) {
 			newLastPage(currentPage, tuple);
+			
 		} else {
 			Page nextAvailablePage = getNextAvailablePage(position, currentPage, tuple);
 			Page nextPage = getPageAtPosition(++position);
 			currentPage.insertIntoPage(tuple);
 			Tuple lastTuple = currentPage.removeLastTuple();
+			
 			while (!arePagesEqual(nextPage, nextAvailablePage)) {
 				currentPage = nextPage;
 				nextPage = getPageAtPosition(++position);
@@ -202,7 +197,7 @@ public class Table implements Serializable {
 		Page page = initializePage();
 		page.insertIntoPage(tuple);
 	}
-	
+
 	private Page initializePage() throws IOException {
 		Page page = new Page(name);
 		page.setName((cntPage++) + "");
@@ -218,22 +213,12 @@ public class Table implements Serializable {
 	public void deleteTuples(Hashtable<String, Object> htblColNameValue)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
 
-		for (String colName : htblColNameValue.keySet()) {
-
-			Object value = htblColNameValue.get(colName);
-			iterateOverPageName(colName, value);
-
-		}
-	}
-
-	private void iterateOverPageName(String colName, Object value)
-			throws ClassNotFoundException, IOException, DBAppException, ParseException {
-		removeEmptyPages();
 		for (int i = 0; i < pagesName.size(); i++) {
 			Page page = Serializer.deserializePage(name, pagesName.get(i));
-			Vector<Tuple> toBeDeleted = page.linearSearch(colName, value);
+			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
 			deletePageRecords(toBeDeleted, page);
 		}
+		removeEmptyPages();
 	}
 
 	private void removeEmptyPages() {
@@ -251,7 +236,7 @@ public class Table implements Serializable {
 			throws IOException, DBAppException, ParseException {
 		for (Tuple tuple : toBeDeleted) {
 			page.deleteFromPage(tuple);
-		    size--;	
+			size--;
 		}
 	}
 
@@ -275,6 +260,5 @@ public class Table implements Serializable {
 	public void deleteTableFiles() {
 		FileDeleter.deleteFile(this, FileType.TABLE);
 	}
-
 
 }

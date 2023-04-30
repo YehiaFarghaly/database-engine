@@ -1,13 +1,1 @@
-students,gpa,java.lang.Double,FALSE,null,null,0.7,5
-students,last_name,java.lang.String,FALSE,null,null,AAAAAA,zzzzzz
-students,first_name,java.lang.String,FALSE,null,null,AAAAAA,zzzzzz
-students,dob,java.util.Date,FALSE,null,null,01/01/1990,31/12/2000
-students,id,java.lang.String,TRUE,null,null,43-0000,99-9999
-courses,hours,java.lang.Integer,FALSE,null,null,1,24
-courses,date_added,java.util.Date,TRUE,null,null,01/01/1901,31/12/2020
-courses,course_id,java.lang.String,FALSE,null,null,0,9999
-courses,course_name,java.lang.String,FALSE,null,null,AAAAAA,zzzzzz
-transcripts,gpa,java.lang.Double,TRUE,null,null,0.7,5
-transcripts,date_passed,java.util.Date,FALSE,null,null,01/01/1990,31/12/2020
-transcripts,course_name,java.lang.String,FALSE,null,null,AAAAAA,zzzzzz
-transcripts,student_id,java.lang.String,FALSE,null,null,43-0000,99-9999
+
