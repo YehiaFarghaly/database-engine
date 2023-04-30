@@ -96,7 +96,7 @@ public class Validator {
 	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue,
 			HashSet<String> appTables)
 			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
-		if (!validTuple(table, htblColNameValue))
+		if (!validTupleInsert(table, htblColNameValue))
 			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
@@ -177,12 +177,11 @@ public class Validator {
 		max = new Object[size];
 	}
 
-	private static boolean validTuple(Table table, Hashtable<String, Object> tuple)
+	private static boolean validTupleInsert(Table table, Hashtable<String, Object> tuple)
 			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
-
 		getTableInfo(table);
-		if (!isTheSameNumberOfColumns(tuple) || !containsAllColumns(tuple) || !isTheSameDataType(tuple)
-				|| !checkMinMax(tuple) || foundPK(table, tuple)) {
+		if (!primaryKeyExists(table, tuple) || !containsAllColumns(tuple) || !isTheSameDataTypeMissingCol(tuple)
+				|| !checkMinMaxMissingCol(tuple) || foundPK(table, tuple)) {
 			return false;
 		} else {
 			return true;
@@ -190,11 +189,12 @@ public class Validator {
 		}
 	}
 
-	private static boolean isTheSameNumberOfColumns(Hashtable<String, Object> tuple) {
-		if (tuple.size() != columns.length) {
-			return false;
+	private static boolean primaryKeyExists(Table table, Hashtable<String, Object> tuple) {
+		for (String key : tuple.keySet()) {
+			if (key.equals(table.getPKColumn()))
+				return true;
 		}
-		return true;
+		return false;
 	}
 
 	private static boolean containsAllColumns(Hashtable<String, Object> tuple) {
@@ -214,15 +214,6 @@ public class Validator {
 			}
 		}
 		return false;
-	}
-
-	private static boolean isTheSameDataType(Hashtable<String, Object> tuple) {
-		for (int i = 0; i < columns.length; i++) {
-			if (!sameSuffix(tuple, columns[i], i))
-
-				return false;
-		}
-		return true;
 	}
 
 	private static boolean validTupleDelete(Hashtable<String, Object> htblColNameValue) {
@@ -257,14 +248,6 @@ public class Validator {
 		} else {
 			return true;
 		}
-	}
-
-	private static boolean checkMinMax(Hashtable<String, Object> tuple) throws ParseException {
-		boolean valid = true;
-		for (int i = 0; i < columns.length; i++) {
-			valid &= parseMinMax(tuple, columns[i], i);
-		}
-		return valid;
 	}
 
 	private static boolean checkMinMaxMissingCol(Hashtable<String, Object> tuple) throws ParseException {

@@ -34,22 +34,6 @@ public class PageSearch {
 		return low;
 	}
 
-	public static Vector<Tuple> linearSearch(Page page, String colName, Object value)
-			throws DBAppException, ParseException {
-
-		Vector<Tuple> results = new Vector<Tuple>();
-
-		for (Tuple currTuple : page.getTuples()) {
-
-			Object currValue = getValueOfColInTuple(currTuple, colName);
-			int comp = Compare.compare(currValue, value);
-			if (comp == 0)
-				results.add(currTuple);
-		}
-
-		return results;
-	}
-
 	public static Vector<Tuple> linearSearch(Page page, Hashtable<String, Object> colNameValue)
 			throws DBAppException, ParseException {
 		Vector<Tuple> results = new Vector<Tuple>();
@@ -59,8 +43,7 @@ public class PageSearch {
 				String colName = curr.getKey();
 				Object value = curr.getValue();
 				Object currValue = getValueOfColInTuple(currTuple, colName);
-				int comp = Compare.compare(currValue, value);
-				if (comp != 0) {
+				if (currValue == null || Compare.compare(currValue, value) != 0) {
 					isValid = false;
 					break;
 				}

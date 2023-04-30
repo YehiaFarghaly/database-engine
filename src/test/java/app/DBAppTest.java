@@ -37,7 +37,7 @@ public class DBAppTest {
 			newTableName = randomNumber1 + "" + randomNumber2;
 		}
 	}
-	
+
 	private static void createTable() throws DBAppException {
 		Hashtable<String, String> htblColNameType = createHashtable(Constants.INTEGER_DATA_TYPE_NAME,
 				Constants.STRING_DATA_TYPE_NAME, Constants.INTEGER_DATA_TYPE_NAME);
@@ -170,9 +170,28 @@ public class DBAppTest {
 	}
 
 	@Test
-	void testInsertIntoTable_OneTuple_ShouldInsertSuccessfully() throws DBAppException, ClassNotFoundException, IOException{
+	void testInsertIntoTable_OneTuple_ShouldInsertSuccessfully()
+			throws DBAppException, ClassNotFoundException, IOException {
 		// Given
 		Hashtable<String, Object> htblColNameValue = createRow(1, TEST_NAME, TEST_AGE);
+
+		// When
+		engine.insertIntoTable(newTableName, htblColNameValue);
+
+		// Then
+		Table table = Serializer.deserializeTable(newTableName);
+		assertThat(table.getPagesName().size()).isEqualTo(1);
+		Page page = table.getPageAtPosition(0);
+		assertThat(page.getSize() == 1);
+	}
+
+	@Test
+	void testInsertIntoTable_MissingColumn_ShouldInsertSuccessfully()
+			throws DBAppException, ClassNotFoundException, IOException {
+		// Given
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(age, TEST_AGE);
+		htblColNameValue.put(id, 5);
 
 		// When
 		engine.insertIntoTable(newTableName, htblColNameValue);
@@ -257,14 +276,14 @@ public class DBAppTest {
 		Hashtable<String, Object> htblColNameValue = createRow(1, "Mohamed", TEST_AGE);
 
 		// When
-		try {
+		Exception exception = assertThrows(DBAppException.class, () -> {
 			engine.insertIntoTable(newTableName, htblColNameValue);
-			fail("Expected DBAppException but no exception was thrown");
-		} catch (DBAppException e) {
+		});
 
-			// Then
-			assertThat(e.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_TUPLE_DATA);
-		}
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
 
 	@Test
@@ -274,6 +293,25 @@ public class DBAppTest {
 		htblColNameValue.put(name, "Foo");
 		htblColNameValue.put(age, "boo");
 		htblColNameValue.put(id, 55);
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.insertIntoTable(newTableName, htblColNameValue);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testInsertIntoTable_MissingPrimaryKey_ShouldFailInsert()
+			throws DBAppException, ClassNotFoundException, IOException {
+		// Given
+		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+		htblColNameValue.put(age, TEST_AGE);
+		htblColNameValue.put(name, TEST_NAME);
 
 		// When
 		Exception exception = assertThrows(DBAppException.class, () -> {
@@ -331,24 +369,6 @@ public class DBAppTest {
 		htblColNameValue.put(name, "{abc");
 		htblColNameValue.put(age, TEST_AGE);
 		htblColNameValue.put(id, 3);
-
-		// When
-		Exception exception = assertThrows(DBAppException.class, () -> {
-			engine.insertIntoTable(newTableName, htblColNameValue);
-		});
-
-		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
-		String outputMessage = exception.getMessage();
-		assertThat(outputMessage).isEqualTo(expectedMessage);
-	}
-
-	@Test
-	void testInsertIntoTable_MissingColumn_ShouldFailInsertion() {
-		// Given
-		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-		htblColNameValue.put(age, TEST_AGE);
-		htblColNameValue.put(id, 5);
 
 		// When
 		Exception exception = assertThrows(DBAppException.class, () -> {

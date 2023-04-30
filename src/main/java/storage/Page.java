@@ -103,10 +103,6 @@ public class Page implements Serializable {
 		return PageSearch.binarySearch(this, primaryKey);
 	}
 
-	protected Vector<Tuple> linearSearch(String colName, Object value) throws DBAppException, ParseException {
-		return PageSearch.linearSearch(this, colName, value);
-	}
-
 	protected Vector<Tuple> linearSearch(Hashtable<String, Object> colNameValue) throws DBAppException, ParseException {
 		return PageSearch.linearSearch(this, colNameValue);
 	}
