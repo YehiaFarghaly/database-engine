@@ -34,10 +34,10 @@ public class Validator {
 		} else if (!validDataTypes(htblColNameType)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_DATATYPE);
 
-		} else if (!sameCol(htblColNameMin, htblColNameMax, htblColNameType)
-				|| !validMinAndMax(htblColNameType, htblColNameMin, htblColNameMax)) {
+		} else if (!validMinAndMax(htblColNameType, htblColNameMin, htblColNameMax)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
-
+		} else if (!sameCol(htblColNameMin, htblColNameMax, htblColNameType)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_DOESNOT_CONTAIN_ALL_COLUMNS);
 		}
 	}
 
