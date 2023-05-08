@@ -37,7 +37,7 @@ public class Validator {
 		} else if (!validMinAndMax(htblColNameType, htblColNameMin, htblColNameMax)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
 		} else if (!sameCol(htblColNameMin, htblColNameMax, htblColNameType)) {
-			throw new DBAppException(Constants.ERROR_MESSAGE_DOESNOT_CONTAIN_ALL_COLUMNS);
+			throw new DBAppException(Constants.ERROR_MESSAGE_DOESNOT_CONTAIN_ALL_MIN_MAX_COLUMNS);
 		}
 	}
 
@@ -96,8 +96,18 @@ public class Validator {
 	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue,
 			HashSet<String> appTables)
 			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
-		if (!validTupleInsert(table, htblColNameValue))
-			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
+		getTableInfo(table);
+		if (!primaryKeyExists(table, htblColNameValue)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_PK_IS_NOT_FOUND);
+		} else if (!containsAllColumns(htblColNameValue)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_NOT_CONTAINING_ALL_COLUMNS);
+		} else if (!isTheSameDataTypeMissingCol(htblColNameValue)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_IN_DATA_TYPES);
+		} else if (!checkMinMaxMissingCol(htblColNameValue)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
+		} else if(foundPK(table, htblColNameValue)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_PK_IS_ALREADY_FOUND);
+		}
 	}
 
 	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue,
@@ -177,17 +187,10 @@ public class Validator {
 		max = new Object[size];
 	}
 
-	private static boolean validTupleInsert(Table table, Hashtable<String, Object> tuple)
-			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
-		getTableInfo(table);
-		if (!primaryKeyExists(table, tuple) || !containsAllColumns(tuple) || !isTheSameDataTypeMissingCol(tuple)
-				|| !checkMinMaxMissingCol(tuple) || foundPK(table, tuple)) {
-			return false;
-		} else {
-			return true;
-
-		}
-	}
+//	private static void validTupleInsert(Table table, Hashtable<String, Object> tuple)
+//			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
+//		jhg	
+//	}
 
 	private static boolean primaryKeyExists(Table table, Hashtable<String, Object> tuple) {
 		for (String key : tuple.keySet()) {

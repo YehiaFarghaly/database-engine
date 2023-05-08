@@ -8,6 +8,10 @@ public final class Constants {
 	public static final String ERROR_MESSAGE_TUPLE_DATA = "The input row contains invalid data, please insert a valid one";
 
 	public static final String ERROR_MESSAGE_SEARCH_NOT_FOUND = "Tuple is not found in the table";
+	
+	public static final String ERROR_MESSAGE_PK_IS_ALREADY_FOUND = "The primary key is already insearted, please enter unique one";
+	
+	public static final String ERROR_MESSAGE_PK_IS_NOT_FOUND = "The primary key is not found, please primary key";
 
 	public static final String ERROR_BINARY_SEARCH_ON_EMPTY_TABLE = "Can not apply binary search on empty Table";
 
@@ -15,7 +19,11 @@ public final class Constants {
 
 	public static final String ERROR_MESSAGE_INVALID_CLUSTERINGKEY = "Clusteringkey is invalid, please enter another one";
 
-	public static final String ERROR_MESSAGE_DOESNOT_CONTAIN_ALL_COLUMNS = "The Min or Max doesn't contain all the columns in the table,"
+	public static final String ERROR_MESSAGE_NOT_CONTAINING_ALL_COLUMNS = "The Tuple doesn't contain all the columns in the table, please enter all the columns";
+	
+	public static final String ERROR_MESSAGE_IN_DATA_TYPES = "The Tuple entered data doesn't match the table coulmns data type";
+	
+	public static final String ERROR_MESSAGE_DOESNOT_CONTAIN_ALL_MIN_MAX_COLUMNS = "The Min or Max doesn't contain all the columns in the table,"
 			+ " please enter all the columns of Min and Max the same as the table";
 
 	
