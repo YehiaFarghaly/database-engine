@@ -89,11 +89,11 @@ public class Validator {
 //			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
-//	public static void validateTable(String tableName, HashSet<String> myTables) throws DBAppException {
-//		if (!isValidTable(tableName, myTables)) {
-//			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
-//		}
-//	}
+	public static void validateTable(String tableName, HashSet<String> myTables) throws DBAppException {
+		if (!isValidTable(tableName, myTables)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_TABLE_NAME);
+		}
+	}
 
 	private static boolean validClusteringKey(String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) {
