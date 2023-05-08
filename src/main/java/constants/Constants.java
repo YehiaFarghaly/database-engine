@@ -19,7 +19,7 @@ public final class Constants {
 
 	public static final String ERROR_MESSAGE_INVALID_CLUSTERINGKEY = "Clusteringkey is invalid, please enter another one";
 
-	public static final String ERROR_MESSAGE_NOT_CONTAINING_ALL_COLUMNS = "The Tuple doesn't contain all the columns in the table, please enter all the columns";
+	public static final String ERROR_MESSAGE_COLUMNS_NOT_FOUND_IN_TABLE = "The Tuple contain some columns that is not in the table, please enter columns in the table";
 	
 	public static final String ERROR_MESSAGE_IN_DATA_TYPES = "The Tuple entered data doesn't match the table coulmns data type";
 	
