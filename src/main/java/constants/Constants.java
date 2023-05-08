@@ -25,7 +25,8 @@ public final class Constants {
 	
 	public static final String ERROR_MESSAGE_DOESNOT_CONTAIN_ALL_MIN_MAX_COLUMNS = "The Min or Max doesn't contain all the columns in the table,"
 			+ " please enter all the columns of Min and Max the same as the table";
-
+	
+	public static final String ERROR_MESSAGE_IN_TUPLE_SIZE = "The Tuple contain more columns than the table columns";
 	
 	public static final String DATA_EXTENSTION = ".ser";
 

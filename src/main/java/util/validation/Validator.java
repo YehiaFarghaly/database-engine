@@ -113,8 +113,15 @@ public class Validator {
 	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue,
 			HashSet<String> appTables) throws DBAppException {
 		getTableInfo(table);
-		if (!validTupleDelete(htblColNameValue))
-			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
+		if (!isTheSameDataTypeMissingCol(htblColNameValue)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_IN_DATA_TYPES);
+		} else if (!checkTupleSize(htblColNameValue)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_IN_TUPLE_SIZE);
+		} else if (!containsAllColumns(htblColNameValue)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_NOT_CONTAINING_ALL_COLUMNS);
+		}
+//		if (!validTupleDelete(htblColNameValue))
+//			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
 	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue,
@@ -219,12 +226,9 @@ public class Validator {
 		return false;
 	}
 
-	private static boolean validTupleDelete(Hashtable<String, Object> htblColNameValue) {
-		if (!isTheSameDataTypeMissingCol(htblColNameValue) || !checkTupleSize(htblColNameValue)
-				|| !containsAllColumns(htblColNameValue))
-			return false;
-		return true;
-	}
+//	private static void validTupleDelete(Hashtable<String, Object> htblColNameValue) throws DBAppException {
+//		
+//	}
 
 	private static boolean checkTupleSize(Hashtable<String, Object> tuple) {
 		return tuple.size() <= columns.length;
