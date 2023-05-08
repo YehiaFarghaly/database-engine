@@ -53,7 +53,7 @@ public class Validator {
 			throw new DBAppException(Constants.ERROR_MESSAGE_IN_DATA_TYPES);
 		} else if (!checkMinMaxMissingCol(htblColNameValue)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
-		} else if(foundPK(table, htblColNameValue)) {
+		} else if (foundPK(table, htblColNameValue)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_PK_IS_ALREADY_FOUND);
 		}
 	}
