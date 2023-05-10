@@ -219,4 +219,10 @@ public class DBApp implements IDatabase {
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		return new Selector(arrSQLTerms, strarrOperators).getResult();
 	}
+
+	//TODO : add the method body
+	@Override
+	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException {
+		
+	}
 }

@@ -1,6 +1,7 @@
 package storage;
 
 import exceptions.DBAppException;
+import storage.index.OctreeIndex;
 import util.filecontroller.FileCreator;
 import util.filecontroller.FileDeleter;
 import util.filecontroller.FileType;
@@ -267,9 +268,9 @@ public class Table implements Serializable {
 	public void deleteTableFiles() {
 		FileDeleter.deleteFile(this, FileType.TABLE);
 	}
-	
-	//TODO : Method needs to be completed then to be called in Insert/Delete/Update 
-	 private void populateToIndex(Hashtable<String, Object> tuple, Action action) {
+
+	// TODO : Method needs to be completed then to be called in Insert/Delete/Update
+	private void populateToIndex(Hashtable<String, Object> tuple, Action action) {
 //	        for (OctreeIndex index : indices) {
 //	            for (String indexColumn : index.getColumns()) {
 //	            	if(action == Action.INSERT)
@@ -277,6 +278,6 @@ public class Table implements Serializable {
 //	            	else index.remove(tuple.get(indexColumn));
 //	            }
 //	        }
-	    }
+	}
 
 }

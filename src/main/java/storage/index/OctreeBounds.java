@@ -1,4 +1,4 @@
-package storage;
+package storage.index;
 
 class OctreeBounds {
 	private final Vector3 min;

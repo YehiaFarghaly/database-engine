@@ -11,8 +11,6 @@ public class Selector {
 
     public Selector(SQLTerm[] arrSQLTerms, String[] strarrOperators) {
         
-        arrSQLTerms[0].isValid();
-        
        
     }
 

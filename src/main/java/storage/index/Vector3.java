@@ -1,4 +1,4 @@
-package storage;
+package storage.index;
 
 class Vector3 {
     private final Object x;

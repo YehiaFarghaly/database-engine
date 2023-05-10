@@ -11,7 +11,4 @@ Object objValue;
         this.objValue = objValue;
     }
     
-    public boolean isValid(){
-        return false;
-    }
 }
