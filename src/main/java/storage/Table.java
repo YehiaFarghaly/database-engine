@@ -14,6 +14,8 @@ import java.text.ParseException;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import app.Action;
+
 public class Table implements Serializable {
 
 	/**
@@ -27,6 +29,7 @@ public class Table implements Serializable {
 	private Hashtable<String, String> colNameType, colNameMin, colNameMax;
 	private String primaryKeyType;
 	private int size;
+	private Vector<OctreeIndex> indices;
 
 	public Table(String name, String pkColumn, Hashtable<String, String> colNameType,
 			Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) {
@@ -97,6 +100,10 @@ public class Table implements Serializable {
 		return pagesName;
 	}
 
+	public Vector<OctreeIndex> getIndices() {
+		return indices;
+	}
+
 	public void insertTuple(Hashtable<String, Object> htblColNameValue)
 			throws DBAppException, ClassNotFoundException, IOException, ParseException {
 		removeEmptyPages();
@@ -151,13 +158,13 @@ public class Table implements Serializable {
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
 		if (atLastPage(position)) {
 			newLastPage(currentPage, tuple);
-			
+
 		} else {
 			Page nextAvailablePage = getNextAvailablePage(position, currentPage, tuple);
 			Page nextPage = getPageAtPosition(++position);
 			currentPage.insertIntoPage(tuple);
 			Tuple lastTuple = currentPage.removeLastTuple();
-			
+
 			while (!arePagesEqual(nextPage, nextAvailablePage)) {
 				currentPage = nextPage;
 				nextPage = getPageAtPosition(++position);
@@ -260,5 +267,16 @@ public class Table implements Serializable {
 	public void deleteTableFiles() {
 		FileDeleter.deleteFile(this, FileType.TABLE);
 	}
+	
+	//TODO : Method needs to be completed then to be called in Insert/Delete/Update 
+	 private void populateToIndex(Hashtable<String, Object> tuple, Action action) {
+//	        for (OctreeIndex index : indices) {
+//	            for (String indexColumn : index.getColumns()) {
+//	            	if(action == Action.INSERT)
+//	                index.add(tuple.get(indexColumn));
+//	            	else index.remove(tuple.get(indexColumn));
+//	            }
+//	        }
+	    }
 
 }
