@@ -117,6 +117,28 @@
 					<mainClass>view.DatabaseManager</mainClass>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>4.9.3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<sourceDirectory>src/main/resources</sourceDirectory>
+					<outputDirectory>src/main/java/sql/parser</outputDirectory>
+					<listener>true</listener>
+					<visitor>true</visitor>
+				</configuration>
+			</plugin>
+
+
+
 		</plugins>
 	</build>
 
