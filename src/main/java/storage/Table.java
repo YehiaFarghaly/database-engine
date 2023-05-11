@@ -7,11 +7,8 @@ import util.filecontroller.FileDeleter;
 import util.filecontroller.FileType;
 import util.filecontroller.Serializer;
 import util.search.TableSearch;
-
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -105,8 +102,7 @@ public class Table implements Serializable {
 		return indices;
 	}
 
-	public void insertTuple(Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, ClassNotFoundException, IOException, ParseException {
+	public void insertTuple(Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		removeEmptyPages();
 		Tuple tuple = createTuple(htblColNameValue);
 		if (isEmpty()) {
@@ -144,19 +140,17 @@ public class Table implements Serializable {
 		return this.prototype.getCopy();
 	}
 
-	public Page getPageAtPosition(int position) throws ClassNotFoundException, IOException {
+	public Page getPageAtPosition(int position) throws DBAppException {
 		String pageName = pagesName.get(position);
 		Page page = Serializer.deserializePage(this.getName(), pageName);
 		return page;
 	}
 
-	public int tableBinarySearch(Object primaryKey)
-			throws ClassNotFoundException, DBAppException, ParseException, IOException {
+	public int tableBinarySearch(Object primaryKey) throws DBAppException {
 		return TableSearch.binarySearchPages(this, primaryKey);
 	}
 
-	private void handleFullPageInsertion(Page currentPage, int position, Tuple tuple)
-			throws ClassNotFoundException, IOException, DBAppException, ParseException {
+	private void handleFullPageInsertion(Page currentPage, int position, Tuple tuple) throws DBAppException {
 		if (atLastPage(position)) {
 			newLastPage(currentPage, tuple);
 
@@ -180,8 +174,7 @@ public class Table implements Serializable {
 		return page1.getName().equals(page2.getName());
 	}
 
-	private Page getNextAvailablePage(int position, Page currentPage, Tuple tuple)
-			throws ClassNotFoundException, IOException {
+	private Page getNextAvailablePage(int position, Page currentPage, Tuple tuple) throws DBAppException {
 		Page nextPage = getPageAtPosition(++position);
 		while (nextPage.isFull()) {
 			if (atLastPage(position)) {
@@ -195,18 +188,18 @@ public class Table implements Serializable {
 		return nextPage;
 	}
 
-	private void newLastPage(Page currentPage, Tuple tuple) throws IOException, DBAppException, ParseException {
+	private void newLastPage(Page currentPage, Tuple tuple) throws DBAppException {
 		currentPage.insertIntoPage(tuple);
 		Tuple lastTuple = currentPage.removeLastTuple();
 		insertNewPage(lastTuple);
 	}
 
-	private void insertNewPage(Tuple tuple) throws IOException, DBAppException, ParseException {
+	private void insertNewPage(Tuple tuple) throws DBAppException {
 		Page page = initializePage();
 		page.insertIntoPage(tuple);
 	}
 
-	private Page initializePage() throws IOException {
+	private Page initializePage() throws DBAppException {
 		Page page = new Page(name);
 		page.setName((cntPage++) + "");
 		page.createPageFile();
@@ -218,8 +211,7 @@ public class Table implements Serializable {
 		return position == pagesName.size() - 1;
 	}
 
-	public void deleteTuples(Hashtable<String, Object> htblColNameValue)
-			throws ClassNotFoundException, IOException, DBAppException, ParseException {
+	public void deleteTuples(Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
 		for (int i = 0; i < pagesName.size(); i++) {
 			Page page = Serializer.deserializePage(name, pagesName.get(i));
@@ -240,8 +232,7 @@ public class Table implements Serializable {
 		}
 	}
 
-	private void deletePageRecords(Vector<Tuple> toBeDeleted, Page page)
-			throws IOException, DBAppException, ParseException {
+	private void deletePageRecords(Vector<Tuple> toBeDeleted, Page page) throws DBAppException {
 		for (Tuple tuple : toBeDeleted) {
 			page.deleteFromPage(tuple);
 			size--;
@@ -249,20 +240,23 @@ public class Table implements Serializable {
 	}
 
 	public void updateRecordsInTaple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue)
-			throws ClassNotFoundException, IOException, DBAppException, ParseException {
+			throws DBAppException {
 		Page page = getPageToUpdate(clusteringKeyValue);
 		page.updateTuple(clusteringKeyValue, htblColNameValue);
 	}
 
-	private Page getPageToUpdate(Object clusteringKeyValue)
-			throws ClassNotFoundException, IOException, DBAppException, ParseException {
+	private Page getPageToUpdate(Object clusteringKeyValue) throws DBAppException {
 		int pkPagePosition = tableBinarySearch(clusteringKeyValue);
 		return getPageAtPosition(pkPagePosition);
 	}
 
-	public void createTableFiles() throws IOException {
-		FileCreator.createTableFolder(this);
-		FileCreator.createFile(this, FileType.TABLE);
+	public void createTableFiles() throws DBAppException {
+		try {
+			FileCreator.createTableFolder(this);
+			FileCreator.createFile(this, FileType.TABLE);
+		} catch (Exception e) {
+			throw new DBAppException(e.getMessage());
+		}
 	}
 
 	public void deleteTableFiles() {
@@ -278,6 +272,15 @@ public class Table implements Serializable {
 //	            	else index.remove(tuple.get(indexColumn));
 //	            }
 //	        }
+	}
+
+	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
+		Vector<Tuple> result = new Vector<>();
+		for (int i = 0; i < pagesName.size(); i++) {
+			Page page = getPageAtPosition(i);
+			result.addAll(page.select(colNameValue, operator));
+		}
+		return result;
 	}
 
 }

@@ -6,9 +6,9 @@ import java.util.*;
 import com.opencsv.exceptions.CsvValidationException;
 import exceptions.DBAppException;
 import util.filecontroller.Serializer;
+import util.search.Selector;
 import storage.*;
 import util.TypeParser;
-import util.search.*;
 import sql.SQLTerm;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
@@ -87,12 +87,9 @@ public class DBApp implements IDatabase {
 		myTables.add(strTableName);
 		writer.write(table);
 
-		try {
-			table.createTableFiles();
-			Serializer.serializeTable(table);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		table.createTableFiles();
+		Serializer.serializeTable(table);
+
 	}
 
 	/**
@@ -136,6 +133,7 @@ public class DBApp implements IDatabase {
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
 		this.clusteringKeyValue = strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
 	}
@@ -155,6 +153,7 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void deleteFromTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
 		takeAction(Action.DELETE, strTableName, htblColNameValue);
 	}
 
@@ -174,55 +173,90 @@ public class DBApp implements IDatabase {
 	 */
 	private void takeAction(Action action, String strTableName, Hashtable<String, Object> htblColNameValue)
 			throws DBAppException {
-		try {
-			Validator.validateTable(strTableName, myTables);
-			Table table = Serializer.deserializeTable(strTableName);
-			if (action == Action.INSERT) {
-				takeInsertAction(table, htblColNameValue);
-			} else if (action == Action.DELETE) {
-				takeDeleteAction(table, htblColNameValue);
-			} else {
-				takeUpdateAction(table, htblColNameValue);
-			}
-			Serializer.serializeTable(table);
-		} catch (CsvValidationException | ClassNotFoundException | IOException | ParseException e1) {
-			throw new DBAppException();
+
+		Validator.validateTable(strTableName, myTables);
+		Table table = Serializer.deserializeTable(strTableName);
+
+		if (action == Action.INSERT) {
+
+			takeInsertAction(table, htblColNameValue);
+		} else if (action == Action.DELETE) {
+
+			takeDeleteAction(table, htblColNameValue);
+		} else {
+
+			takeUpdateAction(table, htblColNameValue);
 		}
+		Serializer.serializeTable(table);
+
 	}
 
-	private void takeInsertAction(Table table, Hashtable<String, Object> htblColNameValue)
-			throws ClassNotFoundException, DBAppException, IOException, ParseException, CsvValidationException {
+	private void takeInsertAction(Table table, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
 		Validator.validateInsertionInput(table, htblColNameValue, myTables);
 		table.insertTuple(htblColNameValue);
 	}
 
-	private void takeDeleteAction(Table table, Hashtable<String, Object> htblColNameValue)
-			throws ClassNotFoundException, DBAppException, IOException, ParseException, CsvValidationException {
+	private void takeDeleteAction(Table table, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
 		Validator.validateDeletionInput(table, htblColNameValue, myTables);
 		table.deleteTuples(htblColNameValue);
 	}
 
-	private void takeUpdateAction(Table table, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, CsvValidationException, ClassNotFoundException, IOException, ParseException {
+	private void takeUpdateAction(Table table, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
 		castClusteringKeyType(table);
 		Validator.checkNoClusteringKey(htblColNameValue, table);
 		htblColNameValue.put(table.getPKColumn(), clusteringKey);
 		Validator.validateUpdateInput(table, htblColNameValue, myTables);
+
 		if (Validator.foundPK(table, htblColNameValue))
-		table.updateRecordsInTaple(clusteringKey, htblColNameValue);
+			table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 	}
 
 	private void castClusteringKeyType(Table table) {
+
 		clusteringKey = TypeParser.castClusteringKey(table, clusteringKeyValue);
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
-		return new Selector(arrSQLTerms, strarrOperators).getResult();
+
+		Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
+		Vector<Vector<Tuple>> result = new Vector<>();
+
+		for (int i = 0; i < arrSQLTerms.length; i++) {
+			Hashtable<String, Object> colNameValue = new Hashtable<>();
+			colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
+			String operator = arrSQLTerms[i]._strOperator;
+			Table table = Serializer.deserializeTable(arrSQLTerms[i]._strTableName);
+			result.add(table.select(colNameValue, operator));
+		}
+
+		return applyArrOperators(result, strarrOperators);
 	}
 
-	//TODO : add the method body
+	private Iterator applyArrOperators(Vector<Vector<Tuple>> selections, String[] strarrOperators) {
+
+		Vector<Tuple> result = new Vector<>();
+		Vector<Vector<Tuple>> tmp = new Vector<>();
+		int idx = 0;
+
+		for (Vector<Tuple> tuplesVector : selections) {
+			tmp.add(tuplesVector);
+			if (tmp.size() == 2) {
+				Vector<Tuple> firstSet = tmp.remove(0);
+				Vector<Tuple> secondSet = tmp.remove(0);
+				tmp.add(Selector.selectOperation(firstSet, secondSet, strarrOperators[idx++]));
+			}
+		}
+		result = tmp.remove(0);
+
+		return result.iterator();
+	}
+
+	// TODO : add the method body
 	@Override
 	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException {
-		
+
 	}
 }
