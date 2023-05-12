@@ -1,5 +1,6 @@
 package storage;
 
+import datamanipulation.CsvReader;
 import exceptions.DBAppException;
 import storage.index.OctreeIndex;
 import util.filecontroller.FileCreator;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -220,13 +222,41 @@ public class Table implements Serializable {
 
 	public void deleteTuples(Hashtable<String, Object> htblColNameValue)
 			throws ClassNotFoundException, IOException, DBAppException, ParseException {
-
-		for (int i = 0; i < pagesName.size(); i++) {
-			Page page = Serializer.deserializePage(name, pagesName.get(i));
-			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
-			deletePageRecords(toBeDeleted, page);
+		for (String col: htblColNameValue.keySet()) {
+			if (checkIndexing(col)){
+				//	TODO: handle the index deletion
+			}
+			else {
+				normalDelete(col, htblColNameValue);
+			}
 		}
 		removeEmptyPages();
+	}
+
+	public void normalDelete(String col, Hashtable<String, Object> htblColNameValue) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+		Hashtable<String, Object> tmphtb = new Hashtable<>();
+		tmphtb.put(col,htblColNameValue.get(col));
+		for (int i = 0; i < pagesName.size(); i++) {
+			Page page = Serializer.deserializePage(name, pagesName.get(i));
+			Vector<Tuple> toBeDeleted = page.linearSearch(tmphtb);
+			deletePageRecords(toBeDeleted, page);
+		}
+	}
+
+	public boolean checkIndexing (String col) {
+		CsvReader read = new CsvReader();
+		ArrayList<String[]> tableAtri = read.readTable(name);
+		boolean ans = false;
+		for (String [] table : tableAtri){
+			if (table[1] == col){
+				if(table[5] == "null")
+					ans =  false;
+				else
+					ans = true;
+				break;
+			}
+		}
+		return ans;
 	}
 
 	private void removeEmptyPages() {
