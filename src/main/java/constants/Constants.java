@@ -69,6 +69,7 @@ public final class Constants {
 	public static final String MAX_NAME_VALUE = "zzzzzzzzzzzzz";
 
 	public static final String MAX_ROWS_IN_PAGE = "MaximumRowsCountinTablePage";
+	public static final String MAX_ENTRIES_IN_OCTREENODE = "MaximumEntriesinOctreeNode";
 
 	public static final String CONFIG_PATH = "DBApp.config";
 
