@@ -1,4 +1,4 @@
-package storage;
+package storage.index;
 
 import java.io.IOException;
 import java.util.*;

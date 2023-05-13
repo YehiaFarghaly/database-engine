@@ -1,4 +1,4 @@
-package storage;
+package storage.index;
 
 import java.io.*;
 import java.util.*;
