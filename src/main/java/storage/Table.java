@@ -12,8 +12,6 @@ import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import app.Action;
-
 public class Table implements Serializable {
 
 	/**
@@ -27,12 +25,13 @@ public class Table implements Serializable {
 	private Hashtable<String, String> colNameType, colNameMin, colNameMax;
 	private String primaryKeyType;
 	private int size;
-	private Vector<OctreeIndex> indices;
+	private Vector<OctreeIndex<?>> indices;
 
 	public Table(String name, String pkColumn, Hashtable<String, String> colNameType,
 			Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) {
 		cntPage = 0;
 		size = 0;
+		this.indices = new Vector<>();
 		this.name = name;
 		this.pkColumn = pkColumn;
 		this.colNameType = colNameType;
@@ -98,7 +97,7 @@ public class Table implements Serializable {
 		return pagesName;
 	}
 
-	public Vector<OctreeIndex> getIndices() {
+	public Vector<OctreeIndex<?>> getIndices() {
 		return indices;
 	}
 
@@ -200,7 +199,7 @@ public class Table implements Serializable {
 	}
 
 	private Page initializePage() throws DBAppException {
-		Page page = new Page(name);
+		Page page = new Page(this);
 		page.setName((cntPage++) + "");
 		page.createPageFile();
 		pagesName.add(page.getName());
@@ -261,17 +260,6 @@ public class Table implements Serializable {
 
 	public void deleteTableFiles() {
 		FileDeleter.deleteFile(this, FileType.TABLE);
-	}
-
-	// TODO : Method needs to be completed then to be called in Insert/Delete/Update
-	private void populateToIndex(Hashtable<String, Object> tuple, Action action) {
-//	        for (OctreeIndex index : indices) {
-//	            for (String indexColumn : index.getColumns()) {
-//	            	if(action == Action.INSERT)
-//	                index.add(tuple.get(indexColumn));
-//	            	else index.remove(tuple.get(indexColumn));
-//	            }
-//	        }
 	}
 
 	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
