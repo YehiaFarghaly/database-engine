@@ -662,7 +662,7 @@ public class DBAppTest {
 	}
 
 	@AfterEach
-	void deleteCreatedTable() throws ClassNotFoundException, IOException, InterruptedException {
+	void deleteCreatedTable() throws DBAppException {
 		Table table = Serializer.deserializeTable(newTableName);
 		FileDeleter.deleteFile(table, FileType.TABLE);
 	}
