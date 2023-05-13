@@ -1,9 +1,9 @@
 package storage.index;
 
-import java.io.IOException;
 import java.util.*;
 import exceptions.DBAppException;
 import storage.Page;
+import storage.Tuple;
 import util.filecontroller.Serializer;
 
 public class OctreeIndex<T> {
@@ -17,7 +17,9 @@ public class OctreeIndex<T> {
 		root = new OctreeNode<>(bounds);
 	}
 
-	public void add(Page page, Hashtable<String, Object> tuple) throws DBAppException {
+	public void add(Page page, Tuple tuple) throws DBAppException {
+		if (!suitableIndex(tuple))
+			return;
 		Object x = tuple.get(colName1);
 		Object y = tuple.get(colName2);
 		Object z = tuple.get(colName3);
@@ -27,13 +29,9 @@ public class OctreeIndex<T> {
 
 	}
 
-	public void update(Hashtable<String, Object> oldTuple, Hashtable<String, Object> newTuple, Page oldPage,
-			Page newPage) throws DBAppException, IOException {
-		remove(oldPage, oldTuple);
-		add(newPage, newTuple);
-	}
-
-	public void remove(Page page, Hashtable<String, Object> tuple) throws DBAppException {
+	public void remove(Page page, Tuple tuple) throws DBAppException {
+		if (!suitableIndex(tuple))
+			return;
 		String ref = Serializer.getPath(page.getTableName(), page.getName());
 		Object x = tuple.get(colName1);
 		Object y = tuple.get(colName2);
@@ -46,6 +44,12 @@ public class OctreeIndex<T> {
 		List<Object> result = new ArrayList<>();
 		getRoot().query(searchBounds, result);
 		return result;
+	}
+
+	private boolean suitableIndex(Tuple tuple) {
+		if (tuple.contains(colName1) || tuple.contains(colName2) || tuple.contains(colName3))
+			return true;
+		return false;
 	}
 
 	public String getColName1() {

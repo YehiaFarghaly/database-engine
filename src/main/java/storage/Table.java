@@ -12,8 +12,6 @@ import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import app.Action;
-
 public class Table implements Serializable {
 
 	/**
@@ -200,7 +198,7 @@ public class Table implements Serializable {
 	}
 
 	private Page initializePage() throws DBAppException {
-		Page page = new Page(name);
+		Page page = new Page(this);
 		page.setName((cntPage++) + "");
 		page.createPageFile();
 		pagesName.add(page.getName());
@@ -261,30 +259,6 @@ public class Table implements Serializable {
 
 	public void deleteTableFiles() {
 		FileDeleter.deleteFile(this, FileType.TABLE);
-	}
-
-	
-	private void populateToIndex(Page page, Hashtable<String, Object> tuple, Action action) throws DBAppException {
-
-		for (OctreeIndex<?> index : indices) {
-			if (indexNotSuitable(index, tuple))
-				continue;
-			if (action == Action.INSERT) {
-				index.add(page, tuple);
-
-			} else {
-				index.remove(page, tuple);
-			}
-		}
-	}
-
-	private boolean indexNotSuitable(OctreeIndex<?> index, Hashtable<String, Object> tuple) {
-
-		if (tuple.containsKey(index.getColName1()) || tuple.containsKey(index.getColName2())
-				|| tuple.containsKey(index.getColName3()))
-			return false;
-
-		return true;
 	}
 
 	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
