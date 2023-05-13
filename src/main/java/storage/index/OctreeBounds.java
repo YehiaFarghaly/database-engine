@@ -1,7 +1,6 @@
 package storage.index;
 
 import java.util.Date;
-
 import constants.Constants;
 import exceptions.DBAppException;
 

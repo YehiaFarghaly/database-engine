@@ -1,4 +1,4 @@
-package storage;
+package storage.index;
 
 public class DBAppNull {
 

@@ -15,7 +15,7 @@ class OctreeNode<T> {
 	private final OctreeNode<T>[] children;
 	private final int maxSize;
 
-	public OctreeNode(OctreeBounds bounds) throws IOException {
+	public OctreeNode(OctreeBounds bounds) throws DBAppException {
 		this.bounds = bounds;
 		items = new ArrayList<>();
 		children = new OctreeNode[8];

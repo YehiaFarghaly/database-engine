@@ -9,7 +9,7 @@ public class OctreeIndex<T> {
 	private final Object colName1, colName2, colName3;
 	private OctreeNode<T> root;
 
-	public OctreeIndex(OctreeBounds bounds, Object col1, Object col2, Object col3) throws IOException {
+	public OctreeIndex(OctreeBounds bounds, Object col1, Object col2, Object col3) throws DBAppException {
 		colName1 = col1;
 		colName2 = col2;
 		colName3 = col3;
