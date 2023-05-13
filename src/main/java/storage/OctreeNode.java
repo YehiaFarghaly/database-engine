@@ -7,6 +7,8 @@ import constants.Constants;
 import exceptions.DBAppException;
 import util.filecontroller.ConfigReader;
 
+//CHECKSTYLE:OFF
+
 class OctreeNode<T> {
 	private final OctreeBounds bounds;
 	private final List<Item<T>> items;
@@ -201,3 +203,5 @@ class OctreeNode<T> {
 		return maxSize;
 	}
 }
+
+//CHECKSTYLE:ON
