@@ -78,7 +78,7 @@ public class Page implements Serializable {
 
 	protected Tuple removeLastTuple() throws DBAppException {
 		Tuple ret = tuples.remove(tuples.size() - 1);
-		Serializer.serializePage(name, this);
+		deleteHelper(ret);
 		return ret;
 	}
 	
@@ -112,11 +112,15 @@ public class Page implements Serializable {
 	protected void deleteFromPage(Tuple tuple) throws DBAppException {
 		int position = pageBinarySearch(tuple.getPrimaryKey());
 		tuples.remove(position);
+		deleteHelper(tuple);
+		handleEmptyPage();
+
+	}
+	
+	private void deleteHelper(Tuple tuple) throws DBAppException {
 		newMinMax();
 		populateToIndex(tuple, Action.DELETE);
 		Serializer.serializePage(name, this);
-		handleEmptyPage();
-
 	}
 
 	private void handleEmptyPage() {
