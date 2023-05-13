@@ -6,19 +6,19 @@ import java.util.List;
 public class Item<T> {
 
 	private Object x, y, z, data;
-	private List<Object> Duplicates;
+	private List<Object> duplicates;
 
 	public Item(Object x, Object y, Object z, Object data) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.data = data;
-		this.Duplicates = new ArrayList<>();
+		this.duplicates = new ArrayList<>();
 	}
 
 	@Override
 	public String toString() {
-		return "( " + x + ", " + y + ", " + z + " ), " + data + ", " + Duplicates;
+		return "( " + x + ", " + y + ", " + z + " ), " + data + ", " + duplicates;
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class Item<T> {
 	}
 
 	public void add(Object data) {
-		this.Duplicates.add(data);
+		this.duplicates.add(data);
 	}
 
 	public Object getX() {
@@ -48,6 +48,6 @@ public class Item<T> {
 	}
 
 	public List<Object> getDuplicates() {
-		return Duplicates;
+		return duplicates;
 	}
 }
