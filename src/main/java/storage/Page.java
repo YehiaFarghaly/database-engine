@@ -2,16 +2,16 @@ package storage;
 
 import constants.Constants;
 import exceptions.DBAppException;
+import storage.index.OctreeIndex;
 import util.PagePrinter;
 import util.filecontroller.*;
 import util.search.PageSearch;
-
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
+import app.Action;
 
 public class Page implements Serializable {
 	/**
@@ -22,11 +22,11 @@ public class Page implements Serializable {
 	private int maxRows;
 	private Vector<Tuple> tuples;
 	private Object minPK, maxPK;
-	private String tableName;
+	private Table table;
 
-	public Page(String tableName) throws IOException {
+	public Page(Table table) throws DBAppException {
 		this.tuples = new Vector<>();
-		this.tableName = tableName;
+		this.table = table;
 		Properties prop = ConfigReader.readProperties();
 		maxRows = Integer.parseInt(prop.getProperty(Constants.MAX_ROWS_IN_PAGE));
 	}
@@ -56,7 +56,7 @@ public class Page implements Serializable {
 	}
 
 	public String getTableName() {
-		return tableName;
+		return table.getName();
 	}
 
 	public String getName() {
@@ -67,9 +67,6 @@ public class Page implements Serializable {
 		this.name = name;
 	}
 
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
 
 	public boolean isEmpty() {
 		return tuples.size() == 0;
@@ -79,16 +76,21 @@ public class Page implements Serializable {
 		return tuples.size() == maxRows;
 	}
 
-	protected Tuple removeLastTuple() throws IOException {
+	protected Tuple removeLastTuple() throws DBAppException {
 		Tuple ret = tuples.remove(tuples.size() - 1);
 		Serializer.serializePage(name, this);
 		return ret;
 	}
+	
+	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) {
+		return PageSearch.linearSearchWithOperator(this, operator, colNameValue);
+	}
 
-	protected void insertIntoPage(Tuple tuple) throws IOException, DBAppException, ParseException {
+	protected void insertIntoPage(Tuple tuple) throws DBAppException {
 		int position = isEmpty() ? 0 : pageBinarySearch(tuple.getPrimaryKey());
 		tuples.add(position, tuple);
 		newMinMax();
+		populateToIndex(tuple, Action.INSERT);
 		Serializer.serializePage(name, this);
 	}
 
@@ -99,58 +101,77 @@ public class Page implements Serializable {
 		}
 	}
 
-	public int pageBinarySearch(Object primaryKey) throws DBAppException, ParseException {
+	public int pageBinarySearch(Object primaryKey) throws DBAppException {
 		return PageSearch.binarySearch(this, primaryKey);
 	}
 
-	protected Vector<Tuple> linearSearch(Hashtable<String, Object> colNameValue) throws DBAppException, ParseException {
+	protected Vector<Tuple> linearSearch(Hashtable<String, Object> colNameValue) throws DBAppException {
 		return PageSearch.linearSearch(this, colNameValue);
 	}
 
-	protected void deleteFromPage(Tuple tuple) throws IOException, DBAppException, ParseException {
+	protected void deleteFromPage(Tuple tuple) throws DBAppException {
 		int position = pageBinarySearch(tuple.getPrimaryKey());
-		if (position != -1) {
-			tuples.remove(position);
-			newMinMax();
-			Serializer.serializePage(name, this);
-			handleEmptyPage();
-		} else {
-			throw new DBAppException(Constants.ERROR_MESSAGE_SEARCH_NOT_FOUND);
-		}
+		tuples.remove(position);
+		newMinMax();
+		populateToIndex(tuple, Action.DELETE);
+		Serializer.serializePage(name, this);
+		handleEmptyPage();
+
 	}
 
-	private void handleEmptyPage() throws IOException {
+	private void handleEmptyPage() {
 		if (tuples.isEmpty()) {
 			deletePageFile();
 		}
-
 	}
 
 	private void deletePageFile() {
 		FileDeleter.deleteFile(this, FileType.PAGE);
 	}
 
-	protected void createPageFile() throws IOException {
+	protected void createPageFile() throws DBAppException {
 
-		FileCreator.createFile(this, FileType.PAGE);
+		try {
+			FileCreator.createFile(this, FileType.PAGE);
+		} catch (IOException e) {
+			throw new DBAppException(e.getMessage());
+		}
 	}
 
 	protected void updateTuple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, ParseException, IOException {
+			throws DBAppException {
+		
 		int pkVectorPoition = pageBinarySearch(clusteringKeyValue);
-		Tuple tuple = tuples.get(pkVectorPoition);
-
-		for (Cell c : tuple.getCells()) {
+		Tuple oldTuple = tuples.get(pkVectorPoition);
+		populateToIndex(oldTuple, Action.DELETE);
+		
+		for (Cell c : oldTuple.getCells()) {
 			if (htblColNameValue.get(c.getKey()) != null)
 				c.setValue(htblColNameValue.get(c.getKey()));
 		}
+		
+		Tuple newTuple = table.createTuple(htblColNameValue);
+		populateToIndex(newTuple, Action.INSERT);
 		Serializer.serializePage(name, this);
+	}
+	
+	private void populateToIndex(Tuple tuple, Action action) throws DBAppException {
 
+		Vector<OctreeIndex<?>> indices = table.getIndices();
+
+		for (OctreeIndex<?> index : indices) {
+			if (action == Action.INSERT) {
+				index.add(this, tuple);
+
+			} else {
+				index.remove(this, tuple);
+			}
+		}
 	}
 
-
-	public void print() throws IOException, ClassNotFoundException {
+	public void print() throws DBAppException {
 		PagePrinter print = new PagePrinter(this);
 		print.printPage();
 	}
+	
 }

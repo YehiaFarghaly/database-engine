@@ -69,6 +69,7 @@ public final class Constants {
 	public static final String MAX_NAME_VALUE = "zzzzzzzzzzzzz";
 
 	public static final String MAX_ROWS_IN_PAGE = "MaximumRowsCountinTablePage";
+	public static final String MAX_ENTRIES_IN_OCTREENODE = "MaximumEntriesinOctreeNode";
 
 	public static final String CONFIG_PATH = "DBApp.config";
 
@@ -98,5 +99,22 @@ public final class Constants {
 	public static final double SCENE_WIDTH = 900;
 
 	public static final double SCENE_HEIGHT = 650;
+
+	public static final String EQUAL = "=";
+	public static final String GREATER_THAN_OR_EQUAL = ">=";
+	public static final String GREATER_THAN = ">";
+	public static final String LESS_THAN_OR_EQUAL = "<=";
+	public static final String LESS_THAN = "<";
+	public static final String NOT_EQUAL = "!=";
+	
+	public static final String AND_OPERATION = "AND";
+	public static final String OR_OPERATION = "OR";
+	public static final String XOR_OPERATION = "XOR";
+
+	public static final String ERROR_MESSAGE_TOO_MUCH_OPERATOS = "Number of  Operators must be = SQLTERMS - 1";
+
+	public static final String ERROR_MESSAGE_UNKNOWN_ARR_OPERATOR = "The only allowed array operators are AND, OR and XOR";
+
+	public static final String ERROR_MESSAGE_UNKNOWN_OPERATOR = "The only allowed operators are =, >, <, >=, <=, and !=";
 
 }
