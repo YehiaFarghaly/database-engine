@@ -31,6 +31,7 @@ public class Table implements Serializable {
 			Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) {
 		cntPage = 0;
 		size = 0;
+		this.indices = new Vector<>();
 		this.name = name;
 		this.pkColumn = pkColumn;
 		this.colNameType = colNameType;
