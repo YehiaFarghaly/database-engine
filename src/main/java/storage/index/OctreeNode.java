@@ -1,8 +1,6 @@
 package storage.index;
 
-import java.io.*;
 import java.util.*;
-
 import constants.Constants;
 import exceptions.DBAppException;
 import util.filecontroller.ConfigReader;
@@ -23,7 +21,7 @@ class OctreeNode<T> {
 		maxSize = Integer.parseInt(prop.getProperty(Constants.MAX_ENTRIES_IN_OCTREENODE));
 	}
 
-	public boolean add(Item<T> item, OctreeBounds itemBounds) throws IOException, DBAppException {
+	public boolean add(Item<T> item, OctreeBounds itemBounds) throws DBAppException {
 		if (!getBounds().contains(itemBounds)) {
 			return false;
 		}
@@ -114,7 +112,7 @@ class OctreeNode<T> {
 		}
 	}
 
-	private void split() throws IOException, DBAppException {
+	private void split() throws DBAppException {
 		Object x0 = getBounds().getMin().getX();
 		Object x1 = getBounds().getMax().getX();
 		Object y0 = getBounds().getMin().getY();
