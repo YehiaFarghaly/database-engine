@@ -166,7 +166,7 @@ public class DBAppTest {
 			engine.createTable("newTable", "course_id", htblColNameType, htblColNameMin, htblColNameMax);
 		});
 		// Then
-		assertThat(exception.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID);
+		assertThat(exception.getMessage()).isEqualTo(Constants.ERROR_MESSAGE_DOESNOT_CONTAIN_ALL_MIN_MAX_COLUMNS);
 	}
 
 	@Test
@@ -281,7 +281,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_PK_IS_ALREADY_FOUND;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -300,7 +300,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_IN_DATA_TYPES;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -319,7 +319,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_PK_IS_NOT_FOUND;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -357,7 +357,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -376,7 +376,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -396,7 +396,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_COLUMNS_NOT_FOUND_IN_TABLE;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -453,7 +453,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_IN_TUPLE_SIZE;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -471,7 +471,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -489,7 +489,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_MIN_OR_MAX_NOT_VALID;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -507,7 +507,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_IN_DATA_TYPES;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -595,7 +595,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_COLUMNS_NOT_FOUND_IN_TABLE;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -614,7 +614,7 @@ public class DBAppTest {
 		});
 
 		// Then
-		String expectedMessage = Constants.ERROR_MESSAGE_TUPLE_DATA;
+		String expectedMessage = Constants.ERROR_MESSAGE_IN_DATA_TYPES;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
 	}
@@ -662,7 +662,7 @@ public class DBAppTest {
 	}
 
 	@AfterEach
-	void deleteCreatedTable() throws ClassNotFoundException, IOException, InterruptedException {
+	void deleteCreatedTable() throws DBAppException {
 		Table table = Serializer.deserializeTable(newTableName);
 		FileDeleter.deleteFile(table, FileType.TABLE);
 	}

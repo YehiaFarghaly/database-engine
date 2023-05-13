@@ -13,7 +13,7 @@ public interface IDatabase {
 			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
 			Hashtable<String, String> htblColNameMax) throws DBAppException;
 
-//	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException;
+	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException;
 
 	public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException;
 
