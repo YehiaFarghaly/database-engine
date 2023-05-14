@@ -268,7 +268,7 @@ public class DBApp implements IDatabase {
 		OctreeIndex index = new OctreeIndex (bounds, strarrColName[0], strarrColName[1], strarrColName[2]);
 		table.getIndices().add(index);
 		if (!table.isEmpty()) {
-			insertExisitngTuples(strTableName, index);
+			insertExisitngTuples(strTableName, index, table);
 		}
 		String indexName = strarrColName[0]+ strarrColName[1]+ strarrColName[2] + "Index";
 		updateCsvFile(strTableName, indexName);
@@ -294,8 +294,7 @@ public class DBApp implements IDatabase {
 		}
 	}
 	
-	private void insertExisitngTuples(String strTableName, OctreeIndex index) throws DBAppException {
-		Table table = Serializer.deserializeTable(strTableName);
+	private void insertExisitngTuples(String strTableName, OctreeIndex index, Table table) throws DBAppException {
 		int numOfPages = table.getPagesName().size();
 		for (int i=0; i<numOfPages; i++) {
 			Page page = table.getPageAtPosition(i); 
