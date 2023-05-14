@@ -166,7 +166,6 @@ public class Page implements Serializable {
 		for (OctreeIndex<?> index : indices) {
 			if (action == Action.INSERT) {
 				index.add(this, tuple);
-
 			} else {
 				index.remove(this, tuple);
 			}

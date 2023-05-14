@@ -4,7 +4,7 @@ import java.util.Date;
 import constants.Constants;
 import exceptions.DBAppException;
 
-class OctreeBounds {
+public class OctreeBounds {
 	private final Vector3 min;
 	private final Vector3 max;
 

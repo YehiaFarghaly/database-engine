@@ -89,6 +89,7 @@ public class Validator {
 	}
 	
 	public static void validateCreatIndex(Table table, String[] strarrColName) throws DBAppException {
+		getTableInfo(table);
 		if (!numberOfColumnsInIndex(strarrColName)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_IN_INDEX_SIZE);
 		} else if (!checkindex(strarrColName)) {
@@ -229,6 +230,7 @@ public class Validator {
 		pk = new String[size];
 		min = new Object[size];
 		max = new Object[size];
+		indexName = new String[size];
 	}
 
 //	private static void validTupleInsert(Table table, Hashtable<String, Object> tuple)
