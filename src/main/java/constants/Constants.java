@@ -117,4 +117,5 @@ public final class Constants {
 
 	public static final String ERROR_MESSAGE_UNKNOWN_OPERATOR = "The only allowed operators are =, >, <, >=, <=, and !=";
 
+	public static final int NUM_OF_DIMENSIONS = 3;
 }

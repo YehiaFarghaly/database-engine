@@ -1,6 +1,9 @@
 package storage;
 
+import constants.Constants;
+import datamanipulation.CsvReader;
 import exceptions.DBAppException;
+import storage.index.OctreeBounds;
 import storage.index.OctreeIndex;
 import util.filecontroller.FileCreator;
 import util.filecontroller.FileDeleter;
@@ -9,13 +12,15 @@ import util.filecontroller.Serializer;
 import util.search.TableSearch;
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.List;
 
 public class Table implements Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 994119161960187256L;
 	private int cntPage;
@@ -28,7 +33,7 @@ public class Table implements Serializable {
 	private Vector<OctreeIndex<?>> indices;
 
 	public Table(String name, String pkColumn, Hashtable<String, String> colNameType,
-			Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) {
+				 Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) {
 		cntPage = 0;
 		size = 0;
 		this.indices = new Vector<>();
@@ -182,7 +187,6 @@ public class Table implements Serializable {
 				return newPage;
 			}
 			nextPage = getPageAtPosition(++position);
-
 		}
 		return nextPage;
 	}
@@ -210,14 +214,79 @@ public class Table implements Serializable {
 		return position == pagesName.size() - 1;
 	}
 
-	public void deleteTuples(Hashtable<String, Object> htblColNameValue) throws DBAppException {
+	public void deleteTuples(Hashtable<String, Object> htblColNameValue)
+			throws DBAppException {
+		ArrayList<String> indexCol = new ArrayList<>();
+		for (String col: htblColNameValue.keySet())
+			if (checkIndexing(col))
+				indexCol.add(col);
+		OctreeIndex index = checkDimensions(indexCol);
+		if(index == null) { // there is no index and will follow traditional deletion
+			normalDelete(htblColNameValue);
+		} else {
+			Object[] values = new Object[Constants.NUM_OF_DIMENSIONS];
+			int idx = 0;
+			for (String col: htblColNameValue.keySet()) {
+				if(col.equals(index.getColName1()) || col.equals(index.getColName2()) || col.equals(index.getColName3()))
+					values[idx++] = htblColNameValue.get(col);
+			}
+			indexDelete(values,index,htblColNameValue);
+		}
+		removeEmptyPages();
+	}
 
+	public void indexDelete(Object [] values, OctreeIndex index, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+		OctreeBounds searchBounds = new OctreeBounds(values[0],values[1],values[2],values[0],values[1],values[2]);
+		List<Object> pages = index.query(searchBounds);
+		deleteByPage(pages, htblColNameValue);
+	}
+
+	public void deleteByPage(List<Object> pages, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+		for (Object page :pages) {
+			Page page = Serializer.deserializePage(name, pagesName.get(i));
+			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
+			deletePageRecords(toBeDeleted, page);
+		}
+	}
+	public OctreeIndex checkDimensions(ArrayList<String> indexCol){
+		for (OctreeIndex index:indices) {
+			ArrayList<String> dimensions = new ArrayList<>();
+			for (String col:indexCol) {
+				if(index.getColName1().equals(col))
+					dimensions.add(col);
+				else if (index.getColName2().equals(col))
+					dimensions.add(col);
+				else if (index.getColName3().equals(col))
+					dimensions.add(col);
+				if (dimensions.size() == Constants.NUM_OF_DIMENSIONS)
+					return index;
+			}
+		}
+		return null;
+	}
+
+	public void normalDelete(Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		for (int i = 0; i < pagesName.size(); i++) {
 			Page page = Serializer.deserializePage(name, pagesName.get(i));
 			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
 			deletePageRecords(toBeDeleted, page);
 		}
-		removeEmptyPages();
+	}
+
+	public boolean checkIndexing (String col) {
+		CsvReader read = new CsvReader();
+		ArrayList<String[]> tableAtri = read.readTable(name);
+		boolean ans = false;
+		for (String [] table : tableAtri){
+			if (table[1] == col){
+				if(table[5] == "null")
+					ans =  false;
+				else
+					ans = true;
+				break;
+			}
+		}
+		return ans;
 	}
 
 	private void removeEmptyPages() {
