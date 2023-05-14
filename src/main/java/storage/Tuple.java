@@ -20,13 +20,28 @@ public class Tuple implements Cloneable, ITuple, Serializable {
 	public void addCell(Cell c) {
 		this.cells.add(c);
 	}
-	
+
 	public Vector<Cell> getCells() {
 		return cells;
 	}
 
 	public Object getPrimaryKey() {
 		return primaryKey;
+	}
+
+	public Object get(String key) {
+		Object ret = null;
+		for (Cell cell : cells) {
+			if (cell.getKey().equals(key))
+				ret = cell.getValue();
+		}
+		return ret;
+	}
+
+	public boolean contains(String key) {
+		if (get(key) != null)
+			return true;
+		return false;
 	}
 
 	@Override

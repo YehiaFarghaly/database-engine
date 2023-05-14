@@ -1,13 +1,12 @@
 package util;
 
 import datamanipulation.CsvReader;
+import exceptions.DBAppException;
 import util.filecontroller.Serializer;
 import storage.Cell;
 import storage.Page;
 import storage.Table;
 import storage.Tuple;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class PagePrinter {
@@ -16,13 +15,13 @@ public class PagePrinter {
     ArrayList<String> colOrder;
     String line;
     
-    public PagePrinter(Page page) throws IOException, ClassNotFoundException {
+    public PagePrinter(Page page) throws DBAppException {
         this.page = page;
         colOrder = getColOrder();
         line = createLine();
     }
 
-    public void printPage() throws IOException, ClassNotFoundException {
+    public void printPage() throws DBAppException {
         printColName();
         println();
         printData();
@@ -30,7 +29,7 @@ public class PagePrinter {
 
     }
 
-    public ArrayList<String> getColOrder() throws IOException, ClassNotFoundException {
+    public ArrayList<String> getColOrder() throws DBAppException {
         CsvReader readInfo = new CsvReader();
         ArrayList<String[]> colsInfo = readInfo.readTable(page.getTableName());
         Table table = Serializer.deserializeTable(page.getTableName());
