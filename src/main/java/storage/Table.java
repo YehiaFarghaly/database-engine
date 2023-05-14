@@ -216,42 +216,45 @@ public class Table implements Serializable {
 
 	public void deleteTuples(Hashtable<String, Object> htblColNameValue)
 			throws DBAppException {
-		ArrayList<String> indexCol = new ArrayList<>();
-		for (String col: htblColNameValue.keySet())
-			if (checkIndexing(col))
-				indexCol.add(col);
-		OctreeIndex index = checkDimensions(indexCol);
+		OctreeIndex index = checkDimensions(htblColNameValue);
 		if(index == null) { // there is no index and will follow traditional deletion
 			normalDelete(htblColNameValue);
 		} else {
-			Object[] values = new Object[Constants.NUM_OF_DIMENSIONS];
+			Object[] minMaxValues = new Object[Constants.NUM_OF_DIMENSIONS];
 			int idx = 0;
 			for (String col: htblColNameValue.keySet()) {
 				if(col.equals(index.getColName1()) || col.equals(index.getColName2()) || col.equals(index.getColName3()))
-					values[idx++] = htblColNameValue.get(col);
+					minMaxValues[idx++] = htblColNameValue.get(col);
 			}
-			indexDelete(values,index,htblColNameValue);
+			indexDelete(minMaxValues,index,htblColNameValue);
 		}
 		removeEmptyPages();
 	}
 
-	public void indexDelete(Object [] values, OctreeIndex index, Hashtable<String, Object> htblColNameValue) throws DBAppException {
-		OctreeBounds searchBounds = new OctreeBounds(values[0],values[1],values[2],values[0],values[1],values[2]);
+	public void indexDelete(Object [] minMaxValues, OctreeIndex index, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+		OctreeBounds searchBounds = new OctreeBounds(minMaxValues[0],minMaxValues[1],minMaxValues[2],minMaxValues[0],minMaxValues[1],minMaxValues[2]);
 		List<Object> pages = index.query(searchBounds);
-		deleteByPage(pages, htblColNameValue);
+		deleteByPage(pages, htblColNameValue, index);
 	}
 
-	public void deleteByPage(List<Object> pages, Hashtable<String, Object> htblColNameValue) throws DBAppException {
-		for (Object page :pages) {
-			Page page = Serializer.deserializePage(name, pagesName.get(i));
+	public void deleteByPage(List<Object> pages, Hashtable<String, Object> htblColNameValue, OctreeIndex index) throws DBAppException {
+		for (Object pageObj :pages) {
+            String pageName = (String)pageObj;
+			Page page = Serializer.deserializePage(name, pagesName.get(pagesName.indexOf(pageName)));
 			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
+            deleteIndexRecord(toBeDeleted, page, index);
 			deletePageRecords(toBeDeleted, page);
 		}
 	}
-	public OctreeIndex checkDimensions(ArrayList<String> indexCol){
+    public void deleteIndexRecord(Vector<Tuple> toBeDeleted, Page page, OctreeIndex index) throws DBAppException {
+        for (Tuple tuple : toBeDeleted) {
+            index.remove(page, tuple);
+        }
+    }
+	public OctreeIndex checkDimensions(Hashtable<String, Object> htblColNameValue){
 		for (OctreeIndex index:indices) {
 			ArrayList<String> dimensions = new ArrayList<>();
-			for (String col:indexCol) {
+			for (String col:htblColNameValue.keySet()) {
 				if(index.getColName1().equals(col))
 					dimensions.add(col);
 				else if (index.getColName2().equals(col))
