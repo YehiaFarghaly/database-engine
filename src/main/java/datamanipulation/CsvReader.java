@@ -23,7 +23,7 @@ public class CsvReader {
 		}
 	}
 
-	private List<String[]> readAll() {
+	public List<String[]> readAll() {
 		List<String[]> allTablesCol = null;
 		try {
 			allTablesCol = reader.readAll();
@@ -32,6 +32,7 @@ public class CsvReader {
 		}
 		return allTablesCol;
 	}
+	
 
 	public ArrayList<String[]> readTable(String tableName) {
 		ArrayList<String[]> tableCol = new ArrayList<>();

@@ -1,6 +1,7 @@
 package datamanipulation;
 
 import java.io.*;
+import java.util.List;
 import java.util.Map.Entry;
 import com.opencsv.CSVWriter;
 import constants.Constants;
@@ -18,6 +19,18 @@ public class CsvWriter {
 		}
 	}
 
+	public void writeAll(List<String[]> tableInfo) throws IOException {
+		this.writer = new CSVWriter(new FileWriter(Constants.METADATA_PATH));
+		writer.writeAll(tableInfo);
+		try {
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void write(Table table) {
 		for (Entry<String, String> e : table.getColNameType().entrySet()) {
 			writeRecord(table.getName(), e.getKey(), e.getValue(), e.getKey().equals(table.getPKColumn()) + "", "null",

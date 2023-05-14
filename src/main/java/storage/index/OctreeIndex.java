@@ -27,7 +27,7 @@ public class OctreeIndex<T> implements Serializable {
 		Object z = tuple.get(colName3);
 		OctreeBounds itemBounds = new OctreeBounds(x, y, z, x, y, z);
 		String ref = Serializer.getPath(page.getTableName(), page.getName());
-		getRoot().add(new Item<>(x, y, z, ref), itemBounds);
+		root.add(new Item<>(x, y, z, ref), itemBounds);
 
 	}
 
@@ -39,12 +39,12 @@ public class OctreeIndex<T> implements Serializable {
 		Object y = tuple.get(colName2);
 		Object z = tuple.get(colName3);
 		OctreeBounds itemBounds = new OctreeBounds(x, y, z, x, y, z);
-		getRoot().remove(ref, itemBounds);
+		root.remove(ref, itemBounds);
 	}
 
 	public List<Object> query(OctreeBounds searchBounds) throws DBAppException {
 		List<Object> result = new ArrayList<>();
-		getRoot().query(searchBounds, result);
+		root.query(searchBounds, result);
 		return result;
 	}
 
