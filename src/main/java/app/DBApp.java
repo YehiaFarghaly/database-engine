@@ -267,7 +267,7 @@ public class DBApp implements IDatabase {
 		OctreeBounds bounds = createBounds(strarrColName);
 		OctreeIndex index = new OctreeIndex (bounds, strarrColName[0], strarrColName[1], strarrColName[2]);
 		if (!table.isEmpty()) {
-			insertExisitngTuples(strTableName,index);
+			insertExisitngTuples(strTableName, index);
 		}
 		String indexName = strarrColName[0]+ strarrColName[1]+ strarrColName[2] + "Index";
 		updateCsvFile(strTableName, indexName);

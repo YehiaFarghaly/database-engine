@@ -114,7 +114,8 @@ public class Validator {
 	private static boolean numberOfColumnsInIndex(String[] strarrColName) {
 		if (strarrColName.length==3) {
 			return true;
-		} return false;
+		}
+		return false;
 	}
 	
 	private static boolean checkindex(String[] strarrColName) {
@@ -221,7 +222,6 @@ public class Validator {
 			max[i] = tableInfo.get(i)[Constants.COL_MAX_VALUE_INDEX];
 			indexName[i] = tableInfo.get(i)[Constants.INDEX_NAME_INDEX];
 		}
-
 	}
 
 	private static void initializeAttributes(int size) {
