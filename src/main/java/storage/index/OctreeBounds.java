@@ -1,10 +1,16 @@
 package storage.index;
 
+import java.io.Serializable;
 import java.util.Date;
 import constants.Constants;
 import exceptions.DBAppException;
 
+
+public class OctreeBounds implements Serializable {
+	private static final long serialVersionUID = 1127517452404966501L;
+
 public class OctreeBounds {
+
 	private final Vector3 min;
 	private final Vector3 max;
 

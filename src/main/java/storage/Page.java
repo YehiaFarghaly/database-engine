@@ -1,13 +1,16 @@
 package storage;
 
 import constants.Constants;
+import datamanipulation.CsvReader;
 import exceptions.DBAppException;
+import storage.index.DBAppNull;
 import storage.index.OctreeIndex;
 import util.PagePrinter;
 import util.filecontroller.*;
 import util.search.PageSearch;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
@@ -22,11 +25,11 @@ public class Page implements Serializable {
 	private int maxRows;
 	private Vector<Tuple> tuples;
 	private Object minPK, maxPK;
-	private Table table;
+	private String tableName;
 
-	public Page(Table table) throws DBAppException {
+	public Page(String tableName) throws DBAppException {
 		this.tuples = new Vector<>();
-		this.table = table;
+		this.tableName = tableName;
 		Properties prop = ConfigReader.readProperties();
 		maxRows = Integer.parseInt(prop.getProperty(Constants.MAX_ROWS_IN_PAGE));
 	}
@@ -56,7 +59,7 @@ public class Page implements Serializable {
 	}
 
 	public String getTableName() {
-		return table.getName();
+		return tableName;
 	}
 
 	public String getName() {
@@ -86,11 +89,11 @@ public class Page implements Serializable {
 		return PageSearch.linearSearchWithOperator(this, operator, colNameValue);
 	}
 
-	protected void insertIntoPage(Tuple tuple) throws DBAppException {
+	protected void insertIntoPage(Tuple tuple, Vector<OctreeIndex<?>> indices) throws DBAppException {
 		int position = isEmpty() ? 0 : pageBinarySearch(tuple.getPrimaryKey());
 		tuples.add(position, tuple);
 		newMinMax();
-		populateToIndex(tuple, Action.INSERT);
+		populateToIndex(tuple, Action.INSERT, indices);
 		Serializer.serializePage(name, this);
 	}
 
@@ -109,7 +112,7 @@ public class Page implements Serializable {
 		return PageSearch.linearSearch(this, colNameValue);
 	}
 
-	protected void deleteFromPage(Tuple tuple) throws DBAppException {
+	protected void deleteFromPage(Tuple tuple, Vector<OctreeIndex<?>> indices) throws DBAppException {
 		int position = pageBinarySearch(tuple.getPrimaryKey());
 		tuples.remove(position);
 		deleteHelper(tuple);
@@ -119,7 +122,7 @@ public class Page implements Serializable {
 	
 	private void deleteHelper(Tuple tuple) throws DBAppException {
 		newMinMax();
-		populateToIndex(tuple, Action.DELETE);
+		populateToIndex(tuple, Action.DELETE, indices);
 		Serializer.serializePage(name, this);
 	}
 
@@ -142,26 +145,39 @@ public class Page implements Serializable {
 		}
 	}
 
-	protected void updateTuple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue)
+	protected void updateTuple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue, Vector<OctreeIndex<?>> indices)
 			throws DBAppException {
 		
 		int pkVectorPoition = pageBinarySearch(clusteringKeyValue);
 		Tuple oldTuple = tuples.get(pkVectorPoition);
-		populateToIndex(oldTuple, Action.DELETE);
+		populateToIndex(oldTuple, Action.DELETE, indices);
 		
 		for (Cell c : oldTuple.getCells()) {
 			if (htblColNameValue.get(c.getKey()) != null)
 				c.setValue(htblColNameValue.get(c.getKey()));
 		}
-		
-		Tuple newTuple = table.createTuple(htblColNameValue);
-		populateToIndex(newTuple, Action.INSERT);
+
+		// TODO: complete the update
+		Tuple newTuple = createTuple(htblColNameValue);
+		populateToIndex(newTuple, Action.INSERT, indices);
 		Serializer.serializePage(name, this);
 	}
-	
-	private void populateToIndex(Tuple tuple, Action action) throws DBAppException {
 
-		Vector<OctreeIndex<?>> indices = table.getIndices();
+	private Tuple createTuple(Hashtable<String, Object> colNameValue){
+		Tuple ret = new Tuple();
+		CsvReader reader = new CsvReader();
+		ArrayList<String[]> arr = reader.readTable(tableName);
+		ArrayList<String> columnNames = new ArrayList<>();
+		for (String[] columns: arr){
+			columnNames.add(columns[1]);
+		}
+		for (String attribute: columnNames ){
+			ret.getCells().add( new Cell(attribute, colNameValue.get(attribute)==null?new DBAppNull():colNameValue.get(attribute)));
+		}
+		return ret;
+	}
+	
+	private void populateToIndex(Tuple tuple, Action action, Vector<OctreeIndex<?>> indices) throws DBAppException {
 
 		for (OctreeIndex<?> index : indices) {
 			if (action == Action.INSERT) {

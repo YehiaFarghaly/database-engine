@@ -53,7 +53,7 @@ public class DBApp implements IDatabase {
 	/**
 	 * Initializes the database management system by reading all the tables from CSV
 	 * file
-	 * 
+	 *
 	 */
 	@Override
 	public void init() {
@@ -64,7 +64,7 @@ public class DBApp implements IDatabase {
 
 	/**
 	 * Creates a new table in the system with the specified parameters.
-	 * 
+	 *
 	 * @param strTableName           The name of the table.
 	 * @param strClusteringKeyColumn The name of the clustering key column.
 	 * @param htblColNameType        A Hashtable containing the name and data type
@@ -73,7 +73,7 @@ public class DBApp implements IDatabase {
 	 *                               value of each column in the table.
 	 * @param htblColNameMax         A Hashtable containing the name and maximum
 	 *                               value of each column in the table.
-	 * 
+	 *
 	 * @throws DBAppException If the table name is invalid or if the table already
 	 *                        exists.
 	 * @throws ParseException
@@ -81,8 +81,8 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
-			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException {
+							Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
+							Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		Validator.validateTableCreation(myTables, strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin,
 				htblColNameMax);
@@ -98,11 +98,11 @@ public class DBApp implements IDatabase {
 
 	/**
 	 * Inserts a new record into the specified table.
-	 * 
+	 *
 	 * @param strTableName     The name of the table.
 	 * @param htblColNameValue A Hashtable containing the name and value of each
 	 *                         column in the record.
-	 * 
+	 *
 	 * @throws DBAppException         If the table name is invalid, the record data
 	 *                                is invalid or the record already exists.
 	 * @throws CsvValidationException If the record fails CSV validation.
@@ -121,12 +121,12 @@ public class DBApp implements IDatabase {
 
 	/**
 	 * Updates a record in a table.
-	 * 
+	 *
 	 * @param strTableName          the name of the table to update a record in.
 	 * @param strClusteringKeyValue the value of the clustering key for the record
 	 *                              to be updated.
 	 * @param htblColNameValue      the new values for the record.
-	 * 
+	 *
 	 * @throws DBAppException         if there is an error with the database
 	 *                                operations.
 	 * @throws CsvValidationException if there is an error with the CSV file.
@@ -136,7 +136,7 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+							Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
 		this.clusteringKeyValue = strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
@@ -144,10 +144,10 @@ public class DBApp implements IDatabase {
 
 	/**
 	 * Deletes records from a table.
-	 * 
+	 *
 	 * @param strTableName     the name of the table to delete records from.
 	 * @param htblColNameValue the values to match records to be deleted.
-	 * 
+	 *
 	 * @throws DBAppException         if there is an error with the database
 	 *                                operations.
 	 * @throws CsvValidationException if there is an error with the CSV file.
@@ -164,11 +164,11 @@ public class DBApp implements IDatabase {
 
 	/**
 	 * Performs an action (insert, delete, or update) on a table.
-	 * 
+	 *
 	 * @param action           the action to perform.
 	 * @param strTableName     the name of the table to perform the action on.
 	 * @param htblColNameValue the values to use for the action.
-	 * 
+	 *
 	 * @throws DBAppException         if there is an error with the database
 	 *                                operations.
 	 * @throws CsvValidationException if there is an error with the CSV file.
