@@ -283,7 +283,7 @@ public class DBApp implements IDatabase {
 			tableInfo.get(i)[Constants.INDEX_TYPE_INDEX] = "Octree";
 		}
 		CsvWriter cw = new CsvWriter();
-		cw.getwriter().writeAll(tableInfo);
+		cw.writeAll(tableInfo);
 	}
 	
 	private void insertExisitngTuples(String strTableName, OctreeIndex index) throws DBAppException {

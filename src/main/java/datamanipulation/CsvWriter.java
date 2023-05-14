@@ -1,6 +1,7 @@
 package datamanipulation;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Map.Entry;
 import com.opencsv.CSVWriter;
 import constants.Constants;
@@ -18,8 +19,15 @@ public class CsvWriter {
 		}
 	}
 
-	public CSVWriter getwriter() {
-		return this.writer;
+	public void writeAll(ArrayList<String[]> tableInfo) {
+		writer.writeAll(tableInfo);
+		try {
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void write(Table table) {
