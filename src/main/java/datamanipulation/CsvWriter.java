@@ -1,7 +1,6 @@
 package datamanipulation;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import com.opencsv.CSVWriter;

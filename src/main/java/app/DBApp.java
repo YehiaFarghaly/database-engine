@@ -280,7 +280,7 @@ public class DBApp implements IDatabase {
 		List<String[]> tableInfo = cr.readAll();
 		int size = tableInfo.size();
 		for (int i = 0; i < size; i++) {
-			if(tableInfo.get(i)[0].equals(strTableName)) {
+			if (tableInfo.get(i)[0].equals(strTableName)) {
 				tableInfo.get(i)[Constants.INDEX_NAME_INDEX] = indexName;
 				tableInfo.get(i)[Constants.INDEX_TYPE_INDEX] = "Octree";
 			}
