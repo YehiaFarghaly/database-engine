@@ -269,12 +269,24 @@ public class DBApp implements IDatabase {
 		if (!table.isEmpty()) {
 			insertExisitngTuples(strTableName,index);
 		}
-		
+		String indexName = strarrColName[0]+ strarrColName[1]+ strarrColName[2] + "Index";
+		updateCsvFile(strTableName, indexName);
 	}
 	
+	private void updateCsvFile(String strTableName, String indexName) {
+		CsvReader cr = new CsvReader();
+		String tablename = strTableName;
+		ArrayList<String[]> tableInfo = cr.readTable(tablename);
+		int size = tableInfo.size();
+		for (int i = 0; i < size; i++) {
+			tableInfo.get(i)[Constants.INDEX_NAME_INDEX] = indexName;
+			tableInfo.get(i)[Constants.INDEX_TYPE_INDEX] = "Octree";
+		}
+		CsvWriter cw = new CsvWriter();
+		cw.getwriter().writeAll(tableInfo);
+	}
 	
-	
-	private void insertExisitngTuples (String strTableName, OctreeIndex index) throws DBAppException {
+	private void insertExisitngTuples(String strTableName, OctreeIndex index) throws DBAppException {
 		Table table = Serializer.deserializeTable(strTableName);
 		int numOfPages = table.getPagesName().size();
 		for (int i=0; i<numOfPages; i++) {

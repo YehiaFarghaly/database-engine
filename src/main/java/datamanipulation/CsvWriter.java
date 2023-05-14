@@ -18,6 +18,10 @@ public class CsvWriter {
 		}
 	}
 
+	public CSVWriter getwriter() {
+		return this.writer;
+	}
+	
 	public void write(Table table) {
 		for (Entry<String, String> e : table.getColNameType().entrySet()) {
 			writeRecord(table.getName(), e.getKey(), e.getValue(), e.getKey().equals(table.getPKColumn()) + "", "null",
