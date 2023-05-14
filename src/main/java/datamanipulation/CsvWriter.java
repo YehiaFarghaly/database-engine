@@ -2,6 +2,7 @@ package datamanipulation;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import com.opencsv.CSVWriter;
 import constants.Constants;
@@ -19,7 +20,8 @@ public class CsvWriter {
 		}
 	}
 
-	public void writeAll(ArrayList<String[]> tableInfo) {
+	public void writeAll(List<String[]> tableInfo) throws IOException {
+		this.writer = new CSVWriter(new FileWriter(Constants.METADATA_PATH));
 		writer.writeAll(tableInfo);
 		try {
 			writer.flush();

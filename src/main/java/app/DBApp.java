@@ -277,14 +277,21 @@ public class DBApp implements IDatabase {
 	private void updateCsvFile(String strTableName, String indexName) {
 		CsvReader cr = new CsvReader();
 		String tablename = strTableName;
-		ArrayList<String[]> tableInfo = cr.readTable(tablename);
+		List<String[]> tableInfo = cr.readAll();
 		int size = tableInfo.size();
 		for (int i = 0; i < size; i++) {
-			tableInfo.get(i)[Constants.INDEX_NAME_INDEX] = indexName;
-			tableInfo.get(i)[Constants.INDEX_TYPE_INDEX] = "Octree";
+			if(tableInfo.get(i)[0].equals(strTableName)) {
+				tableInfo.get(i)[Constants.INDEX_NAME_INDEX] = indexName;
+				tableInfo.get(i)[Constants.INDEX_TYPE_INDEX] = "Octree";
+			}
 		}
 		CsvWriter cw = new CsvWriter();
-		cw.writeAll(tableInfo);
+		try {
+			cw.writeAll(tableInfo);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void insertExisitngTuples(String strTableName, OctreeIndex index) throws DBAppException {
@@ -300,7 +307,6 @@ public class DBApp implements IDatabase {
 	}
 	
 	private OctreeBounds createBounds (String[] strarrColName) {
-		
 		return new OctreeBounds (0, 0, 0,
 				1, 1, 1);
 	}
