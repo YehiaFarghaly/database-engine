@@ -1,12 +1,14 @@
 package storage.index;
 
+import java.io.Serializable;
 import java.util.*;
 import exceptions.DBAppException;
 import storage.Page;
 import storage.Tuple;
 import util.filecontroller.Serializer;
 
-public class OctreeIndex<T> {
+public class OctreeIndex<T> implements Serializable {
+	private static final long serialVersionUID = 4835109290601395974L;
 	private final String colName1, colName2, colName3;
 	private OctreeNode<T> root;
 

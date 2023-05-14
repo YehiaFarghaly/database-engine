@@ -1,6 +1,9 @@
 package storage.index;
 
-class Vector3 {
+import java.io.Serializable;
+
+public class Vector3 implements Serializable {
+	private static final long serialVersionUID = 586536815635767374L;
 	private final Object x;
 	private final Object y;
 	private final Object z;
