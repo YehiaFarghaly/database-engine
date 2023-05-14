@@ -33,7 +33,7 @@ public class Table implements Serializable {
 	private Vector<OctreeIndex<?>> indices;
 
 	public Table(String name, String pkColumn, Hashtable<String, String> colNameType,
-				 Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) {
+			Hashtable<String, String> colNameMin, Hashtable<String, String> colNameMax) {
 		cntPage = 0;
 		size = 0;
 		this.indices = new Vector<>();
@@ -162,13 +162,13 @@ public class Table implements Serializable {
 			Page nextAvailablePage = getNextAvailablePage(position, currentPage, tuple);
 			Page nextPage = getPageAtPosition(++position);
 			currentPage.insertIntoPage(tuple, indices);
-			Tuple lastTuple = currentPage.removeLastTuple();
+			Tuple lastTuple = currentPage.removeLastTuple(indices);
 
 			while (!arePagesEqual(nextPage, nextAvailablePage)) {
 				currentPage = nextPage;
 				nextPage = getPageAtPosition(++position);
 				currentPage.insertIntoPage(lastTuple, indices);
-				lastTuple = currentPage.removeLastTuple();
+				lastTuple = currentPage.removeLastTuple(indices);
 			}
 			nextAvailablePage.insertIntoPage(lastTuple, indices);
 		}
@@ -193,7 +193,7 @@ public class Table implements Serializable {
 
 	private void newLastPage(Page currentPage, Tuple tuple) throws DBAppException {
 		currentPage.insertIntoPage(tuple, indices);
-		Tuple lastTuple = currentPage.removeLastTuple();
+		Tuple lastTuple = currentPage.removeLastTuple(indices);
 		insertNewPage(lastTuple);
 	}
 
@@ -214,16 +214,16 @@ public class Table implements Serializable {
 		return position == pagesName.size() - 1;
 	}
 
-	public void deleteTuples(Hashtable<String, Object> htblColNameValue)
-			throws DBAppException {
+	public void deleteTuples(Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		OctreeIndex index = checkDimensions(htblColNameValue);
 		if (index == null) {
 			normalDelete(htblColNameValue);
 		} else {
 			Object[] minMaxValues = new Object[Constants.NUM_OF_DIMENSIONS];
 			int idx = 0;
-			for (String col: htblColNameValue.keySet()) {
-				if (col.equals(index.getColName1()) || col.equals(index.getColName2()) || col.equals(index.getColName3()))
+			for (String col : htblColNameValue.keySet()) {
+				if (col.equals(index.getColName1()) || col.equals(index.getColName2())
+						|| col.equals(index.getColName3()))
 					minMaxValues[idx++] = htblColNameValue.get(col);
 			}
 			indexDelete(minMaxValues, index, htblColNameValue);
@@ -231,28 +231,31 @@ public class Table implements Serializable {
 		removeEmptyPages();
 	}
 
-	public void indexDelete(Object [] minMaxValues, OctreeIndex index, Hashtable<String, Object> htblColNameValue) throws DBAppException {
-		OctreeBounds searchBounds = new OctreeBounds(minMaxValues[0], minMaxValues[1],
-				minMaxValues[2], minMaxValues[0], minMaxValues[1], minMaxValues[2]);
+	public void indexDelete(Object[] minMaxValues, OctreeIndex index, Hashtable<String, Object> htblColNameValue)
+			throws DBAppException {
+		OctreeBounds searchBounds = new OctreeBounds(minMaxValues[0], minMaxValues[1], minMaxValues[2], minMaxValues[0],
+				minMaxValues[1], minMaxValues[2]);
 		List<Object> pages = index.query(searchBounds);
 		deleteByPage(pages, htblColNameValue, index);
 	}
 
-	public void deleteByPage(List<Object> pages, Hashtable<String, Object> htblColNameValue, OctreeIndex index) throws DBAppException {
-		for (Object pageObj :pages) {
-            String pageName = (String) pageObj;
+	public void deleteByPage(List<Object> pages, Hashtable<String, Object> htblColNameValue, OctreeIndex index)
+			throws DBAppException {
+		for (Object pageObj : pages) {
+			String pageName = (String) pageObj;
 			System.out.println(pageName);
 			System.out.println();
-			Page page = Serializer.deserializePage(name, pagesName.get(pagesName.indexOf((pageName.split("//")[1]).split(".ser")[0])));
+			Page page = Serializer.deserializePage(name,
+					pagesName.get(pagesName.indexOf((pageName.split("//")[1]).split(".ser")[0])));
 			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
 			deletePageRecords(toBeDeleted, page);
 		}
 	}
 
-	public OctreeIndex checkDimensions(Hashtable<String, Object> htblColNameValue){
-		for (OctreeIndex index:indices) {
+	public OctreeIndex checkDimensions(Hashtable<String, Object> htblColNameValue) {
+		for (OctreeIndex index : indices) {
 			ArrayList<String> dimensions = new ArrayList<>();
-			for (String col:htblColNameValue.keySet()) {
+			for (String col : htblColNameValue.keySet()) {
 				if (index.getColName1().equals(col))
 					dimensions.add(col);
 				else if (index.getColName2().equals(col))
@@ -274,12 +277,12 @@ public class Table implements Serializable {
 		}
 	}
 
-	public boolean checkIndexing (String col) {
+	public boolean checkIndexing(String col) {
 		CsvReader read = new CsvReader();
 		ArrayList<String[]> tableAtri = read.readTable(name);
 		boolean ans = false;
-		for (String [] table : tableAtri){
-			if (table[1].equals(col)){
+		for (String[] table : tableAtri) {
+			if (table[1].equals(col)) {
 				if (table[5].equals("null"))
 					ans = false;
 				else
