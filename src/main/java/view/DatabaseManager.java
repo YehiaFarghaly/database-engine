@@ -25,7 +25,8 @@ public class DatabaseManager  {
 
 		//OR (l=u AnD wejo=vfkm and t=1)
 		//c=oo OR f=1 AND p=0 OR I=2 AND R=09 AND 1=1
-		s.append("1w");
+		s.append("INSERT INTO employees (id, name, salary)\n" +
+				"VALUES (1, 'John Doe', 5000);");
 //		s.append("select abc,d,f,t FROM tttt where b=bk or f=0 AND 1=1;");
 //		s.append("DELETE FROM employees WHERE salary < 5000 and a>4;");
 //s.append("CREATE INDEX idx_customers ON customers (last_name, first_name);\n");

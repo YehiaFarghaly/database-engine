@@ -9,6 +9,7 @@ import sql.antlrfiles.SQLiteParser;
 import sql.antlrfiles.SQLiteParserBaseListener;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -30,10 +31,47 @@ public class MiniDBListener extends SQLiteParserBaseListener {
     @Override
     public void enterInsert_stmt(SQLiteParser.Insert_stmtContext ctx) {
 
+        Hashtable<String, Object> colVal = new Hashtable<>();
+
+        String tableName = ctx.table_name().getText();
+        for (int i = 0; i < ctx.expr().size(); i++) {
+            String colName = ctx.column_name(i).getText();
+            Object val = parseObject(ctx.expr(i).getText());
+            colVal.put(colName, val);
+
+        }
+
+        try {
+            app.insertIntoTable(tableName,colVal );
+        } catch (DBAppException e) {
+            throw new RuntimeException(e);
+        }
 
         result = null;
 
     }
+
+    private Object parseObject(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+
+        }
+
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+
+        }
+
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMATE);
+            return dateFormat.parse(value);
+        } catch (ParseException e) {
+        }
+        return value;
+    }
+
 
     @Override
     public void enterSelect_stmt(SQLiteParser.Select_stmtContext ctx) {
