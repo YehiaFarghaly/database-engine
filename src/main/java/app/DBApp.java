@@ -4,6 +4,7 @@ import sql.parser.SQLParser;
 import com.opencsv.exceptions.CsvValidationException;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
+import constants.Constants;
 import exceptions.DBAppException;
 import sql.SQLTerm;
 import storage.Table;
@@ -11,6 +12,12 @@ import storage.Tuple;
 import util.TypeParser;
 import util.filecontroller.Serializer;
 import util.search.Selector;
+import storage.*;
+import storage.index.*;
+import util.TypeParser;
+import sql.SQLTerm;
+import datamanipulation.CsvReader;
+import datamanipulation.CsvWriter;
 import util.validation.Validator;
 import java.io.IOException;
 import java.text.ParseException;
@@ -32,6 +39,7 @@ public class DBApp implements IDatabase {
 	private CsvWriter writer;
 	private Object clusteringKey;
 	private String clusteringKeyValue;
+
 
 	public DBApp() {
 		this.myTables = new HashSet<>();
@@ -161,6 +169,7 @@ public class DBApp implements IDatabase {
 
 		takeAction(Action.DELETE, strTableName, htblColNameValue);
 	}
+	
 
 	/**
 	 * Performs an action (insert, delete, or update) on a table.
@@ -259,11 +268,19 @@ public class DBApp implements IDatabase {
 		return result.iterator();
 	}
 
-	// TODO : add the method body
-
 	@Override
 	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException {
-
+		Validator.validateTable(strTableName, myTables);
+		Table table = Serializer.deserializeTable(strTableName);
+		Validator.validateCreatIndex(table, strarrColName);
+		OctreeBounds bounds = createBounds(strarrColName);
+		OctreeIndex index = new OctreeIndex (bounds, strarrColName[0], strarrColName[1], strarrColName[2]);
+		table.getIndices().add(index);
+		if (!table.isEmpty()) {
+			insertExisitngTuples(strTableName, index, table);
+		}
+		String indexName = strarrColName[0]+ strarrColName[1]+ strarrColName[2] + "Index";
+		updateCsvFile(strTableName, indexName);
 	}
 
 	public Iterator parseSQL(StringBuffer strbufSQL) throws
@@ -272,4 +289,42 @@ public class DBApp implements IDatabase {
 		Iterator result = parser.parse(strbufSQL);
 		return result;
 	}
+}
+	
+	private void updateCsvFile(String strTableName, String indexName) {
+		CsvReader cr = new CsvReader();
+		String tablename = strTableName;
+		List<String[]> tableInfo = cr.readAll();
+		int size = tableInfo.size();
+		for (int i = 0; i < size; i++) {
+			if (tableInfo.get(i)[0].equals(strTableName)) {
+				tableInfo.get(i)[Constants.INDEX_NAME_INDEX] = indexName;
+				tableInfo.get(i)[Constants.INDEX_TYPE_INDEX] = "Octree";
+			}
+		}
+		CsvWriter cw = new CsvWriter();
+		try {
+			cw.writeAll(tableInfo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void insertExisitngTuples(String strTableName, OctreeIndex index, Table table) throws DBAppException {
+		int numOfPages = table.getPagesName().size();
+		for (int i=0; i<numOfPages; i++) {
+			Page page = table.getPageAtPosition(i); 
+			Vector<Tuple> tuples = page.getTuples();
+			for (Tuple tuple : tuples) {
+				index.add(page, tuple);
+			}
+		}
+	}
+	
+	private OctreeBounds createBounds (String[] strarrColName) {
+		return new OctreeBounds (0, 0, 0,
+				1, 1, 1);
+	}
+	
+
 }

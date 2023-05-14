@@ -19,6 +19,7 @@ public class Validator {
 	private static String[] pk;
 	private static Object[] min;
 	private static Object[] max;
+	private static String[] indexName;
 
 	public static void validateTableCreation(HashSet<String> appTables, String strTableName,
 			String strClusteringKeyColumn, Hashtable<String, String> htblColNameType,
@@ -86,6 +87,15 @@ public class Validator {
 //		if (!validTupleUpdate(table, htblColNameValue))
 //			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
+	
+	public static void validateCreatIndex(Table table, String[] strarrColName) throws DBAppException {
+		getTableInfo(table);
+		if (!numberOfColumnsInIndex(strarrColName)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_IN_INDEX_SIZE);
+		} else if (!checkindex(strarrColName)) {
+			throw new DBAppException(Constants.ERROR_MESSAGE_INDEX_FOUND);
+		}
+	}
 
 	public static void validateTable(String tableName, HashSet<String> myTables) throws DBAppException {
 		if (!isValidTable(tableName, myTables)) {
@@ -99,6 +109,27 @@ public class Validator {
 			return true;
 		}
 		return false;
+	}
+	
+	private static boolean numberOfColumnsInIndex(String[] strarrColName) {
+		if (strarrColName.length==3) {
+			return true;
+		}
+		return false;
+	}
+	
+	private static boolean checkindex(String[] strarrColName) {
+		int tableColumnsLength = columns.length;
+		for (String colName : strarrColName) {
+			for (int i=0; i<tableColumnsLength; i++) {
+				if (colName.equals(columns[i])) {
+					if (!indexName[i].equals(null)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	private static boolean validDataTypes(Hashtable<String, String> htblColNameType) {
@@ -189,8 +220,8 @@ public class Validator {
 			pk[i] = tableInfo.get(i)[Constants.PRIMARY_KEY_INDEX];
 			min[i] = tableInfo.get(i)[Constants.COL_MIN_VALUE_INDEX];
 			max[i] = tableInfo.get(i)[Constants.COL_MAX_VALUE_INDEX];
+			indexName[i] = tableInfo.get(i)[Constants.INDEX_NAME_INDEX];
 		}
-
 	}
 
 	private static void initializeAttributes(int size) {
@@ -199,6 +230,7 @@ public class Validator {
 		pk = new String[size];
 		min = new Object[size];
 		max = new Object[size];
+		indexName = new String[size];
 	}
 
 //	private static void validTupleInsert(Table table, Hashtable<String, Object> tuple)

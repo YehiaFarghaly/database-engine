@@ -29,6 +29,10 @@ public final class Constants {
 	
 	public static final String ERROR_MESSAGE_IN_TUPLE_SIZE = "The Tuple contain more columns than the table columns";
 	
+	public static final String ERROR_MESSAGE_IN_INDEX_SIZE = "The index should be created on 3 columns so enter 3 columns";
+	
+	public static final String ERROR_MESSAGE_INDEX_FOUND = "The index already was created in one of the columns, please select another columns";
+	
 	public static final String DATA_EXTENSTION = ".ser";
 
 	public static final String METADATA_PATH = "Metadata//metadata.csv";
