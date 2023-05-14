@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import com.opencsv.exceptions.CsvValidationException;
-
-import constants.Constants;
 import exceptions.DBAppException;
 import util.filecontroller.Serializer;
 import util.search.Selector;
@@ -30,7 +28,6 @@ public class DBApp implements IDatabase {
 	private CsvWriter writer;
 	private Object clusteringKey;
 	private String clusteringKeyValue;
-
 
 	public DBApp() {
 		this.myTables = new HashSet<>();
@@ -81,8 +78,8 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
-							Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-							Hashtable<String, String> htblColNameMax) throws DBAppException {
+			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
+			Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		Validator.validateTableCreation(myTables, strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin,
 				htblColNameMax);
@@ -136,7 +133,7 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-							Hashtable<String, Object> htblColNameValue) throws DBAppException {
+			Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
 		this.clusteringKeyValue = strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
@@ -160,7 +157,6 @@ public class DBApp implements IDatabase {
 
 		takeAction(Action.DELETE, strTableName, htblColNameValue);
 	}
-	
 
 	/**
 	 * Performs an action (insert, delete, or update) on a table.
@@ -264,51 +260,29 @@ public class DBApp implements IDatabase {
 		Validator.validateTable(strTableName, myTables);
 		Table table = Serializer.deserializeTable(strTableName);
 		Validator.validateCreatIndex(table, strarrColName);
-		OctreeBounds bounds = createBounds(strarrColName);
-		OctreeIndex index = new OctreeIndex (bounds, strarrColName[0], strarrColName[1], strarrColName[2]);
+		OctreeIndex index = new OctreeIndex(strarrColName[0], strarrColName[1], strarrColName[2]);
 		table.getIndices().add(index);
 		if (!table.isEmpty()) {
 			insertExisitngTuples(strTableName, index, table);
 		}
-		String indexName = strarrColName[0]+ strarrColName[1]+ strarrColName[2] + "Index";
+		String indexName = strarrColName[0] + strarrColName[1] + strarrColName[2] + "Index";
 		updateCsvFile(strTableName, indexName);
 	}
-	
-	private void updateCsvFile(String strTableName, String indexName) {
-		CsvReader cr = new CsvReader();
-		String tablename = strTableName;
-		List<String[]> tableInfo = cr.readAll();
-		int size = tableInfo.size();
-		for (int i = 0; i < size; i++) {
-			if (tableInfo.get(i)[0].equals(strTableName)) {
-				tableInfo.get(i)[Constants.INDEX_NAME_INDEX] = indexName;
-				tableInfo.get(i)[Constants.INDEX_TYPE_INDEX] = "Octree";
-			}
-		}
+
+	private void updateCsvFile(String strTableName, String indexName) throws DBAppException {
 		CsvWriter cw = new CsvWriter();
-		try {
-			cw.writeAll(tableInfo);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		cw.updateCsvFile(strTableName, indexName);
 	}
-	
+
 	private void insertExisitngTuples(String strTableName, OctreeIndex index, Table table) throws DBAppException {
 		int numOfPages = table.getPagesName().size();
-		for (int i=0; i<numOfPages; i++) {
-			Page page = table.getPageAtPosition(i); 
+		for (int i = 0; i < numOfPages; i++) {
+			Page page = table.getPageAtPosition(i);
 			Vector<Tuple> tuples = page.getTuples();
 			for (Tuple tuple : tuples) {
 				index.add(page, tuple);
 			}
 		}
 	}
-	
-	private OctreeBounds createBounds (String[] strarrColName) {
-		return new OctreeBounds (0, 0, 0,
-				1, 1, 1);
-	}
-	
 
 }

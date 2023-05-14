@@ -3,6 +3,7 @@ package storage;
 import constants.Constants;
 import datamanipulation.CsvReader;
 import exceptions.DBAppException;
+import storage.index.DBAppNull;
 import storage.index.OctreeBounds;
 import storage.index.OctreeIndex;
 import util.filecontroller.FileCreator;
@@ -127,7 +128,7 @@ public class Table implements Serializable {
 		Tuple tuple = getPrototype();
 
 		for (Cell c : tuple.getCells()) {
-			c.setValue(htblColNameValue.get(c.getKey()));
+			c.setValue(htblColNameValue.get(c.getKey()) == null ? new DBAppNull() : htblColNameValue.get(c.getKey()));
 			if (c.getKey().equals(getPKColumn())) {
 				tuple.setPrimaryKey(c.getValue());
 			}
