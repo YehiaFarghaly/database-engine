@@ -266,6 +266,7 @@ public class DBApp implements IDatabase {
 		Validator.validateCreatIndex(table, strarrColName);
 		OctreeBounds bounds = createBounds(strarrColName);
 		OctreeIndex index = new OctreeIndex (bounds, strarrColName[0], strarrColName[1], strarrColName[2]);
+		table.getIndices().add(index);
 		if (!table.isEmpty()) {
 			insertExisitngTuples(strTableName, index);
 		}
