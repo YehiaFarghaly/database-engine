@@ -1,3 +1,4 @@
+//CHECKSTYLE:OFF
 package sql.parser;
 
 import app.DBApp;
@@ -376,4 +377,4 @@ public class MiniDBListener extends SQLiteParserBaseListener {
 
     }
 
-}
+}//CHECKSTYLE:ON

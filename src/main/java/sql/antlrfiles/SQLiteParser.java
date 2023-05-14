@@ -1,3 +1,4 @@
+//CHECKSTYLE:OFF
 package sql.antlrfiles;// Generated from SQLiteParser.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -13779,4 +13780,4 @@ public class SQLiteParser extends Parser {
 			_decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);
 		}
 	}
-}
+}//CHECKSTYLE:ON

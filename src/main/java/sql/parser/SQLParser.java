@@ -1,3 +1,4 @@
+//CHECKSTYLE:OFF
 package sql.parser;
 
 import app.DBApp;
@@ -29,4 +30,4 @@ public class SQLParser {
         return miniDBListener.getResult();
 
     }
-}
+}//CHECKSTYLE:ON

@@ -1,3 +1,4 @@
+//CHECKSTYLE:OFF
 package sql.antlrfiles;// Generated from SQLiteParser.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -787,4 +788,4 @@ public class SQLiteParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> impl
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitAny_name(SQLiteParser.Any_nameContext ctx) { return visitChildren(ctx); }
-}
+}//CHECKSTYLE:ON

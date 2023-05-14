@@ -1,3 +1,4 @@
+//CHECKSTYLE:OFF
 package sql.antlrfiles;// Generated from SQLiteParser.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -675,4 +676,4 @@ public interface SQLiteParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitAny_name(SQLiteParser.Any_nameContext ctx);
-}
+}//CHECKSTYLE:ON

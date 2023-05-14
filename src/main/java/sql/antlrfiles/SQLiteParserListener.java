@@ -1,3 +1,4 @@
+//CHECKSTYLE:OFF
 package sql.antlrfiles;// Generated from SQLiteParser.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -1116,4 +1117,4 @@ public interface SQLiteParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAny_name(SQLiteParser.Any_nameContext ctx);
-}
+}//CHECKSTYLE:ON

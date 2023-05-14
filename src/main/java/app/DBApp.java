@@ -1,4 +1,5 @@
 package app;
+
 import sql.parser.SQLParser;
 import com.opencsv.exceptions.CsvValidationException;
 import datamanipulation.CsvReader;
@@ -11,7 +12,6 @@ import util.TypeParser;
 import util.filecontroller.Serializer;
 import util.search.Selector;
 import util.validation.Validator;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashSet;
@@ -260,10 +260,12 @@ public class DBApp implements IDatabase {
 	}
 
 	// TODO : add the method body
+
 	@Override
 	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException {
 
 	}
+
 	public Iterator parseSQL(StringBuffer strbufSQL) throws
 			DBAppException {
 		SQLParser parser = new SQLParser(this);

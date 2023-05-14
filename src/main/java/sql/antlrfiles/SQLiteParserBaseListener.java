@@ -1,3 +1,4 @@
+//CHECKSTYLE:OFF
 package sql.antlrfiles;// Generated from SQLiteParser.g4 by ANTLR 4.9.2
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -1367,4 +1368,4 @@ public class SQLiteParserBaseListener implements SQLiteParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void visitErrorNode(ErrorNode node) { }
-}
+}//CHECKSTYLE:ON
