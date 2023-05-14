@@ -1,4 +1,4 @@
-package sql.parser;// Generated from SQLiteParser.g4 by ANTLR 4.9.3
+package sql.antlrfiles;// Generated from SQLiteParser.g4 by ANTLR 4.9.2
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -435,30 +435,6 @@ public class SQLiteParserBaseListener implements SQLiteParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterValue_row(SQLiteParser.Value_rowContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitValue_row(SQLiteParser.Value_rowContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterValues_clause(SQLiteParser.Values_clauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitValues_clause(SQLiteParser.Values_clauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterInsert_stmt(SQLiteParser.Insert_stmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -466,18 +442,6 @@ public class SQLiteParserBaseListener implements SQLiteParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitInsert_stmt(SQLiteParser.Insert_stmtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterReturning_clause(SQLiteParser.Returning_clauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitReturning_clause(SQLiteParser.Returning_clauseContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -927,25 +891,25 @@ public class SQLiteParserBaseListener implements SQLiteParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOffset(SQLiteParser.OffsetContext ctx) { }
+	@Override public void enterOf_OF_fset(SQLiteParser.Of_OF_fsetContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOffset(SQLiteParser.OffsetContext ctx) { }
+	@Override public void exitOf_OF_fset(SQLiteParser.Of_OF_fsetContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDefault_value(SQLiteParser.Default_valueContext ctx) { }
+	@Override public void enterDefault_DEFAULT__value(SQLiteParser.Default_DEFAULT__valueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDefault_value(SQLiteParser.Default_valueContext ctx) { }
+	@Override public void exitDefault_DEFAULT__value(SQLiteParser.Default_DEFAULT__valueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1011,13 +975,13 @@ public class SQLiteParserBaseListener implements SQLiteParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRecursive_select(SQLiteParser.Recursive_selectContext ctx) { }
+	@Override public void enterRecursive__select(SQLiteParser.Recursive__selectContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRecursive_select(SQLiteParser.Recursive_selectContext ctx) { }
+	@Override public void exitRecursive__select(SQLiteParser.Recursive__selectContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1138,6 +1102,18 @@ public class SQLiteParserBaseListener implements SQLiteParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitTable_or_index_name(SQLiteParser.Table_or_index_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNew_table_name(SQLiteParser.New_table_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNew_table_name(SQLiteParser.New_table_nameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

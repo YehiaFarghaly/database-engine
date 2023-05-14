@@ -1,18 +1,22 @@
 package app;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.*;
 import com.opencsv.exceptions.CsvValidationException;
-import exceptions.DBAppException;
-import util.filecontroller.Serializer;
-import storage.*;
-import util.TypeParser;
-import util.search.*;
-import sql.SQLTerm;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
+import exceptions.DBAppException;
+import sql.SQLTerm;
+import sql.parser.SQLParser;
+import storage.Table;
+import util.TypeParser;
+import util.filecontroller.Serializer;
+import util.search.Selector;
 import util.validation.Validator;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
 
 /**
  * The DBApp class represents a database management system. It implements the
@@ -49,7 +53,6 @@ public class DBApp implements IDatabase {
 	/**
 	 * Initializes the database management system by reading all the tables from CSV
 	 * file
-	 * 
 	 */
 	@Override
 	public void init() {
@@ -60,7 +63,7 @@ public class DBApp implements IDatabase {
 
 	/**
 	 * Creates a new table in the system with the specified parameters.
-	 * 
+	 *
 	 * @param strTableName           The name of the table.
 	 * @param strClusteringKeyColumn The name of the clustering key column.
 	 * @param htblColNameType        A Hashtable containing the name and data type
@@ -69,7 +72,6 @@ public class DBApp implements IDatabase {
 	 *                               value of each column in the table.
 	 * @param htblColNameMax         A Hashtable containing the name and maximum
 	 *                               value of each column in the table.
-	 * 
 	 * @throws DBAppException If the table name is invalid or if the table already
 	 *                        exists.
 	 * @throws ParseException
@@ -77,8 +79,8 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
-			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException {
+							Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
+							Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		Validator.validateTableCreation(myTables, strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin,
 				htblColNameMax);
@@ -97,11 +99,10 @@ public class DBApp implements IDatabase {
 
 	/**
 	 * Inserts a new record into the specified table.
-	 * 
+	 *
 	 * @param strTableName     The name of the table.
 	 * @param htblColNameValue A Hashtable containing the name and value of each
 	 *                         column in the record.
-	 * 
 	 * @throws DBAppException         If the table name is invalid, the record data
 	 *                                is invalid or the record already exists.
 	 * @throws CsvValidationException If the record fails CSV validation.
@@ -120,12 +121,11 @@ public class DBApp implements IDatabase {
 
 	/**
 	 * Updates a record in a table.
-	 * 
+	 *
 	 * @param strTableName          the name of the table to update a record in.
 	 * @param strClusteringKeyValue the value of the clustering key for the record
 	 *                              to be updated.
 	 * @param htblColNameValue      the new values for the record.
-	 * 
 	 * @throws DBAppException         if there is an error with the database
 	 *                                operations.
 	 * @throws CsvValidationException if there is an error with the CSV file.
@@ -135,17 +135,16 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+							Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		this.clusteringKeyValue = strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
 	}
 
 	/**
 	 * Deletes records from a table.
-	 * 
+	 *
 	 * @param strTableName     the name of the table to delete records from.
 	 * @param htblColNameValue the values to match records to be deleted.
-	 * 
 	 * @throws DBAppException         if there is an error with the database
 	 *                                operations.
 	 * @throws CsvValidationException if there is an error with the CSV file.
@@ -160,11 +159,10 @@ public class DBApp implements IDatabase {
 
 	/**
 	 * Performs an action (insert, delete, or update) on a table.
-	 * 
+	 *
 	 * @param action           the action to perform.
 	 * @param strTableName     the name of the table to perform the action on.
 	 * @param htblColNameValue the values to use for the action.
-	 * 
 	 * @throws DBAppException         if there is an error with the database
 	 *                                operations.
 	 * @throws CsvValidationException if there is an error with the CSV file.
@@ -209,7 +207,7 @@ public class DBApp implements IDatabase {
 		htblColNameValue.put(table.getPKColumn(), clusteringKey);
 		Validator.validateUpdateInput(table, htblColNameValue, myTables);
 		if (Validator.foundPK(table, htblColNameValue))
-		table.updateRecordsInTaple(clusteringKey, htblColNameValue);
+			table.updateRecordsInTaple(clusteringKey, htblColNameValue);
 	}
 
 	private void castClusteringKeyType(Table table) {
@@ -223,6 +221,13 @@ public class DBApp implements IDatabase {
 	//TODO : add the method body
 	@Override
 	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException {
-		
+
+	}
+
+	public Iterator parseSQL(StringBuffer strbufSQL) throws
+			DBAppException {
+		SQLParser parser = new SQLParser(this);
+		Iterator result = parser.parse(strbufSQL);
+		return result;
 	}
 }

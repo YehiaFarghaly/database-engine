@@ -1,4 +1,4 @@
-package sql.parser;// Generated from SQLiteParser.g4 by ANTLR 4.9.3
+package sql.antlrfiles;// Generated from SQLiteParser.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -220,29 +220,11 @@ public interface SQLiteParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLiteral_value(SQLiteParser.Literal_valueContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SQLiteParser#value_row}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitValue_row(SQLiteParser.Value_rowContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SQLiteParser#values_clause}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitValues_clause(SQLiteParser.Values_clauseContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link SQLiteParser#insert_stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitInsert_stmt(SQLiteParser.Insert_stmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SQLiteParser#returning_clause}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitReturning_clause(SQLiteParser.Returning_clauseContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SQLiteParser#upsert_clause}.
 	 * @param ctx the parse tree
@@ -466,17 +448,17 @@ public interface SQLiteParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitWindow_function(SQLiteParser.Window_functionContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SQLiteParser#offset}.
+	 * Visit a parse tree produced by {@link SQLiteParser#of_OF_fset}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOffset(SQLiteParser.OffsetContext ctx);
+	T visitOf_OF_fset(SQLiteParser.Of_OF_fsetContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SQLiteParser#default_value}.
+	 * Visit a parse tree produced by {@link SQLiteParser#default_DEFAULT__value}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDefault_value(SQLiteParser.Default_valueContext ctx);
+	T visitDefault_DEFAULT__value(SQLiteParser.Default_DEFAULT__valueContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SQLiteParser#partition_by}.
 	 * @param ctx the parse tree
@@ -508,11 +490,11 @@ public interface SQLiteParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitInitial_select(SQLiteParser.Initial_selectContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SQLiteParser#recursive_select}.
+	 * Visit a parse tree produced by {@link SQLiteParser#recursive__select}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRecursive_select(SQLiteParser.Recursive_selectContext ctx);
+	T visitRecursive__select(SQLiteParser.Recursive__selectContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SQLiteParser#unary_operator}.
 	 * @param ctx the parse tree
@@ -573,6 +555,12 @@ public interface SQLiteParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTable_or_index_name(SQLiteParser.Table_or_index_nameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SQLiteParser#new_table_name}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNew_table_name(SQLiteParser.New_table_nameContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SQLiteParser#column_name}.
 	 * @param ctx the parse tree

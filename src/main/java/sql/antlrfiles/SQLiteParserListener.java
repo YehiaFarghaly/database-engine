@@ -1,4 +1,4 @@
-package sql.parser;// Generated from SQLiteParser.g4 by ANTLR 4.9.3
+package sql.antlrfiles;// Generated from SQLiteParser.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -357,26 +357,6 @@ public interface SQLiteParserListener extends ParseTreeListener {
 	 */
 	void exitLiteral_value(SQLiteParser.Literal_valueContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link SQLiteParser#value_row}.
-	 * @param ctx the parse tree
-	 */
-	void enterValue_row(SQLiteParser.Value_rowContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SQLiteParser#value_row}.
-	 * @param ctx the parse tree
-	 */
-	void exitValue_row(SQLiteParser.Value_rowContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SQLiteParser#values_clause}.
-	 * @param ctx the parse tree
-	 */
-	void enterValues_clause(SQLiteParser.Values_clauseContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SQLiteParser#values_clause}.
-	 * @param ctx the parse tree
-	 */
-	void exitValues_clause(SQLiteParser.Values_clauseContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link SQLiteParser#insert_stmt}.
 	 * @param ctx the parse tree
 	 */
@@ -386,16 +366,6 @@ public interface SQLiteParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitInsert_stmt(SQLiteParser.Insert_stmtContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SQLiteParser#returning_clause}.
-	 * @param ctx the parse tree
-	 */
-	void enterReturning_clause(SQLiteParser.Returning_clauseContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SQLiteParser#returning_clause}.
-	 * @param ctx the parse tree
-	 */
-	void exitReturning_clause(SQLiteParser.Returning_clauseContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SQLiteParser#upsert_clause}.
 	 * @param ctx the parse tree
@@ -767,25 +737,25 @@ public interface SQLiteParserListener extends ParseTreeListener {
 	 */
 	void exitWindow_function(SQLiteParser.Window_functionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link SQLiteParser#offset}.
+	 * Enter a parse tree produced by {@link SQLiteParser#of_OF_fset}.
 	 * @param ctx the parse tree
 	 */
-	void enterOffset(SQLiteParser.OffsetContext ctx);
+	void enterOf_OF_fset(SQLiteParser.Of_OF_fsetContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link SQLiteParser#offset}.
+	 * Exit a parse tree produced by {@link SQLiteParser#of_OF_fset}.
 	 * @param ctx the parse tree
 	 */
-	void exitOffset(SQLiteParser.OffsetContext ctx);
+	void exitOf_OF_fset(SQLiteParser.Of_OF_fsetContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link SQLiteParser#default_value}.
+	 * Enter a parse tree produced by {@link SQLiteParser#default_DEFAULT__value}.
 	 * @param ctx the parse tree
 	 */
-	void enterDefault_value(SQLiteParser.Default_valueContext ctx);
+	void enterDefault_DEFAULT__value(SQLiteParser.Default_DEFAULT__valueContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link SQLiteParser#default_value}.
+	 * Exit a parse tree produced by {@link SQLiteParser#default_DEFAULT__value}.
 	 * @param ctx the parse tree
 	 */
-	void exitDefault_value(SQLiteParser.Default_valueContext ctx);
+	void exitDefault_DEFAULT__value(SQLiteParser.Default_DEFAULT__valueContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SQLiteParser#partition_by}.
 	 * @param ctx the parse tree
@@ -837,15 +807,15 @@ public interface SQLiteParserListener extends ParseTreeListener {
 	 */
 	void exitInitial_select(SQLiteParser.Initial_selectContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link SQLiteParser#recursive_select}.
+	 * Enter a parse tree produced by {@link SQLiteParser#recursive__select}.
 	 * @param ctx the parse tree
 	 */
-	void enterRecursive_select(SQLiteParser.Recursive_selectContext ctx);
+	void enterRecursive__select(SQLiteParser.Recursive__selectContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link SQLiteParser#recursive_select}.
+	 * Exit a parse tree produced by {@link SQLiteParser#recursive__select}.
 	 * @param ctx the parse tree
 	 */
-	void exitRecursive_select(SQLiteParser.Recursive_selectContext ctx);
+	void exitRecursive__select(SQLiteParser.Recursive__selectContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SQLiteParser#unary_operator}.
 	 * @param ctx the parse tree
@@ -946,6 +916,16 @@ public interface SQLiteParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTable_or_index_name(SQLiteParser.Table_or_index_nameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link SQLiteParser#new_table_name}.
+	 * @param ctx the parse tree
+	 */
+	void enterNew_table_name(SQLiteParser.New_table_nameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link SQLiteParser#new_table_name}.
+	 * @param ctx the parse tree
+	 */
+	void exitNew_table_name(SQLiteParser.New_table_nameContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SQLiteParser#column_name}.
 	 * @param ctx the parse tree
