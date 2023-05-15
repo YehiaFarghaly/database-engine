@@ -1,1 +1,5 @@
-
+"table","gpa","java.lang.Double","FALSE","agesalarygpaIndex","Octree","0.7","4"
+"table","age","java.lang.Integer","FALSE","agesalarygpaIndex","Octree","1","100"
+"table","name","java.lang.String","FALSE","null","null","aaaa","zzzz"
+"table","salary","java.lang.Integer","FALSE","agesalarygpaIndex","Octree","1000","10000"
+"table","id","java.lang.Integer","TRUE","null","null","0","1000"

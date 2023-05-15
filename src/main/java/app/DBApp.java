@@ -260,18 +260,19 @@ public class DBApp implements IDatabase {
 		Validator.validateTable(strTableName, myTables);
 		Table table = Serializer.deserializeTable(strTableName);
 		Validator.validateCreatIndex(table, strarrColName);
-		OctreeIndex index = new OctreeIndex(strarrColName[0], strarrColName[1], strarrColName[2]);
+		OctreeIndex index = new OctreeIndex(strTableName, strarrColName[0], strarrColName[1], strarrColName[2]);
 		table.getIndices().add(index);
 		if (!table.isEmpty()) {
 			insertExisitngTuples(strTableName, index, table);
 		}
 		String indexName = strarrColName[0] + strarrColName[1] + strarrColName[2] + "Index";
-		updateCsvFile(strTableName, indexName);
+		updateCsvFile(strTableName, indexName, strarrColName);
+		Serializer.serializeTable(table);
 	}
 
-	private void updateCsvFile(String strTableName, String indexName) throws DBAppException {
+	private void updateCsvFile(String strTableName, String indexName, String[] strarrColName) throws DBAppException {
 		CsvWriter cw = new CsvWriter();
-		cw.updateCsvFile(strTableName, indexName);
+		cw.updateCsvFile(strTableName, indexName, strarrColName);
 	}
 
 	private void insertExisitngTuples(String strTableName, OctreeIndex index, Table table) throws DBAppException {

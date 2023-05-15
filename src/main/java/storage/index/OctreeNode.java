@@ -230,19 +230,19 @@ public class OctreeNode<T> implements Serializable {
 		return sb.toString();
 	}
 
-	protected OctreeBounds getBounds() {
+	public OctreeBounds getBounds() {
 		return bounds;
 	}
 
-	protected List<Item<T>> getItems() {
+	public List<Item<T>> getItems() {
 		return items;
 	}
 
-	protected OctreeNode<T>[] getChildren() {
+	public OctreeNode<T>[] getChildren() {
 		return children;
 	}
 
-	protected int getMaxSize() {
+	public int getMaxSize() {
 		return maxSize;
 	}
 }

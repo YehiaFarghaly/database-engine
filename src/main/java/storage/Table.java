@@ -247,7 +247,7 @@ public class Table implements Serializable {
 			System.out.println(pageName);
 			System.out.println();
 			Page page = Serializer.deserializePage(name,
-					pagesName.get(pagesName.indexOf((pageName.split("//")[1]).split(".ser")[0])));
+					pagesName.get(getPageIdxFromPath(pageName)));
 			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
 			deletePageRecords(toBeDeleted, page);
 		}
@@ -268,6 +268,10 @@ public class Table implements Serializable {
 			}
 		}
 		return null;
+	}
+	
+	private int getPageIdxFromPath(String pageName) {
+		return pagesName.indexOf((pageName.split("//")[1]).split(".ser")[0]);
 	}
 
 	public void normalDelete(Hashtable<String, Object> htblColNameValue) throws DBAppException {

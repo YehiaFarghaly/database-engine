@@ -157,7 +157,6 @@ public class Page implements Serializable {
 				c.setValue(htblColNameValue.get(c.getKey()));
 		}
 
-		// TODO: complete the update
 		Tuple newTuple = createTuple(htblColNameValue);
 		populateToIndex(newTuple, Action.INSERT, indices);
 		Serializer.serializePage(name, this);

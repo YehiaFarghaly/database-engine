@@ -123,7 +123,7 @@ public class Validator {
 		for (String colName : strarrColName) {
 			for (int i=0; i<tableColumnsLength; i++) {
 				if (colName.equals(columns[i])) {
-					if (!indexName[i].equals(null)) {
+					if (!indexName[i].equals("null")) {
 						return false;
 					}
 				}
