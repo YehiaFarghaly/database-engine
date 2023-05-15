@@ -1,39 +1,33 @@
 package app;
 
-import sql.parser.SQLParser;
 import com.opencsv.exceptions.CsvValidationException;
-
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
-import constants.Constants;
-
 import exceptions.DBAppException;
 import sql.SQLTerm;
+import sql.parser.SQLParser;
+import storage.Page;
 import storage.Table;
 import storage.Tuple;
+import storage.index.OctreeIndex;
 import util.TypeParser;
 import util.filecontroller.Serializer;
 import util.search.Selector;
-import storage.*;
-import storage.index.*;
-import util.TypeParser;
-import sql.SQLTerm;
-import datamanipulation.CsvReader;
-import datamanipulation.CsvWriter;
 import util.validation.Validator;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
-
 /**
  * The DBApp class represents a database management system. It implements the
  * IDatabase interface and provides methods for initializing the system,
  * creating tables, creating indices, inserting, updating and deleting records,
  * and selecting records using SQL terms.
  */
+
 public class DBApp implements IDatabase {
 
 	private HashSet<String> myTables;
@@ -283,38 +277,9 @@ public class DBApp implements IDatabase {
 		Serializer.serializeTable(table);
 	}
 
-  
-	public Iterator parseSQL(StringBuffer strbufSQL) throws
-			DBAppException {
-		SQLParser parser = new SQLParser(this);
-		Iterator result = parser.parse(strbufSQL);
-		return result;
-	}
-}
-	
-	private void updateCsvFile(String strTableName, String indexName) {
-		CsvReader cr = new CsvReader();
-		String tablename = strTableName;
-		List<String[]> tableInfo = cr.readAll();
-		int size = tableInfo.size();
-		for (int i = 0; i < size; i++) {
-			if (tableInfo.get(i)[0].equals(strTableName)) {
-				tableInfo.get(i)[Constants.INDEX_NAME_INDEX] = indexName;
-				tableInfo.get(i)[Constants.INDEX_TYPE_INDEX] = "Octree";
-			}
-		}
-		CsvWriter cw = new CsvWriter();
-		try {
-			cw.writeAll(tableInfo);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    
-    
 	private void updateCsvFile(String strTableName, String indexName, String[] strarrColName) throws DBAppException {
 		CsvWriter cw = new CsvWriter();
 		cw.updateCsvFile(strTableName, indexName, strarrColName);
-
 	}
 
 	private void insertExisitngTuples(String strTableName, OctreeIndex index, Table table) throws DBAppException {
@@ -328,4 +293,10 @@ public class DBApp implements IDatabase {
 		}
 	}
 
+	public Iterator parseSQL(StringBuffer strbufSQL) throws
+			DBAppException {
+		SQLParser parser = new SQLParser(this);
+		Iterator result = parser.parse(strbufSQL);
+		return result;
+	}
 }
