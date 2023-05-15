@@ -6,7 +6,6 @@ import constants.Constants;
 import exceptions.DBAppException;
 import util.filecontroller.ConfigReader;
 
-
 public class OctreeNode<T> implements Serializable {
 	private static final long serialVersionUID = 4771709168704730297L;
 	private final OctreeBounds bounds;

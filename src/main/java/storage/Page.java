@@ -70,7 +70,6 @@ public class Page implements Serializable {
 		this.name = name;
 	}
 
-
 	public boolean isEmpty() {
 		return tuples.size() == 0;
 	}
@@ -81,10 +80,14 @@ public class Page implements Serializable {
 
 	protected Tuple removeLastTuple(Vector<OctreeIndex<?>> indices) throws DBAppException {
 		Tuple ret = tuples.remove(tuples.size() - 1);
-		deleteHelper(ret, indices);
+		newMinMax();
+		for (OctreeIndex<?> index : indices) {
+			index.removeOneTuple(this, ret);
+		}
+		Serializer.serializePage(name, this);
 		return ret;
 	}
-	
+
 	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) {
 		return PageSearch.linearSearchWithOperator(this, operator, colNameValue);
 	}
@@ -115,15 +118,11 @@ public class Page implements Serializable {
 	protected void deleteFromPage(Tuple tuple, Vector<OctreeIndex<?>> indices) throws DBAppException {
 		int position = pageBinarySearch(tuple.getPrimaryKey());
 		tuples.remove(position);
-		deleteHelper(tuple, indices);
-		handleEmptyPage();
-
-	}
-	
-	private void deleteHelper(Tuple tuple, Vector<OctreeIndex<?>> indices ) throws DBAppException {
 		newMinMax();
 		populateToIndex(tuple, Action.DELETE, indices);
 		Serializer.serializePage(name, this);
+		handleEmptyPage();
+
 	}
 
 	private void handleEmptyPage() {
@@ -145,13 +144,13 @@ public class Page implements Serializable {
 		}
 	}
 
-	protected void updateTuple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue, Vector<OctreeIndex<?>> indices)
-			throws DBAppException {
-		
+	protected void updateTuple(Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue,
+			Vector<OctreeIndex<?>> indices) throws DBAppException {
+
 		int pkVectorPoition = pageBinarySearch(clusteringKeyValue);
 		Tuple oldTuple = tuples.get(pkVectorPoition);
 		populateToIndex(oldTuple, Action.DELETE, indices);
-		
+
 		for (Cell c : oldTuple.getCells()) {
 			if (htblColNameValue.get(c.getKey()) != null)
 				c.setValue(htblColNameValue.get(c.getKey()));
@@ -162,20 +161,21 @@ public class Page implements Serializable {
 		Serializer.serializePage(name, this);
 	}
 
-	private Tuple createTuple(Hashtable<String, Object> colNameValue){
+	private Tuple createTuple(Hashtable<String, Object> colNameValue) {
 		Tuple ret = new Tuple();
 		CsvReader reader = new CsvReader();
 		ArrayList<String[]> arr = reader.readTable(tableName);
 		ArrayList<String> columnNames = new ArrayList<>();
-		for (String[] columns: arr){
+		for (String[] columns : arr) {
 			columnNames.add(columns[1]);
 		}
-		for (String attribute: columnNames ){
-			ret.getCells().add( new Cell(attribute, colNameValue.get(attribute)==null?new DBAppNull():colNameValue.get(attribute)));
+		for (String attribute : columnNames) {
+			ret.getCells().add(new Cell(attribute,
+					colNameValue.get(attribute) == null ? new DBAppNull() : colNameValue.get(attribute)));
 		}
 		return ret;
 	}
-	
+
 	private void populateToIndex(Tuple tuple, Action action, Vector<OctreeIndex<?>> indices) throws DBAppException {
 
 		for (OctreeIndex<?> index : indices) {
@@ -191,5 +191,5 @@ public class Page implements Serializable {
 		PagePrinter print = new PagePrinter(this);
 		print.printPage();
 	}
-	
+
 }

@@ -57,15 +57,29 @@ public class OctreeIndex<T> implements Serializable {
 
 	}
 
+	public void removeOneTuple(Page page, Tuple tuple) throws DBAppException {
+		if (!suitableIndex(tuple))
+			return;
+		OctreeBounds itemBounds = getBoundsForRemove(tuple);
+
+		root.remove(Serializer.getPath(page.getTableName(), page.getName()), itemBounds);
+	}
+
 	public void remove(Page page, Tuple tuple) throws DBAppException {
 		if (!suitableIndex(tuple))
 			return;
-		String ref = Serializer.getPath(page.getTableName(), page.getName());
+
+		OctreeBounds itemBounds = getBoundsForRemove(tuple);
+
+		root.remove(null, itemBounds);
+	}
+
+	private OctreeBounds getBoundsForRemove(Tuple tuple) {
 		Object x = tuple.get(colName1);
 		Object y = tuple.get(colName2);
 		Object z = tuple.get(colName3);
 		OctreeBounds itemBounds = new OctreeBounds(x, y, z, x, y, z);
-		root.remove(ref, itemBounds);
+		return itemBounds;
 	}
 
 	public List<Object> query(OctreeBounds searchBounds) throws DBAppException {
