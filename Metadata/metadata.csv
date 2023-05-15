@@ -1,4 +1,3 @@
-
 "6911992077","age","java.lang.Integer","false","null","null","1","100"
 "6911992077","name","java.lang.String","false","null","null","A","zzzzzzzzzzzzz"
 "6911992077","id","java.lang.Integer","true","null","null","0","100000"
@@ -253,3 +252,8 @@
 "5214784104","id","java.lang.Integer","true","null","null","0","100000"
 "employees","employee_id","java.lang.Integer","true","null","null","-2147483648","2147483647"
 "employees","id","java.lang.Integer","false","null","null","-2147483648","2147483647"
+"table","gpa","java.lang.Double","FALSE","agesalarygpaIndex","Octree","0.7","4"
+"table","age","java.lang.Integer","FALSE","agesalarygpaIndex","Octree","1","100"
+"table","name","java.lang.String","FALSE","null","null","aaaa","zzzz"
+"table","salary","java.lang.Integer","FALSE","agesalarygpaIndex","Octree","1000","10000"
+"table","id","java.lang.Integer","TRUE","null","null","0","1000"

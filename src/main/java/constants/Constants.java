@@ -121,6 +121,9 @@ public final class Constants {
 
 	public static final String ERROR_MESSAGE_UNKNOWN_OPERATOR = "The only allowed operators are =, >, <, >=, <=, and !=";
 
+
+	public static final int NUM_OF_DIMENSIONS = 3;
+
 	public static final int NUMBER_OF_NODE_CHILDREN = 8;
 
 	public static final int ASCII_OF_FIRST_ALPHAPET = 97;

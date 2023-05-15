@@ -3,6 +3,8 @@ package storage;
 import java.io.Serializable;
 import java.util.Vector;
 
+import storage.index.DBAppNull;
+
 public class Tuple implements Cloneable, ITuple, Serializable {
 
 	/**
@@ -39,7 +41,7 @@ public class Tuple implements Cloneable, ITuple, Serializable {
 	}
 
 	public boolean contains(String key) {
-		if (get(key) != null)
+		if (!(get(key) instanceof DBAppNull))
 			return true;
 		return false;
 	}

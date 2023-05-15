@@ -1,19 +1,21 @@
 package storage.index;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Vector;
 
-public class Item<T> {
+public class Item<T> implements Serializable {
 
+	private static final long serialVersionUID = 5164015443193314963L;
 	private Object x, y, z, data;
-	private List<Object> duplicates;
+	private Vector<Object> duplicates;
 
 	public Item(Object x, Object y, Object z, Object data) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.data = data;
-		this.duplicates = new ArrayList<>();
+		this.duplicates = new Vector<>();
 	}
 
 	@Override

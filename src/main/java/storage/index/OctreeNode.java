@@ -1,12 +1,14 @@
 package storage.index;
 
+import java.io.Serializable;
 import java.util.*;
 import constants.Constants;
 import exceptions.DBAppException;
 import util.filecontroller.ConfigReader;
 
 
-class OctreeNode<T> {
+public class OctreeNode<T> implements Serializable {
+	private static final long serialVersionUID = 4771709168704730297L;
 	private final OctreeBounds bounds;
 	private final List<Item<T>> items;
 	private final OctreeNode<T>[] children;
@@ -228,19 +230,19 @@ class OctreeNode<T> {
 		return sb.toString();
 	}
 
-	protected OctreeBounds getBounds() {
+	public OctreeBounds getBounds() {
 		return bounds;
 	}
 
-	protected List<Item<T>> getItems() {
+	public List<Item<T>> getItems() {
 		return items;
 	}
 
-	protected OctreeNode<T>[] getChildren() {
+	public OctreeNode<T>[] getChildren() {
 		return children;
 	}
 
-	protected int getMaxSize() {
+	public int getMaxSize() {
 		return maxSize;
 	}
 }
