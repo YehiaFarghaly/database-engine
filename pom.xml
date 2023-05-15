@@ -42,8 +42,10 @@
 
 		<dependency>
 			<groupId>org.antlr</groupId>
+
 			<artifactId>antlr4</artifactId>
-			<version>4.12.0</version>
+			<!--	DO NOT CHANGE THE VERSION OTHERWISE THE SQL PARSER WON'T WORK-->
+			<version>4.9.2</version>
 		</dependency>
 
 		<dependency>
@@ -105,8 +107,11 @@
 						</goals>
 					</execution>
 				</executions>
+
 				<configuration>
 					<configLocation>checkstyle.xml</configLocation>
+					<suppressionsLocation>suppressions.xml</suppressionsLocation>
+					<excludes>src/main/java/sql/*</excludes>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -117,6 +122,27 @@
 					<mainClass>view.DatabaseManager</mainClass>
 				</configuration>
 			</plugin>
+
+
+<!--			<plugin>-->
+<!--				<groupId>org.antlr</groupId>-->
+<!--				<artifactId>antlr4-maven-plugin</artifactId>-->
+<!--				<version>4.9.2</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<goals>-->
+<!--							<goal>antlr4</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--				<configuration>-->
+<!--					<sourceDirectory>src/main/resources</sourceDirectory>-->
+<!--					<outputDirectory>src/main/java/</outputDirectory>-->
+<!--					<listener>true</listener>-->
+<!--					<visitor>true</visitor>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
+
 		</plugins>
 	</build>
 

@@ -1,26 +1,33 @@
 package app;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.*;
 import com.opencsv.exceptions.CsvValidationException;
-import exceptions.DBAppException;
-import util.filecontroller.Serializer;
-import util.search.Selector;
-import storage.*;
-import storage.index.*;
-import util.TypeParser;
-import sql.SQLTerm;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
+import exceptions.DBAppException;
+import sql.SQLTerm;
+import sql.parser.SQLParser;
+import storage.Page;
+import storage.Table;
+import storage.Tuple;
+import storage.index.OctreeIndex;
+import util.TypeParser;
+import util.filecontroller.Serializer;
+import util.search.Selector;
 import util.validation.Validator;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
 /**
  * The DBApp class represents a database management system. It implements the
  * IDatabase interface and provides methods for initializing the system,
  * creating tables, creating indices, inserting, updating and deleting records,
  * and selecting records using SQL terms.
  */
+
 public class DBApp implements IDatabase {
 
 	private HashSet<String> myTables;
@@ -78,8 +85,8 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
-			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException {
+							Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
+							Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		Validator.validateTableCreation(myTables, strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin,
 				htblColNameMax);
@@ -133,7 +140,7 @@ public class DBApp implements IDatabase {
 	 */
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+							Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
 		this.clusteringKeyValue = strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
@@ -286,4 +293,10 @@ public class DBApp implements IDatabase {
 		}
 	}
 
+	public Iterator parseSQL(StringBuffer strbufSQL) throws
+			DBAppException {
+		SQLParser parser = new SQLParser(this);
+		Iterator result = parser.parse(strbufSQL);
+		return result;
+	}
 }
