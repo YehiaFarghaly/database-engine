@@ -37,7 +37,7 @@
 		<module name="UnusedImports" />
 	</module>
 	<module name="LineLength">
-		<property name="max" value="160" />
+		<property name="max" value="190" />
 	</module>
 
 </module>
