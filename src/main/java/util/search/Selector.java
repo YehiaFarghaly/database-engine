@@ -10,6 +10,7 @@ import java.util.*;
 
 public class Selector {
 
+
     public static Vector<Tuple> selectOperation(Vector<Tuple> set1, Vector<Tuple> set2, String operation) {
         if (operation.equals(Constants.AND_OPERATION))
             return getANDingResults(set1, set2);

@@ -236,7 +236,7 @@ public class Table implements Serializable {
 			throws DBAppException {
 		OctreeBounds searchBounds = new OctreeBounds(minMaxValues[0], minMaxValues[1], minMaxValues[2], minMaxValues[0],
 				minMaxValues[1], minMaxValues[2]);
-		List<Object> pages = index.query(searchBounds);
+		List<Object> pages = index.query(searchBounds, 0, 0);
 		deleteByPage(pages, htblColNameValue, index);
 	}
 
@@ -246,8 +246,7 @@ public class Table implements Serializable {
 			String pageName = (String) pageObj;
 			System.out.println(pageName);
 			System.out.println();
-			Page page = Serializer.deserializePage(name,
-					pagesName.get(getPageIdxFromPath(pageName)));
+			Page page = Serializer.deserializePage(name, pagesName.get(getPageIdxFromPath(pageName)));
 			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
 			deletePageRecords(toBeDeleted, page);
 		}
@@ -269,7 +268,7 @@ public class Table implements Serializable {
 		}
 		return null;
 	}
-	
+
 	private int getPageIdxFromPath(String pageName) {
 		return pagesName.indexOf((pageName.split("//")[1]).split(".ser")[0]);
 	}
