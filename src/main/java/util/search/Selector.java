@@ -74,23 +74,27 @@ public class Selector {
 
         return applyArrOperators(result, strarrOperators).iterator();
     }
+    
+//    public static Iterator selectWithIndex(OctreeIndex index, String [] Object colValue) {
+//    	Vector<Vector<Tuple>> result = new Vector<>();
+//    	
+//    }
 
-    public static Iterator selectWithIndex(SQLTerm[] terms, String[] opr, HashMap<OctreeIndex<?>, ArrayList<Integer>> indIdx) throws DBAppException {
-
-        String tableName = terms[0]._strTableName;
-        Vector<Vector<Tuple>> finalResult = new Vector<>();
-        for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> curr : indIdx.entrySet()) {
-            ArrayList<Integer> idx = curr.getValue();
-            OctreeIndex currIndex = curr.getKey();
-            OctreeBounds octreeBounds = prepareOctreeBounds(currIndex, idx, terms);
-            List<Object> pages = curr.getKey().query(octreeBounds);
-            Vector<Vector<Tuple>> result = new Vector<>();
-            getPrimarySelectResult(pages, tableName, idx, terms, result);
-            String[] oprBetweenIndexCol = {AND_OPERATION, AND_OPERATION, AND_OPERATION};
-            finalResult.add(applyArrOperators(result, oprBetweenIndexCol));
-        }
-        return finalResult.iterator();
-    }
+//    public static Iterator selectWithIndex(SQLTerm[] terms, String[] opr, HashMap<OctreeIndex<?>, ArrayList<Integer>> indIdx) throws DBAppException {
+//        String tableName = terms[0]._strTableName;
+//        Vector<Vector<Tuple>> finalResult = new Vector<>();
+//        for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> curr : indIdx.entrySet()) {
+//            ArrayList<Integer> idx = curr.getValue();
+//            OctreeIndex currIndex = curr.getKey();
+//            OctreeBounds octreeBounds = prepareOctreeBounds(currIndex, idx, terms);
+//            List<Object> pages = curr.getKey().query(octreeBounds);
+//            Vector<Vector<Tuple>> result = new Vector<>();
+//            getPrimarySelectResult(pages, tableName, idx, terms, result);
+//            String[] oprBetweenIndexCol = {AND_OPERATION, AND_OPERATION, AND_OPERATION};
+//            finalResult.add(applyArrOperators(result, oprBetweenIndexCol));
+//        }
+//        return finalResult.iterator();
+//    }
 
     private static void getPrimarySelectResult(List<Object>pages, String tableName, ArrayList<Integer>idx, SQLTerm[]arrSQLTerms, Vector<Vector<Tuple>>result) throws DBAppException {
         for (Object tmp : pages) {
@@ -138,12 +142,12 @@ public class Selector {
     }
 
 
-    private static Vector<Tuple> selectFromTableHelper(String strTableName, Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
+    public static Vector<Tuple> selectFromTableHelper(String strTableName, Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
         Table table = Serializer.deserializeTable(strTableName);
         return table.select(colNameValue, operator);
     }
 
-    private static Vector<Tuple> applyArrOperators(Vector<Vector<Tuple>> selections, String[] strarrOperators) {
+    public static Vector<Tuple> applyArrOperators(Vector<Vector<Tuple>> selections, String[] strarrOperators) {
 
         Vector<Tuple> result = new Vector<>();
         Vector<Vector<Tuple>> tmp = new Vector<>();
