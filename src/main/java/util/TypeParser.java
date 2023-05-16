@@ -1,11 +1,11 @@
 package util;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Hashtable;
-
-import com.ibm.icu.text.SimpleDateFormat;
-
+import java.text.SimpleDateFormat;
 import constants.Constants;
+import datamanipulation.CsvReader;
 import storage.Table;
 
 public class TypeParser {
@@ -41,6 +41,17 @@ public class TypeParser {
 			}
 		}
 		return data.toString();
+	}
+
+	public static Object parseFromTable(Object data, String colName, String tableName) {
+		CsvReader reader = new CsvReader();
+		ArrayList<String[]> list = reader.readTable(tableName);
+		Object ret = null;
+		for (String[] arr : list) {
+			if (arr[Constants.COLUMN_NAME_INDEX].equals(colName))
+				ret = typeParser(data, arr[Constants.COLUMN_TYPE_INDEX]);
+		}
+		return ret;
 	}
 
 }
