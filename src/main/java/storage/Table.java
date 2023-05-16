@@ -269,8 +269,9 @@ public class Table implements Serializable {
 		}
 		return null;
 	}
-	
-	private int getPageIdxFromPath(String pageName) {
+
+	public int getPageIdxFromPath(String pageName) {
+
 		return pagesName.indexOf((pageName.split("//")[1]).split(".ser")[0]);
 	}
 
