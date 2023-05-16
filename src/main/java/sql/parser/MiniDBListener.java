@@ -191,8 +191,8 @@ public class MiniDBListener extends SQLiteParserBaseListener {
 			nameType.put(colName, type);
 
 			try {
-				colMin.put(colName, getMin(type, 1000));
-				colMax.put(colName, getMax(type, 1000));
+				colMin.put(colName, getMin(type, 1));
+				colMax.put(colName, getMax(type, 100));
 			} catch (DBAppException e) {
 				throw new RuntimeException(e);
 			}
