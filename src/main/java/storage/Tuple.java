@@ -63,4 +63,8 @@ public class Tuple implements Cloneable, ITuple, Serializable {
 		return copy;
 	}
 
+	@Override
+	public String toString() {
+		return "Tuple [cells=" + cells + ", primaryKey=" + primaryKey + "]";
+	}
 }

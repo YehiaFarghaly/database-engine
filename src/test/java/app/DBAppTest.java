@@ -769,7 +769,7 @@ public class DBAppTest {
 		for (int i = 1; i <= 10; i++)
 			insertRow(i);
 		engine.createIndex(newTableName, new String[] { age, name, id });
-
+		Table table = Serializer.deserializeTable(newTableName);
 		// When
 		SQLTerm[] sqlTerms = new SQLTerm[3];
 		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);

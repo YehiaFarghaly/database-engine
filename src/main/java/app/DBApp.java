@@ -242,25 +242,24 @@ public class DBApp implements IDatabase {
     			ArrayList<String> colNames = fillcolNames(arrSQLTerms,i);
     			for (OctreeIndex<?> index : table.getIndices()) {
     				int idx[] = new int[3]; 
-    				System.out.println("now searchn=ing for index");	
+    				//System.out.println("now searchn=ing for index");	
     				 idx[0] = colNames.indexOf(index.getColName1());
     				 idx[1] = colNames.indexOf(index.getColName2());
     				 idx[2] = colNames.indexOf(index.getColName3());
-    				 System.out.println(idx[0]+" "+idx[1]+" "+idx[2]);
+//    				 System.out.println(idx[0]+" "+idx[1]+" "+idx[2]);
+//    				 System.out.println(colNames);
     				if (idx[0]!=-1 && idx[1]!=-1 && idx[2] !=-1) {
-    					
-    					
     					SQLTerm[] arrSQLTermsIndex = new SQLTerm[3];
     					String [] columnsNames = new String [3];
     					for(int j=0;j<3;j++) {
-    						arrSQLTermsIndex[j] = arrSQLTerms[i+j];
+    						arrSQLTermsIndex[j] = arrSQLTerms[i+idx[j]];
     						columnsNames [j] = colNames.get(idx[j]);
     					}
     					
     					strarrOperators = removeFromStrarrOperators(strarrOperators,i);
     					strarrOperators = removeFromStrarrOperators(strarrOperators,i+1);
     					System.out.println("found an index");
-    					result.add(Selector.selectWithIndex(index, arrSQLTerms, columnsNames, table));
+    					result.add(Selector.selectWithIndex(index, arrSQLTermsIndex, columnsNames, table));
     					i = i + 1;
     					break;
     				}
