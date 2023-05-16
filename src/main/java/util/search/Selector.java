@@ -125,8 +125,6 @@ public class Selector {
 		Object maxbounds[] = new Object[3];
 		int minmask = 0;
 		int maxmask = 0;
-		System.out.println(min);
-		System.out.println(max);
 		for (int i = 0; i < strOperator.length; i++) {
 			if (strOperator[i].equals(Constants.EQUAL)) {
 				minbounds[i] = colNameValue.get(ColumnsNames[i]);
@@ -135,7 +133,6 @@ public class Selector {
 				minbounds[i] = colNameValue.get(ColumnsNames[i]);
 				maxbounds[i] = max.get(ColumnsNames[i]);
 			} else if (strOperator[i].equals(Constants.GREATER_THAN)) {
-				System.out.println(ColumnsNames[i]);
 				minbounds[i] = colNameValue.get(ColumnsNames[i]);
 				maxbounds[i] = max.get(ColumnsNames[i]);
 				minmask |= (1 << i);
@@ -154,7 +151,6 @@ public class Selector {
 
 		OctreeBounds bounds = new OctreeBounds(minbounds[0], minbounds[1], minbounds[2], maxbounds[0], maxbounds[1],
 				maxbounds[2]);
-		System.out.println(bounds);
 		return index.query(bounds, minmask, maxmask);
 	}
 
@@ -172,24 +168,25 @@ public class Selector {
 		List pagepathes;
 		HashSet<Integer> pagenumbers;
 		String strOperator[] = new String[arrSQLTerms.length];
-		System.out.println(arrSQLTerms.length);
 		Vector<Vector<Tuple>> result = new Vector<>();
 		Hashtable<String, Object> colNameValue = new Hashtable<>();
 		for (int i = 0; i < arrSQLTerms.length; i++) {
 			colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
 			strOperator[i] = arrSQLTerms[i]._strOperator;
-			System.out.println(strOperator[i]);
 		}
 		pagepathes = getPageIndcies(strOperator, index, ColumnsNames, colNameValue, table.getName());
 		pagenumbers = getPagesNumbers(pagepathes, table);
-		for (int i = 0; i < arrSQLTerms.length; i++) {
-			result.add(selectFromTableWithIndex(arrSQLTerms[i]._strTableName, colNameValue, arrSQLTerms[i]._strOperator,
+		int idx = 0;
+		for (String key : colNameValue.keySet()) {
+			Hashtable<String, Object> colVal = new Hashtable<>();
+			colVal.put(key, colNameValue.get(key));
+			result.add(selectFromTableWithIndex(arrSQLTerms[idx]._strTableName, colVal, arrSQLTerms[idx++]._strOperator,
 					pagenumbers));
 		}
-		for(Vector<Tuple> vv: result) {
-			System.out.println(vv);
-			System.out.println();
+		for (int i = 0; i < arrSQLTerms.length; i++) {
+
 		}
+
 		strarrOperators[0] = Constants.AND_OPERATION;
 		strarrOperators[1] = Constants.AND_OPERATION;
 		return applyArrOperators(result, strarrOperators);

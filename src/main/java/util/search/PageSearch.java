@@ -34,17 +34,14 @@ public class PageSearch {
 
 	public static Vector<Tuple> linearSearchWithOperator(Page page, String operator,
 			Hashtable<String, Object> colNameValue) {
-
 		Vector<Tuple> res = new Vector<>();
 		String key = colNameValue.keys().nextElement();
-		for(String xx :colNameValue.keySet()) {
-			key = xx;
 		for (int i = 0; i < page.getSize(); i++) {
 			Tuple tuple = page.getTuples().get(i);
 			Object tupleVal = getValueOfColInTuple(tuple, key);
 			if (operatorBasedSelection(tupleVal, colNameValue.get(key), operator))
 				res.add(tuple);
-		}}
+		}
 		return res;
 	}
 
