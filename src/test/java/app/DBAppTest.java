@@ -3,16 +3,20 @@ package app;
 import org.junit.jupiter.api.Test;
 import com.opencsv.exceptions.CsvValidationException;
 import exceptions.DBAppException;
+import sql.SQLTerm;
 import util.filecontroller.FileDeleter;
 import util.filecontroller.FileType;
 import util.filecontroller.Serializer;
 import storage.Page;
 import storage.Table;
 import storage.Tuple;
+import storage.index.OctreeBounds;
 import constants.Constants;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Hashtable;
+import java.util.Iterator;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import static org.assertj.core.api.Assertions.*;
@@ -24,7 +28,7 @@ public class DBAppTest {
 	private static String id = Constants.ID;
 	private static String name = Constants.NAME;
 	private static String age = Constants.AGE;
-	private static final String TEST_NAME = "Yehia";
+	private static final String TEST_NAME = "yehia";
 	private static final int TEST_AGE = 21;
 
 	private static void generateNewTableName() {
@@ -273,7 +277,7 @@ public class DBAppTest {
 			throws CsvValidationException, ClassNotFoundException, DBAppException, IOException {
 		// Given
 		insertRow(1);
-		Hashtable<String, Object> htblColNameValue = createRow(1, "Mohamed", TEST_AGE);
+		Hashtable<String, Object> htblColNameValue = createRow(1, "moham", TEST_AGE);
 
 		// When
 		Exception exception = assertThrows(DBAppException.class, () -> {
@@ -406,7 +410,7 @@ public class DBAppTest {
 			throws DBAppException, ClassNotFoundException, IOException {
 		// Given
 		insertRow(1);
-		String updatedName = "Mohamed";
+		String updatedName = "moham";
 		Hashtable<String, Object> htblColNameValue = new Hashtable<>();
 		htblColNameValue.put(name, updatedName);
 
@@ -636,6 +640,197 @@ public class DBAppTest {
 		String expectedMessage = Constants.ERROR_MESSAGE_TABLE_NAME;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testCreateIndex_ValidInput_ShouldCreateSuccessfully() throws DBAppException {
+		// Given
+		insertRow(1);
+		String[] columns = new String[] { id, age, name };
+
+		// When
+		engine.createIndex(newTableName, columns);
+
+		// Then
+		Table table = Serializer.deserializeTable(newTableName);
+		assertThat(table.getIndices().get(0).getRoot().getItems().size()).isEqualTo(1);
+		assertThat(table.getIndices().size()).isEqualTo(1);
+	}
+
+	@Test
+	void testCreateIndex_RepeatedIndex_ShouldFailCreation() throws DBAppException {
+		// Given
+		String[] columns = new String[] { id, age, name };
+
+		// When
+		engine.createIndex(newTableName, columns);
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.createIndex(newTableName, columns);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_INDEX_FOUND;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+
+	}
+
+	@Test
+	void testCreateIndex_InvalidTableName_ShouldFailCreation() throws DBAppException {
+
+		// Given
+		String[] columns = new String[] { id, age, name };
+
+		// When
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.createIndex("Foo", columns);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TABLE_NAME;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testInsertionIntoIndex_ValidInput_ShouldInsertIntoIndex() throws DBAppException {
+		// Given
+		String[] columns = new String[] { id, age, name };
+		engine.createIndex(newTableName, columns);
+		Table table = Serializer.deserializeTable(newTableName);
+		int oldSize = table.getIndices().get(0).getRoot().getItems().size();
+
+		// When
+		insertRow(1);
+
+		// Then
+		table = Serializer.deserializeTable(newTableName);
+		int newSize = table.getIndices().get(0).getRoot().getItems().size();
+		assertThat(newSize).isEqualTo(oldSize + 1);
+	}
+
+	@Test
+	void testUpdateTable_ValidInput_ShouldUpdateIndex() throws DBAppException {
+		// Given
+		String[] columns = new String[] { id, age, name };
+		engine.createIndex(newTableName, columns);
+		insertRow(3);
+		Table table = Serializer.deserializeTable(newTableName);
+		int oldQuerySize = table.getIndices().get(0).query(new OctreeBounds(1, 20, "bbbbb", 10, 60, "zzzzz")).size();
+
+		// When
+		Hashtable<String, Object> updateTable = new Hashtable<>();
+		updateTable.put("age", 15);
+		engine.updateTable(newTableName, "3", updateTable);
+
+		// Then
+		table = Serializer.deserializeTable(newTableName);
+		int newQuerySize = table.getIndices().get(0).query(new OctreeBounds(1, 20, "bbbbb", 10, 60, "zzzzz")).size();
+		assertThat(newQuerySize).isEqualTo(oldQuerySize - 1);
+	}
+
+	@Test
+	void testSelectFromTable_TwoORTerms_ShouldSelectSixTuples() throws DBAppException {
+		// Given
+		for (int i = 1; i <= 10; i++)
+			insertRow(i);
+
+		// When
+		SQLTerm[] sqlTerms = new SQLTerm[2];
+		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);
+		sqlTerms[1] = new SQLTerm(newTableName, id, Constants.LESS_THAN, 2);
+		String[] strArrOperator = new String[] { "OR" };
+
+		// Then
+		Iterator it = engine.selectFromTable(sqlTerms, strArrOperator);
+		assertThat(getIteratorSize(it)).isEqualTo(6);
+	}
+
+	@Test
+	void testSelectFromTable_TwoANDTerms_ShouldSelectZeroTuples() throws DBAppException {
+		// Given
+		for (int i = 1; i <= 10; i++)
+			insertRow(i);
+
+		// When
+		SQLTerm[] sqlTerms = new SQLTerm[2];
+		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);
+		sqlTerms[1] = new SQLTerm(newTableName, id, Constants.LESS_THAN, 2);
+		String[] strArrOperator = new String[] { "AND" };
+
+		// Then
+		Iterator it = engine.selectFromTable(sqlTerms, strArrOperator);
+		assertThat(getIteratorSize(it)).isEqualTo(0);
+	}
+
+	@Test
+	void testSelectFromTable_TwoXORTerms_ShouldSelectFiveTuples() throws DBAppException {
+		// Given
+		for (int i = 1; i <= 10; i++)
+			insertRow(i);
+
+		// When
+		SQLTerm[] sqlTerms = new SQLTerm[2];
+		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);
+		sqlTerms[1] = new SQLTerm(newTableName, name, Constants.EQUAL, "yehia");
+		String[] strArrOperator = new String[] { "XOR" };
+
+		// Then
+		Iterator it = engine.selectFromTable(sqlTerms, strArrOperator);
+		assertThat(getIteratorSize(it)).isEqualTo(5);
+	}
+
+	@Test
+	void testSelectFromTable_WrongNumberOfOperators_ShouldFailSelection() throws DBAppException {
+		// Given
+		for (int i = 1; i <= 10; i++)
+			insertRow(i);
+
+		// When
+		SQLTerm[] sqlTerms = new SQLTerm[2];
+		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);
+		sqlTerms[1] = new SQLTerm(newTableName, name, Constants.EQUAL, "yehia");
+		String[] strArrOperator = new String[] { "XOR", "AND" };
+
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.selectFromTable(sqlTerms, strArrOperator);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_TOO_MUCH_OPERATOS;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testSelectFromTable_UnknownOperator_ShouldFailSelection() throws DBAppException {
+		// Given
+		for (int i = 1; i <= 10; i++)
+			insertRow(i);
+
+		// When
+		SQLTerm[] sqlTerms = new SQLTerm[2];
+		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);
+		sqlTerms[1] = new SQLTerm(newTableName, name, Constants.EQUAL, "yehia");
+		String[] strArrOperator = new String[] { "NOT" };
+
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.selectFromTable(sqlTerms, strArrOperator);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_UNKNOWN_ARR_OPERATOR;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	private int getIteratorSize(Iterator it) {
+		int ret = 0;
+		while (it.hasNext()) {
+			ret++;
+			it.next();
+		}
+		return ret;
 	}
 
 	private static void insertRow(int id) throws DBAppException {

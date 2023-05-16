@@ -15,7 +15,6 @@ import util.TypeParser;
 import util.filecontroller.Serializer;
 import util.search.Selector;
 import util.validation.Validator;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
@@ -222,19 +221,20 @@ public class DBApp implements IDatabase {
 
     public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 
-        Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
-        HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices = getPossibleIndex(arrSQLTerms);
-        possibleIndices = getApplicableIndices(possibleIndices, strarrOperators);
-        if (possibleIndices.isEmpty())
-            return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators);
-        Integer[] noIndexIdx = chooseIndexIdx(possibleIndices, arrSQLTerms);
-        Iterator withIndex, noIndex;
-        SQLTerm[] newArrSQLTerms = new SQLTerm[noIndexIdx.length];  // to be sent to select with no index
-        for (int i = 0; i < noIndexIdx.length; i++)
-            newArrSQLTerms[i] = arrSQLTerms[noIndexIdx[i]];
-        withIndex = Selector.selectWithIndex(arrSQLTerms, strarrOperators, possibleIndices);
-        noIndex = Selector.selectWithNoIndex(newArrSQLTerms, strarrOperators);
-        return union(withIndex, noIndex);
+    	Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
+    	return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators);
+//        HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices = getPossibleIndex(arrSQLTerms);
+//        possibleIndices = getApplicableIndices(possibleIndices, strarrOperators);
+//        if (possibleIndices.isEmpty())
+//            return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators);
+//        Integer[] noIndexIdx = chooseIndexIdx(possibleIndices, arrSQLTerms);
+//        Iterator withIndex, noIndex;
+//        SQLTerm[] newArrSQLTerms = new SQLTerm[noIndexIdx.length];  // to be sent to select with no index
+//        for (int i = 0; i < noIndexIdx.length; i++)
+//            newArrSQLTerms[i] = arrSQLTerms[noIndexIdx[i]];
+//        withIndex = Selector.selectWithIndex(arrSQLTerms, strarrOperators, possibleIndices);
+//        noIndex = Selector.selectWithNoIndex(newArrSQLTerms, strarrOperators);
+//        return union(withIndex, noIndex);
     }
 
     private HashMap<OctreeIndex<?>, ArrayList<Integer>> getApplicableIndices(HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices, String[] opr) {
@@ -246,7 +246,7 @@ public class DBApp implements IDatabase {
 
             if (Math.abs(idxSQLTerm3 - idxSQLTerm2) != 1 || Math.abs(idxSQLTerm3 - idxSQLTerm1) != 2 || Math.abs(idxSQLTerm1 - idxSQLTerm2) != 1)
                 continue;
-            if (opr[0].equals(Constants.AND_OPERATION) && opr[0].equals(opr[1]) && opr[1].equals(opr[2]))
+            if (opr[idxSQLTerm1].equals(Constants.AND_OPERATION) && opr[idxSQLTerm1].equals(opr[idxSQLTerm2]))
                 applicableIndices.put(index.getKey(), index.getValue());
         }
         return applicableIndices;
@@ -266,7 +266,11 @@ public class DBApp implements IDatabase {
             if (!allIndexIdx.contains(i))
                 noIndexIdx.add(i);
 
-        return (Integer[]) noIndexIdx.toArray();
+        Integer []arr = new Integer[noIndexIdx.size()];
+        for (int i=0; i<arr.length; i++) {
+        	arr[i]=noIndexIdx.get(i);
+        }
+        return arr;
     }
 
     public Iterator union(Iterator i1, Iterator i2) {
@@ -342,4 +346,5 @@ public class DBApp implements IDatabase {
         Iterator result = parser.parse(strbufSQL);
         return result;
     }
+    
 }
