@@ -34,7 +34,7 @@ public class DBAppTest {
 	private static void generateNewTableName() {
 		int randomNumber1 = (int) (Math.random() * 100000) + 1;
 		int randomNumber2 = (int) (Math.random() * 100000) + 1;
-		newTableName = randomNumber1 + "" + randomNumber2;
+		newTableName = "aa"+randomNumber1 + "" + randomNumber2;
 		while (engine.getMyTables().contains(newTableName)) {
 			randomNumber1 = (int) (Math.random() * 100000) + 1;
 			randomNumber2 = (int) (Math.random() * 100000) + 1;
@@ -764,6 +764,25 @@ public class DBAppTest {
 	}
 
 	@Test
+	void testSelectFromWithIndex_ThreeANDTerms_ShouldSelectFiveTuples() throws DBAppException {
+		// Given
+		for (int i = 1; i <= 10; i++)
+			insertRow(i);
+		engine.createIndex(newTableName, new String[] { age, name, id });
+
+		// When
+		SQLTerm[] sqlTerms = new SQLTerm[3];
+		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);
+		sqlTerms[1] = new SQLTerm(newTableName, name, Constants.EQUAL, TEST_NAME);
+		sqlTerms[2] = new SQLTerm(newTableName, age, Constants.EQUAL, TEST_AGE);
+		String[] strArrOperator = new String[] { "AND", "AND" };
+
+		// Then
+		Iterator it = engine.selectFromTable(sqlTerms, strArrOperator);
+		assertThat(getIteratorSize(it)).isEqualTo(5);
+	}
+
+	@Test
 	void testSelectFromTable_TwoXORTerms_ShouldSelectFiveTuples() throws DBAppException {
 		// Given
 		for (int i = 1; i <= 10; i++)
@@ -803,7 +822,7 @@ public class DBAppTest {
 	}
 
 	@Test
-	void testSelectFromTable_UnknownOperator_ShouldFailSelection() throws DBAppException {
+	void testSelectFromTable_UnknownArrOperator_ShouldFailSelection() throws DBAppException {
 		// Given
 		for (int i = 1; i <= 10; i++)
 			insertRow(i);
@@ -822,6 +841,110 @@ public class DBAppTest {
 		String expectedMessage = Constants.ERROR_MESSAGE_UNKNOWN_ARR_OPERATOR;
 		String outputMessage = exception.getMessage();
 		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testSelectFromTable_UnknownOperator_ShouldFailSelection() throws DBAppException {
+		// Given
+		for (int i = 1; i <= 10; i++)
+			insertRow(i);
+
+		// When
+		SQLTerm[] sqlTerms = new SQLTerm[2];
+		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);
+		sqlTerms[1] = new SQLTerm(newTableName, name, "<>", "yehia");
+		String[] strArrOperator = new String[] { "AND" };
+
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.selectFromTable(sqlTerms, strArrOperator);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_UNKNOWN_OPERATOR;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testSelectFromTable_InvalidColumn_ShouldFailSelection() throws DBAppException {
+		// Given
+		for (int i = 1; i <= 10; i++)
+			insertRow(i);
+
+		// When
+		SQLTerm[] sqlTerms = new SQLTerm[2];
+		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);
+		sqlTerms[1] = new SQLTerm(newTableName, "salary", Constants.EQUAL, "yehia");
+		String[] strArrOperator = new String[] { "AND" };
+
+		Exception exception = assertThrows(DBAppException.class, () -> {
+			engine.selectFromTable(sqlTerms, strArrOperator);
+		});
+
+		// Then
+		String expectedMessage = Constants.ERROR_MESSAGE_COLUMNS_NOT_FOUND_IN_TABLE;
+		String outputMessage = exception.getMessage();
+		assertThat(outputMessage).isEqualTo(expectedMessage);
+	}
+
+	@Test
+	void testSQLParser_SelectFromTable_ShouldSelect8Values() throws DBAppException {
+		//Given
+		for (int i = 1; i < 9 ; i++)
+		insertRow(i);
+		StringBuffer command = new StringBuffer("SELECT * FROM "+newTableName+" WHERE name = \'yehia\'; ");
+		
+		//When
+		Iterator it = engine.parseSQL(command);
+		
+		//Then
+		assertThat(getIteratorSize(it)).isEqualTo(8);
+	}
+
+	@Test
+	void testSQLParser_InsertIntoTable_ShouldInsertSuccessfully() throws DBAppException {
+		// Given
+		for (int i = 1; i < 9; i++)
+			insertRow(i);
+		StringBuffer command = new StringBuffer(
+				"INSERT INTO " +newTableName + "(id, age, name) VALUES (15, 20, \'fffff\');");
+		int oldSize = Serializer.deserializeTable(newTableName).getSize();
+
+		// When
+		engine.parseSQL(command);
+
+		// Then
+		int newSize = Serializer.deserializeTable(newTableName).getSize();
+		assertThat(newSize).isEqualTo(oldSize + 1);
+	}
+
+	@Test
+	void testSQLParser_UpdateTable_ShouldUpdateSuccessfully() throws DBAppException {
+		// Given
+		insertRow(1);
+		StringBuffer command = new StringBuffer("UPDATE " + newTableName + " SET age = 15 WHERE id = 1; ");
+		int oldAge = (int) (Serializer.deserializePage(newTableName, "0").getTuples().get(0).get("age"));
+		// When
+		engine.parseSQL(command);
+
+		// Then
+		int newAge = (int) (Serializer.deserializePage(newTableName, "0").getTuples().get(0).get("age"));
+		assertThat(oldAge).isEqualTo(TEST_AGE);
+		assertThat(newAge).isEqualTo(15);
+	}
+
+	@Test
+	void testSQLParser_DeleteFromTable_ShouldDeleteValues() throws DBAppException {
+		// Given
+		insertRow(1);
+		StringBuffer command = new StringBuffer("DELETE FROM " + newTableName + " WHERE id = 1; ");
+
+		// When
+		engine.parseSQL(command);
+
+		// Then
+		Table table = Serializer.deserializeTable(newTableName);
+		assertThat(table.isEmpty());
 	}
 
 	private int getIteratorSize(Iterator it) {
