@@ -29,6 +29,10 @@ public final class Constants {
 	
 	public static final String ERROR_MESSAGE_IN_TUPLE_SIZE = "The Tuple contain more columns than the table columns";
 	
+	public static final String ERROR_MESSAGE_IN_INDEX_SIZE = "The index should be created on 3 columns so enter 3 columns";
+	
+	public static final String ERROR_MESSAGE_INDEX_FOUND = "The index already was created in one of the columns, please select another columns";
+	
 	public static final String DATA_EXTENSTION = ".ser";
 
 	public static final String METADATA_PATH = "Metadata//metadata.csv";
@@ -62,11 +66,11 @@ public final class Constants {
 
 	public static final String MIN_ID_VALUE = "0";
 	public static final String MIN_AGE_VALUE = "1";
-	public static final String MIN_NAME_VALUE = "A";
+	public static final String MIN_NAME_VALUE = "aaaaa";
 
-	public static final String MAX_ID_VALUE = "100000";
+	public static final String MAX_ID_VALUE = "10000";
 	public static final String MAX_AGE_VALUE = "100";
-	public static final String MAX_NAME_VALUE = "zzzzzzzzzzzzz";
+	public static final String MAX_NAME_VALUE = "zzzzz";
 
 	public static final String MAX_ROWS_IN_PAGE = "MaximumRowsCountinTablePage";
 	public static final String MAX_ENTRIES_IN_OCTREENODE = "MaximumEntriesinOctreeNode";
@@ -116,5 +120,14 @@ public final class Constants {
 	public static final String ERROR_MESSAGE_UNKNOWN_ARR_OPERATOR = "The only allowed array operators are AND, OR and XOR";
 
 	public static final String ERROR_MESSAGE_UNKNOWN_OPERATOR = "The only allowed operators are =, >, <, >=, <=, and !=";
+
+
+	public static final int NUM_OF_DIMENSIONS = 3;
+
+	public static final int NUMBER_OF_NODE_CHILDREN = 8;
+
+	public static final int ASCII_OF_FIRST_ALPHAPET = 97;
+
+	public static final int NUM_OF_ALPHAPET = 26;
 
 }
