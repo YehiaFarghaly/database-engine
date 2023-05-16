@@ -231,37 +231,57 @@ public class DBApp implements IDatabase {
     public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
     	Vector<Vector<Tuple>> result = new Vector<>();
     	Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
+    	if(strarrOperators.length<2){
+    		
+    		return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators).iterator();
+    	}
     	for (int i =0; i<strarrOperators.length-1; i++) {
+    		
     		Table table = Serializer.deserializeTable(arrSQLTerms[0]._strTableName);
-    		if (strarrOperators[i].equals(Constants.AND_OPERATION)&&strarrOperators[i+1].equals(Constants.AND_OPERATION)) {
+    		if (strarrOperators[i].toLowerCase().equals(Constants.AND_OPERATION)&&strarrOperators[i+1].toLowerCase().equals(Constants.AND_OPERATION)) {
     			ArrayList<String> colNames = fillcolNames(arrSQLTerms,i);
     			for (OctreeIndex<?> index : table.getIndices()) {
     				int idx[] = new int[3]; 
+    				System.out.println("now searchn=ing for index");	
     				 idx[0] = colNames.indexOf(index.getColName1());
     				 idx[1] = colNames.indexOf(index.getColName2());
     				 idx[2] = colNames.indexOf(index.getColName3());
-    				if (idx[0]!=0 && idx[1]!=0 && idx[2] !=0) {
+    				 System.out.println(idx[0]+" "+idx[1]+" "+idx[2]);
+    				if (idx[0]!=-1 && idx[1]!=-1 && idx[2] !=-1) {
+    					
+    					
     					SQLTerm[] arrSQLTermsIndex = new SQLTerm[3];
     					String [] columnsNames = new String [3];
     					for(int j=0;j<3;j++) {
     						arrSQLTermsIndex[j] = arrSQLTerms[i+j];
     						columnsNames [j] = colNames.get(idx[j]);
     					}
+    					
     					strarrOperators = removeFromStrarrOperators(strarrOperators,i);
     					strarrOperators = removeFromStrarrOperators(strarrOperators,i+1);
+    					System.out.println("found an index");
     					result.add(Selector.selectWithIndex(index, arrSQLTerms, columnsNames, table));
-    					i = i + 2;
+    					i = i + 1;
     					break;
     				}
     			}
-    			}else {
-    		            Hashtable<String, Object> colNameValue = new Hashtable<>();
-    		            colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
-    		            result.add(Selector.selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue, arrSQLTerms[i]._strOperator));   
+    			} else {
+    				System.out.println("found no index");
+    				Hashtable<String, Object> colNameValue = new Hashtable<>();
+		            colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
+		            result.add(Selector.selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue, arrSQLTerms[i]._strOperator));
+    				if (i == strarrOperators.length-1) {
+    		            colNameValue.put(arrSQLTerms[i+1]._strColumnName, arrSQLTerms[i+1]._objValue);
+    		            result.add(Selector.selectFromTableHelper(arrSQLTerms[i+1]._strTableName, colNameValue, arrSQLTerms[i+1]._strOperator));
+    				}
+    					
     			}
     	}
-    		 return Selector.applyArrOperators(result,strarrOperators).iterator();
-    	}
+    	System.out.println("result= "+result);
+    	
+    	return Selector.applyArrOperators(result,strarrOperators).iterator();
+    	
+    }
 
     
     private String[]  removeFromStrarrOperators(String[] strarrOperators, int index) {

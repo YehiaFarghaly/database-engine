@@ -74,7 +74,6 @@ public class Selector {
 			colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
 			result.add(selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue, arrSQLTerms[i]._strOperator));
 		}
-
 		return applyArrOperators(result, strarrOperators);
 	}
 
@@ -114,13 +113,13 @@ public class Selector {
 
 	private static List getPageIndcies(String[] strOperator, OctreeIndex index, String[] ColumnsNames,
 			Hashtable<String, Object> colNameValue, String TableName) throws DBAppException {
-		List<Object> pagepaths;
 		Object[] min = getMin(TableName, ColumnsNames);
 		Object[] max = getMax(TableName, ColumnsNames);
 		Object minbounds[] = new Object[3];
 		Object maxbounds[] = new Object[3];
 		int minmask = 0;
 		int maxmask = 0;
+		
 		for (int i = 0; i < strOperator.length; i++) {
 			if (strOperator[i].equals(Constants.EQUAL)) {
 				minbounds[i] = colNameValue.get(ColumnsNames[i]);
@@ -147,6 +146,7 @@ public class Selector {
 
 		OctreeBounds bounds = new OctreeBounds(minbounds[0], minbounds[1], minbounds[2], maxbounds[0], maxbounds[1],
 				maxbounds[2]);
+		System.out.print( index.query(bounds, minmask, maxmask));
 		return index.query(bounds, minmask, maxmask);
 	}
 	
@@ -163,14 +163,19 @@ public class Selector {
     	String[] strarrOperators = new String[2];
     	List pagepathes;
     	int [] pagenumbers;
+    	String strOperator [] = new String[arrSQLTerms.length];
+    	System.out.println(arrSQLTerms.length);
     	Vector<Vector<Tuple>> result = new Vector<>();
+    	Hashtable<String, Object> colNameValue = new Hashtable<>();
         for (int i = 0; i < arrSQLTerms.length; i++) {
-            Hashtable<String, Object> colNameValue = new Hashtable<>();
-            String strOperator [] = new String[arrSQLTerms.length];
-            strOperator [i] =  arrSQLTerms[i]._strOperator;  
-            pagepathes = getPageIndcies(strOperator, index, ColumnsNames,colNameValue, table.getName()); 
+        	colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
+            strOperator [i] =  arrSQLTerms[i]._strOperator;
+            System.out.println(strOperator [i]);   
+        }
+        for (int i = 0; i < arrSQLTerms.length; i++) {
+        	pagepathes = getPageIndcies(strOperator, index, ColumnsNames,colNameValue, table.getName()); 
             pagenumbers = getPagesNumbers(pagepathes, table);
-            colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
+            System.out.println(pagepathes);
             result.add(selectFromTableWithIndex(arrSQLTerms[i]._strTableName, colNameValue, Constants.AND_OPERATION, pagenumbers));
         }
         strarrOperators[0] = Constants.AND_OPERATION;
@@ -287,7 +292,7 @@ public class Selector {
 			if (tmp.size() == 2) {
 				Vector<Tuple> firstSet = tmp.remove(0);
 				Vector<Tuple> secondSet = tmp.remove(0);
-				tmp.add(Selector.selectOperation(firstSet, secondSet, strarrOperators[idx++]));
+				tmp.add(Selector.selectOperation(firstSet, secondSet, strarrOperators[idx++].toLowerCase()));
 			}
 		}
 		result = tmp.remove(0);
