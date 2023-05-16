@@ -8,6 +8,7 @@ import sql.parser.SQLParser;
 import storage.Page;
 import storage.Table;
 import storage.Tuple;
+import storage.index.OctreeBounds;
 import storage.index.OctreeIndex;
 import util.TypeParser;
 import util.filecontroller.Serializer;

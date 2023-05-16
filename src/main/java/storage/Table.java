@@ -245,7 +245,7 @@ public class Table implements Serializable {
 			throws DBAppException {
 		OctreeBounds searchBounds = new OctreeBounds(minMaxValues[0], minMaxValues[1], minMaxValues[2], minMaxValues[0],
 				minMaxValues[1], minMaxValues[2]);
-		List<Object> pages = index.query(searchBounds);
+		List<Object> pages = index.query(searchBounds, 0, 0);
 		deleteByPage(pages, htblColNameValue, index);
 	}
 
