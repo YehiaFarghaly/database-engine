@@ -33,6 +33,7 @@ public class DBApp implements IDatabase {
     private final CsvWriter writer;
     private Object clusteringKey;
     private String clusteringKeyValue;
+    
 
     public DBApp() {
         this.myTables = new HashSet<>();
@@ -218,26 +219,63 @@ public class DBApp implements IDatabase {
 
         clusteringKey = TypeParser.castClusteringKey(table, clusteringKeyValue);
     }
-
+    
     public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
-
+    	Vector<Vector<Tuple>> result = new Vector<>();
     	Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
-    	return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators);
-//        HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices = getPossibleIndex(arrSQLTerms);
-//        possibleIndices = getApplicableIndices(possibleIndices, strarrOperators);
-//        if (possibleIndices.isEmpty())
-//            return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators);
-//        Integer[] noIndexIdx = chooseIndexIdx(possibleIndices, arrSQLTerms);
-//        Iterator withIndex, noIndex;
-//        SQLTerm[] newArrSQLTerms = new SQLTerm[noIndexIdx.length];  // to be sent to select with no index
-//        for (int i = 0; i < noIndexIdx.length; i++)
-//            newArrSQLTerms[i] = arrSQLTerms[noIndexIdx[i]];
-//        withIndex = Selector.selectWithIndex(arrSQLTerms, strarrOperators, possibleIndices);
-//        noIndex = Selector.selectWithNoIndex(newArrSQLTerms, strarrOperators);
-//        return union(withIndex, noIndex);
-    }
+    	for (int i =0; i<strarrOperators.length-1; i++) {
+    		String tableName = arrSQLTerms[0]._strTableName;
+    		if (strarrOperators[i].equals(Constants.AND_OPERATION)&&strarrOperators[i+1].equals(Constants.AND_OPERATION)) {
+    			ArrayList<String> colNames = new ArrayList<>();
+				colNames.add(arrSQLTerms[i]._strColumnName);
+				colNames.add(arrSQLTerms[i+1]._strColumnName);
+				colNames.add(arrSQLTerms[i+2]._strColumnName);
+				Table currTable = Serializer.deserializeTable(tableName);
+    			for (OctreeIndex<?> index : currTable.getIndices()) {
+    				int idx1 = colNames.indexOf(index.getColName1());
+    				int idx2 = colNames.indexOf(index.getColName2());
+    				int idx3 = colNames.indexOf(index.getColName3());
+    				if (idx1!=0 && idx2!=0 && idx3 !=0) {
+    					SQLTerm[] arrSQLTermsIndex = new SQLTerm[3];
+    					arrSQLTermsIndex[0] = arrSQLTerms[i];
+    					arrSQLTermsIndex[1] = arrSQLTerms[i+1];
+    					arrSQLTermsIndex[2] = arrSQLTerms[i+2];
+    					String [] columnsNames = new String [3];
+    					columnsNames [0] = colNames.get(idx1);
+    					columnsNames [1] = colNames.get(idx2);
+    					columnsNames [2] = colNames.get(idx3);
+    					strarrOperators = removeFromStrarrOperators(strarrOperators,i);
+    					strarrOperators = removeFromStrarrOperators(strarrOperators,i+1);
+    					result.add(Selector.selectWithIndex(index, arrSQLTerms, columnsNames));
+    					i = i + 2;
+    					break;
+    				}
+    			}
+    			}else {
+    				
+    		            Hashtable<String, Object> colNameValue = new Hashtable<>();
+    		            colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
+    		            result.add(Selector.selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue, arrSQLTerms[i]._strOperator));
+    		            
+    			}
+    	}
+    	
+    		 return Selector.applyArrOperators(result,strarrOperators).iterator();
+    	
+    	}
 
-    private HashMap<OctreeIndex<?>, ArrayList<Integer>> getApplicableIndices(HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices, String[] opr) {
+    
+    private String[]  removeFromStrarrOperators(String[] strarrOperators, int index) {
+		String [] res = new String[strarrOperators.length];
+		for(int i =0;i<strarrOperators.length && i!=index;i++) {
+			for(int j=0;j<strarrOperators.length-1;j++) {
+				res[j]=strarrOperators[i];
+			}
+		}
+		return res;
+	}
+
+	private HashMap<OctreeIndex<?>, ArrayList<Integer>> getApplicableIndices(HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices, String[] opr) {
         HashMap<OctreeIndex<?>, ArrayList<Integer>> applicableIndices = new HashMap<>();
         for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> index : possibleIndices.entrySet()) {
             int idxSQLTerm1 = index.getValue().get(0);

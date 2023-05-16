@@ -64,7 +64,7 @@ public class Selector {
         return false;
     }
 
-    public static Iterator selectWithNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+    public static Vector<Tuple> selectWithNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
         Vector<Vector<Tuple>> result = new Vector<>();
         for (int i = 0; i < arrSQLTerms.length; i++) {
             Hashtable<String, Object> colNameValue = new Hashtable<>();
@@ -72,25 +72,51 @@ public class Selector {
             result.add(selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue, arrSQLTerms[i]._strOperator));
         }
 
-        return applyArrOperators(result, strarrOperators).iterator();
+        return applyArrOperators(result, strarrOperators);
+    }
+    
+    private static int[] getPageIndcies(String [] strOperator, OctreeIndex index, String[] ColumnsNames, Hashtable<String, Object> colNameValue) {
+    	for (int i=0;i<strOperator.length;i++) {
+    		if(strOperator[0].equals(Constants.EQUAL)) {
+    			OctreeBounds bounds = new OctreeBounds(colNameValue.get(ColumnsNames[0]), colNameValue.get(ColumnsNames[1]), colNameValue.get(ColumnsNames[2]) , colNameValue.get(ColumnsNames[0]), colNameValue.get(ColumnsNames[1]), colNameValue.get(ColumnsNames[2]) );
+    		}
+    	}
     }
 
-    public static Iterator selectWithIndex(SQLTerm[] terms, String[] opr, HashMap<OctreeIndex<?>, ArrayList<Integer>> indIdx) throws DBAppException {
-
-        String tableName = terms[0]._strTableName;
-        Vector<Vector<Tuple>> finalResult = new Vector<>();
-        for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> curr : indIdx.entrySet()) {
-            ArrayList<Integer> idx = curr.getValue();
-            OctreeIndex currIndex = curr.getKey();
-            OctreeBounds octreeBounds = prepareOctreeBounds(currIndex, idx, terms);
-            List<Object> pages = curr.getKey().query(octreeBounds);
-            Vector<Vector<Tuple>> result = new Vector<>();
-            getPrimarySelectResult(pages, tableName, idx, terms, result);
-            String[] oprBetweenIndexCol = {AND_OPERATION, AND_OPERATION, AND_OPERATION};
-            finalResult.add(applyArrOperators(result, oprBetweenIndexCol));
+    public static Vector<Tuple> selectWithIndex(OctreeIndex index, SQLTerm[] arrSQLTerms, String[] ColumnsNames) throws DBAppException {
+    	String[] strarrOperators = new String[2];
+    	
+    	Vector<Vector<Tuple>> result = new Vector<>();
+        for (int i = 0; i < arrSQLTerms.length; i++) {
+            Hashtable<String, Object> colNameValue = new Hashtable<>();
+            String strOperator [] = new String[arrSQLTerms.length];
+            strOperator [i] =  arrSQLTerms[i]._strOperator;  
+            getPageIndcies(strOperator, index, ColumnsNames,colNameValue); 
+            colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
+            result.add(selectFromTableWithIndex(arrSQLTerms[i]._strTableName, colNameValue, Constants.AND_OPERATION, ));
         }
-        return finalResult.iterator();
+        strarrOperators[0] = Constants.AND_OPERATION;
+        strarrOperators[1] = Constants.AND_OPERATION;
+        return applyArrOperators(result, strarrOperators);
+        
     }
+    
+//    public static Iterator selectWithIndex(SQLTerm[] terms, String[] opr, HashMap<OctreeIndex<?>, ArrayList<Integer>> indIdx) throws DBAppException {
+//
+//        String tableName = terms[0]._strTableName;
+//        Vector<Vector<Tuple>> finalResult = new Vector<>();
+//        for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> curr : indIdx.entrySet()) {
+//            ArrayList<Integer> idx = curr.getValue();
+//            OctreeIndex currIndex = curr.getKey();
+//            OctreeBounds octreeBounds = prepareOctreeBounds(currIndex, idx, terms);
+//            List<Object> pages = curr.getKey().query(octreeBounds);
+//            Vector<Vector<Tuple>> result = new Vector<>();
+//            getPrimarySelectResult(pages, tableName, idx, terms, result);
+//            String[] oprBetweenIndexCol = {AND_OPERATION, AND_OPERATION, AND_OPERATION};
+//            finalResult.add(applyArrOperators(result, oprBetweenIndexCol));
+//        }
+//        return finalResult.iterator();
+//    }
 
     private static void getPrimarySelectResult(List<Object>pages, String tableName, ArrayList<Integer>idx, SQLTerm[]arrSQLTerms, Vector<Vector<Tuple>>result) throws DBAppException {
         for (Object tmp : pages) {
@@ -138,12 +164,23 @@ public class Selector {
     }
 
 
-    private static Vector<Tuple> selectFromTableHelper(String strTableName, Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
+    public static Vector<Tuple> selectFromTableWithIndex(String strTableName, Hashtable<String, Object> colNameValue, String operator,int[] pageIndex) throws DBAppException {
+    	Vector<Tuple> result = new Vector<>();
+    	Table table = Serializer.deserializeTable(strTableName);
+    	for(int i=0;i<pageIndex.length;i++) {
+    		Page page = table.getPageAtPosition(pageIndex[i]);
+    		result.addAll(page.select(colNameValue, operator));
+    	}
+    	return result;
+    }
+
+    
+    public static Vector<Tuple> selectFromTableHelper(String strTableName, Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
         Table table = Serializer.deserializeTable(strTableName);
         return table.select(colNameValue, operator);
     }
 
-    private static Vector<Tuple> applyArrOperators(Vector<Vector<Tuple>> selections, String[] strarrOperators) {
+    public static Vector<Tuple> applyArrOperators(Vector<Vector<Tuple>> selections, String[] strarrOperators) {
 
         Vector<Tuple> result = new Vector<>();
         Vector<Vector<Tuple>> tmp = new Vector<>();
