@@ -366,16 +366,17 @@ public class MiniDBListener extends SQLiteParserBaseListener {
 
 	private String chooseDataType(SQLiteParser.Type_nameContext type_name) {
 		String type = type_name.getText().trim().toLowerCase();
+		String ret = "";
 		if (type.equals("int"))
-			return INTEGER_DATA_TYPE_NAME;
+			ret = INTEGER_DATA_TYPE_NAME;
 		else if (type.contains("varchar"))
-			return STRING_DATA_TYPE_NAME;
+			ret = STRING_DATA_TYPE_NAME;
 		else if (type.equals("float") || type.equals("double") || type.contains("decimal"))
-			return DOUBLE_DATA_TYPE_NAME;
+			ret = DOUBLE_DATA_TYPE_NAME;
 		else if (type.equals("date"))
-			return DATE_DATA_TYPE_NAME;
+			ret = DATE_DATA_TYPE_NAME;
 
-		return null;
+		return ret;
 
 	}
 

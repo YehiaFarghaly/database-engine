@@ -107,6 +107,15 @@ public class Table implements Serializable {
 		return indices;
 	}
 
+	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
+		Vector<Tuple> result = new Vector<>();
+		for (int i = 0; i < pagesName.size(); i++) {
+			Page page = getPageAtPosition(i);
+			result.addAll(page.select(colNameValue, operator));
+		}
+		return result;
+	}
+
 	public void insertTuple(Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		removeEmptyPages();
 		Tuple tuple = createTuple(htblColNameValue);
@@ -246,8 +255,7 @@ public class Table implements Serializable {
 			String pageName = (String) pageObj;
 			System.out.println(pageName);
 			System.out.println();
-			Page page = Serializer.deserializePage(name,
-					pagesName.get(getPageIdxFromPath(pageName)));
+			Page page = Serializer.deserializePage(name, pagesName.get(getPageIdxFromPath(pageName)));
 			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
 			deletePageRecords(toBeDeleted, page);
 		}
@@ -269,9 +277,9 @@ public class Table implements Serializable {
 		}
 		return null;
 	}
-	
+
 	private int getPageIdxFromPath(String pageName) {
-		return pagesName.indexOf((pageName.split("//")[1]).split(".ser")[0]);
+		return pagesName.indexOf((pageName.split("//")[1]).split(Constants.DATA_EXTENSTION)[0]);
 	}
 
 	public void normalDelete(Hashtable<String, Object> htblColNameValue) throws DBAppException {
@@ -338,15 +346,6 @@ public class Table implements Serializable {
 
 	public void deleteTableFiles() {
 		FileDeleter.deleteFile(this, FileType.TABLE);
-	}
-
-	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
-		Vector<Tuple> result = new Vector<>();
-		for (int i = 0; i < pagesName.size(); i++) {
-			Page page = getPageAtPosition(i);
-			result.addAll(page.select(colNameValue, operator));
-		}
-		return result;
 	}
 
 }

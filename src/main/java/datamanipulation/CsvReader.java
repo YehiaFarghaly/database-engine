@@ -10,7 +10,6 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import constants.Constants;
 
-
 public class CsvReader {
 
 	CSVReader reader;
@@ -32,7 +31,6 @@ public class CsvReader {
 		}
 		return allTablesCol;
 	}
-	
 
 	public ArrayList<String[]> readTable(String tableName) {
 		ArrayList<String[]> tableCol = new ArrayList<>();

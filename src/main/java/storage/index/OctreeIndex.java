@@ -31,6 +31,7 @@ public class OctreeIndex<T> implements Serializable {
 
 		for (String[] arr : columns) {
 			if (arr[Constants.COLUMN_NAME_INDEX].equals(col1)) {
+
 				col1Min = TypeParser.typeParser(arr[Constants.COL_MIN_VALUE_INDEX], arr[Constants.COLUMN_TYPE_INDEX]);
 				col1Max = TypeParser.typeParser(arr[Constants.COL_MAX_VALUE_INDEX], arr[Constants.COLUMN_TYPE_INDEX]);
 			} else if (arr[Constants.COLUMN_NAME_INDEX].equals(col2)) {
@@ -40,7 +41,6 @@ public class OctreeIndex<T> implements Serializable {
 				col3Min = TypeParser.typeParser(arr[Constants.COL_MIN_VALUE_INDEX], arr[Constants.COLUMN_TYPE_INDEX]);
 				col3Max = TypeParser.typeParser(arr[Constants.COL_MAX_VALUE_INDEX], arr[Constants.COLUMN_TYPE_INDEX]);
 			}
-
 		}
 		return new OctreeBounds(col1Min, col2Min, col3Min, col1Max, col2Max, col3Max);
 	}
