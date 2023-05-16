@@ -82,9 +82,9 @@ public class OctreeIndex<T> implements Serializable {
 		return itemBounds;
 	}
 
-	public List<Object> query(OctreeBounds searchBounds) throws DBAppException {
+	public List<Object> query(OctreeBounds searchBounds, int minBoundType, int maxBoundType) throws DBAppException {
 		List<Object> result = new ArrayList<>();
-		root.query(searchBounds, result);
+		root.query(searchBounds, minBoundType, maxBoundType, result);
 		return result;
 	}
 

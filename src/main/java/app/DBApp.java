@@ -220,48 +220,47 @@ public class DBApp implements IDatabase {
         clusteringKey = TypeParser.castClusteringKey(table, clusteringKeyValue);
     }
     
+    private static ArrayList<String> fillcolNames(SQLTerm[] arrSQLTerms, int index){
+    	ArrayList<String> colNames = new ArrayList<String>();
+    	for(int i =0;i<3;i++) {
+    		colNames.add(arrSQLTerms[index+i]._strColumnName);
+    	}
+        return colNames;
+    }
+    
     public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
     	Vector<Vector<Tuple>> result = new Vector<>();
     	Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
     	for (int i =0; i<strarrOperators.length-1; i++) {
-    		String tableName = arrSQLTerms[0]._strTableName;
+    		Table table = Serializer.deserializeTable(arrSQLTerms[0]._strTableName);
     		if (strarrOperators[i].equals(Constants.AND_OPERATION)&&strarrOperators[i+1].equals(Constants.AND_OPERATION)) {
-    			ArrayList<String> colNames = new ArrayList<>();
-				colNames.add(arrSQLTerms[i]._strColumnName);
-				colNames.add(arrSQLTerms[i+1]._strColumnName);
-				colNames.add(arrSQLTerms[i+2]._strColumnName);
-				Table currTable = Serializer.deserializeTable(tableName);
-    			for (OctreeIndex<?> index : currTable.getIndices()) {
-    				int idx1 = colNames.indexOf(index.getColName1());
-    				int idx2 = colNames.indexOf(index.getColName2());
-    				int idx3 = colNames.indexOf(index.getColName3());
-    				if (idx1!=0 && idx2!=0 && idx3 !=0) {
+    			ArrayList<String> colNames = fillcolNames(arrSQLTerms,i);
+    			for (OctreeIndex<?> index : table.getIndices()) {
+    				int idx[] = new int[3]; 
+    				 idx[0] = colNames.indexOf(index.getColName1());
+    				 idx[1] = colNames.indexOf(index.getColName2());
+    				 idx[2] = colNames.indexOf(index.getColName3());
+    				if (idx[0]!=0 && idx[1]!=0 && idx[2] !=0) {
     					SQLTerm[] arrSQLTermsIndex = new SQLTerm[3];
-    					arrSQLTermsIndex[0] = arrSQLTerms[i];
-    					arrSQLTermsIndex[1] = arrSQLTerms[i+1];
-    					arrSQLTermsIndex[2] = arrSQLTerms[i+2];
     					String [] columnsNames = new String [3];
-    					columnsNames [0] = colNames.get(idx1);
-    					columnsNames [1] = colNames.get(idx2);
-    					columnsNames [2] = colNames.get(idx3);
+    					for(int j=0;j<3;j++) {
+    						arrSQLTermsIndex[j] = arrSQLTerms[i+j];
+    						columnsNames [j] = colNames.get(idx[j]);
+    					}
     					strarrOperators = removeFromStrarrOperators(strarrOperators,i);
     					strarrOperators = removeFromStrarrOperators(strarrOperators,i+1);
-    					result.add(Selector.selectWithIndex(index, arrSQLTerms, columnsNames));
+    					result.add(Selector.selectWithIndex(index, arrSQLTerms, columnsNames, table));
     					i = i + 2;
     					break;
     				}
     			}
     			}else {
-    				
     		            Hashtable<String, Object> colNameValue = new Hashtable<>();
     		            colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
-    		            result.add(Selector.selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue, arrSQLTerms[i]._strOperator));
-    		            
+    		            result.add(Selector.selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue, arrSQLTerms[i]._strOperator));   
     			}
     	}
-    	
     		 return Selector.applyArrOperators(result,strarrOperators).iterator();
-    	
     	}
 
     
