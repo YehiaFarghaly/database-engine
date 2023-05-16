@@ -2,9 +2,10 @@ package storage.index;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import app.DBApp;
 import constants.Constants;
 import exceptions.DBAppException;
-
 
 public class OctreeBounds implements Serializable {
 	private static final long serialVersionUID = 1127517452404966501L;
@@ -30,6 +31,7 @@ public class OctreeBounds implements Serializable {
 		if (x instanceof Date && y instanceof Date) {
 			return ((Date) x).compareTo((Date) y) <= 0 ? y : x;
 		}
+		System.out.println(x + " " + y);
 		throw new DBAppException(Constants.ERROR_MESSAGE_DATATYPE);
 	}
 
@@ -63,26 +65,41 @@ public class OctreeBounds implements Serializable {
 		return obj;
 	}
 
+	private boolean insureExclusion(Object bound, Object target, boolean exclude) {
+		if (target instanceof DBAppNull || !exclude)
+			return true;
+		return !bound.equals(target);
+	}
+
 	private boolean contains(Object leftBound, Object rightBound, Object target) throws DBAppException {
 		return min(leftBound, target).equals(leftBound) && max(target, rightBound).equals(rightBound);
 	}
 
-	private boolean containsX(Object target) throws DBAppException {
-		return contains(getMin().getX(), getMax().getX(), get(target, 0));
+	private boolean containsX(Object target, int minBoundType, int maxBoundType) throws DBAppException {
+		return contains(getMin().getX(), getMax().getX(), get(target, 0))
+				&& insureExclusion(getMin().getX(), get(target, 0), (minBoundType & 1) != 0)
+				&& insureExclusion(getMax().getX(), get(target, 0), (maxBoundType & 1) != 0);
 	}
 
-	private boolean containsY(Object target) throws DBAppException {
-		return contains(getMin().getY(), getMax().getY(), get(target, 1));
+	private boolean containsY(Object target, int minBoundType, int maxBoundType) throws DBAppException {
+		return contains(getMin().getY(), getMax().getY(), get(target, 1))
+				&& insureExclusion(getMin().getY(), get(target, 0), (minBoundType & 2) != 0)
+				&& insureExclusion(getMax().getY(), get(target, 0), (maxBoundType & 2) != 0);
 	}
 
-	private boolean containsZ(Object target) throws DBAppException {
-		return contains(getMin().getZ(), getMax().getZ(), get(target, 2));
+	private boolean containsZ(Object target, int minBoundType, int maxBoundType) throws DBAppException {
+		return contains(getMin().getZ(), getMax().getZ(), get(target, 2))
+				&& insureExclusion(getMin().getZ(), get(target, 0), (minBoundType & 4) != 0)
+				&& insureExclusion(getMax().getZ(), get(target, 0), (maxBoundType & 4) != 0);
 	}
 
-	public boolean contains(OctreeBounds other) throws DBAppException {
-		return containsX(other.getMin().getX()) && containsX(other.getMax().getX()) && containsY(other.getMin().getY())
-				&& containsY(other.getMax().getY()) && containsZ(other.getMin().getZ())
-				&& containsZ(other.getMax().getZ());
+	public boolean contains(OctreeBounds other, int minBoundType, int maxBoundType) throws DBAppException {
+		return containsX(other.getMin().getX(), minBoundType, maxBoundType)
+				&& containsX(other.getMax().getX(), minBoundType, maxBoundType)
+				&& containsY(other.getMin().getY(), minBoundType, maxBoundType)
+				&& containsY(other.getMax().getY(), minBoundType, maxBoundType)
+				&& containsZ(other.getMin().getZ(), minBoundType, maxBoundType)
+				&& containsZ(other.getMax().getZ(), minBoundType, maxBoundType);
 	}
 
 	public boolean intersects(OctreeBounds other) throws DBAppException {

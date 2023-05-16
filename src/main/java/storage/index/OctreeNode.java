@@ -22,7 +22,7 @@ public class OctreeNode<T> implements Serializable {
 	}
 
 	protected boolean add(Item<T> item, OctreeBounds itemBounds) throws DBAppException {
-		if (!bounds.contains(itemBounds)) {
+		if (!bounds.contains(itemBounds, 0, 0)) {
 			return false;
 		}
 		if (children[0] != null) {
@@ -94,7 +94,7 @@ public class OctreeNode<T> implements Serializable {
 	private void leafRemove(Object ref, OctreeBounds itemBounds) throws DBAppException {
 		for (int i = 0; i < items.size(); i++) {
 			Item<T> item = items.get(i);
-			if (itemBounds.contains(getBounds(item))) {
+			if (itemBounds.contains(getBounds(item), 0, 0)) {
 				if (ref == null || item.getDuplicates().isEmpty()) {
 					items.remove(i);
 					i--;
@@ -105,27 +105,30 @@ public class OctreeNode<T> implements Serializable {
 		}
 	}
 
-	protected void query(OctreeBounds searchBounds, List<Object> result) throws DBAppException {
+	protected void query(OctreeBounds searchBounds, int minBoundType, int maxBoundType, List<Object> result)
+			throws DBAppException {
 		if (!bounds.intersects(searchBounds)) {
 			return;
 		}
 		if (children[0] != null) {
-			nonLeafSearch(searchBounds, result);
+			nonLeafSearch(searchBounds, minBoundType, maxBoundType, result);
 		} else {
-			leafSearch(searchBounds, result);
+			leafSearch(searchBounds, minBoundType, maxBoundType, result);
 		}
 	}
 
-	private void nonLeafSearch(OctreeBounds searchBounds, List<Object> result) throws DBAppException {
+	private void nonLeafSearch(OctreeBounds searchBounds, int minBoundType, int maxBoundType, List<Object> result)
+			throws DBAppException {
 		for (int i = 0; i < Constants.NUMBER_OF_NODE_CHILDREN; i++) {
-			children[i].query(searchBounds, result);
+			children[i].query(searchBounds, minBoundType, maxBoundType, result);
 		}
 	}
 
-	private void leafSearch(OctreeBounds searchBounds, List<Object> result) throws DBAppException {
+	private void leafSearch(OctreeBounds searchBounds, int minBoundType, int maxBoundType, List<Object> result)
+			throws DBAppException {
 		for (Item<T> item : getItems()) {
 			OctreeBounds itemBounds = getBounds(item);
-			if (searchBounds.contains(itemBounds)) {
+			if (searchBounds.contains(itemBounds, minBoundType, maxBoundType)) {
 				result.add(item.getData());
 				for (Object dup : item.getDuplicates()) {
 					result.add(dup);
