@@ -1,7 +1,6 @@
 package app;
 
 import com.opencsv.exceptions.CsvValidationException;
-import constants.Constants;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
 import exceptions.DBAppException;
@@ -223,92 +222,8 @@ public class DBApp implements IDatabase {
 
     	Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
     	return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators);
-//        HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices = getPossibleIndex(arrSQLTerms);
-//        possibleIndices = getApplicableIndices(possibleIndices, strarrOperators);
-//        if (possibleIndices.isEmpty())
-//            return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators);
-//        Integer[] noIndexIdx = chooseIndexIdx(possibleIndices, arrSQLTerms);
-//        Iterator withIndex, noIndex;
-//        SQLTerm[] newArrSQLTerms = new SQLTerm[noIndexIdx.length];  // to be sent to select with no index
-//        for (int i = 0; i < noIndexIdx.length; i++)
-//            newArrSQLTerms[i] = arrSQLTerms[noIndexIdx[i]];
-//        withIndex = Selector.selectWithIndex(arrSQLTerms, strarrOperators, possibleIndices);
-//        noIndex = Selector.selectWithNoIndex(newArrSQLTerms, strarrOperators);
-//        return union(withIndex, noIndex);
     }
-
-    private HashMap<OctreeIndex<?>, ArrayList<Integer>> getApplicableIndices(HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices, String[] opr) {
-        HashMap<OctreeIndex<?>, ArrayList<Integer>> applicableIndices = new HashMap<>();
-        for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> index : possibleIndices.entrySet()) {
-            int idxSQLTerm1 = index.getValue().get(0);
-            int idxSQLTerm2 = index.getValue().get(1);
-            int idxSQLTerm3 = index.getValue().get(2);
-
-            if (Math.abs(idxSQLTerm3 - idxSQLTerm2) != 1 || Math.abs(idxSQLTerm3 - idxSQLTerm1) != 2 || Math.abs(idxSQLTerm1 - idxSQLTerm2) != 1)
-                continue;
-            if (opr[idxSQLTerm1].equals(Constants.AND_OPERATION) && opr[idxSQLTerm1].equals(opr[idxSQLTerm2]))
-                applicableIndices.put(index.getKey(), index.getValue());
-        }
-        return applicableIndices;
-    }
-
-    private Integer[] chooseIndexIdx(HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices, SQLTerm[] arrSQLTerms) {
-        ArrayList<Integer> allIndexIdx = new ArrayList<>();
-
-        for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> index : possibleIndices.entrySet())
-            for (int i : index.getValue())
-                allIndexIdx.add(i);
-
-
-        ArrayList<Integer> noIndexIdx = new ArrayList<>();
-
-        for (int i = 0; i < arrSQLTerms.length; i++)
-            if (!allIndexIdx.contains(i))
-                noIndexIdx.add(i);
-
-        Integer []arr = new Integer[noIndexIdx.size()];
-        for (int i=0; i<arr.length; i++) {
-        	arr[i]=noIndexIdx.get(i);
-        }
-        return arr;
-    }
-
-    public Iterator union(Iterator i1, Iterator i2) {
-        if (i1 == null && i2 == null) return null;
-        if (i1 == null) return i2;
-        if (i2 == null) return i1;
-
-        Vector<Tuple> union = new Vector<>();
-        while (i1.hasNext())
-            union.add((Tuple) i1.next());
-        while (i2.hasNext())
-            union.add((Tuple) i2.next());
-
-        return union.iterator();
-    }
-
-    private HashMap<OctreeIndex<?>, ArrayList<Integer>> getPossibleIndex(SQLTerm[] arrSQLTerms) throws DBAppException {
-
-        if (arrSQLTerms.length < 3) return null;
-        String table = arrSQLTerms[0]._strTableName;
-        ArrayList<String> colNames = new ArrayList<>();
-        for (int i = 0; i < arrSQLTerms.length; i++)
-            colNames.add(arrSQLTerms[i]._strColumnName);
-        Table currTable = Serializer.deserializeTable(table);
-        HashMap<OctreeIndex<?>, ArrayList<Integer>> foundIndexIdx = new HashMap<>();
-        for (OctreeIndex<?> index : currTable.getIndices()) {
-            int idx1 = colNames.indexOf(index.getColName1()); int idx2 = colNames.indexOf(index.getColName2());
-            int idx3 = colNames.indexOf(index.getColName3());
-            if (idx1 == -1 || idx2 == -1 || idx3 == -1) continue;
-            colNames.set(idx1, null); colNames.set(idx2, null); colNames.set(idx3, null);
-            ArrayList<Integer> tmpIdx = new ArrayList<>();
-            tmpIdx.add(idx1); tmpIdx.add(idx2); tmpIdx.add(idx3);
-            foundIndexIdx.put(index, tmpIdx);
-        }currTable = null;
-        return foundIndexIdx;
-    }
-
-
+    
     @Override
     public void createIndex(String strTableName, String[] strarrColName) throws DBAppException {
         Validator.validateTable(strTableName, myTables);

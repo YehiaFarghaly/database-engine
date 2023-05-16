@@ -111,9 +111,9 @@ public final class Constants {
 	public static final String LESS_THAN = "<";
 	public static final String NOT_EQUAL = "!=";
 	
-	public static final String AND_OPERATION = "AND";
-	public static final String OR_OPERATION = "OR";
-	public static final String XOR_OPERATION = "XOR";
+	public static final String AND_OPERATION = "and";
+	public static final String OR_OPERATION = "or";
+	public static final String XOR_OPERATION = "xor";
 
 	public static final String ERROR_MESSAGE_TOO_MUCH_OPERATOS = "Number of  Operators must be = SQLTERMS - 1";
 

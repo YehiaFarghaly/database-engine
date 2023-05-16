@@ -68,8 +68,6 @@ public class Validator {
 		} else if (!columnsExistenceInTable(htblColNameValue)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_COLUMNS_NOT_FOUND_IN_TABLE);
 		}
-//		if (!validTupleDelete(htblColNameValue))
-//			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
 
 	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue,
@@ -84,10 +82,8 @@ public class Validator {
 		} else if (!columnsExistenceInTable(htblColNameValue)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_COLUMNS_NOT_FOUND_IN_TABLE);
 		}
-//		if (!validTupleUpdate(table, htblColNameValue))
-//			throw new DBAppException(Constants.ERROR_MESSAGE_TUPLE_DATA);
 	}
-	
+
 	public static void validateCreatIndex(Table table, String[] strarrColName) throws DBAppException {
 		getTableInfo(table);
 		if (!numberOfColumnsInIndex(strarrColName)) {
@@ -110,18 +106,18 @@ public class Validator {
 		}
 		return false;
 	}
-	
+
 	private static boolean numberOfColumnsInIndex(String[] strarrColName) {
-		if (strarrColName.length==3) {
+		if (strarrColName.length == 3) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	private static boolean checkindex(String[] strarrColName) {
 		int tableColumnsLength = columns.length;
 		for (String colName : strarrColName) {
-			for (int i=0; i<tableColumnsLength; i++) {
+			for (int i = 0; i < tableColumnsLength; i++) {
 				if (colName.equals(columns[i])) {
 					if (!indexName[i].equals("null")) {
 						return false;
@@ -233,11 +229,6 @@ public class Validator {
 		indexName = new String[size];
 	}
 
-//	private static void validTupleInsert(Table table, Hashtable<String, Object> tuple)
-//			throws CsvValidationException, IOException, ClassNotFoundException, DBAppException, ParseException {
-//		jhg	
-//	}
-
 	private static boolean primaryKeyExists(Table table, Hashtable<String, Object> tuple) {
 		for (String key : tuple.keySet()) {
 			if (key.equals(table.getPKColumn()))
@@ -264,10 +255,6 @@ public class Validator {
 		}
 		return false;
 	}
-
-//	private static void validTupleDelete(Hashtable<String, Object> htblColNameValue) throws DBAppException {
-//		
-//	}
 
 	private static boolean checkTupleSize(Hashtable<String, Object> tuple) {
 		return tuple.size() <= columns.length;
@@ -336,8 +323,9 @@ public class Validator {
 
 	private static boolean knownArrOperators(String[] operators) {
 		for (String operator : operators) {
-			if (!(operator.equals(Constants.AND_OPERATION) || operator.equals(Constants.OR_OPERATION)
-					|| operator.equals(Constants.XOR_OPERATION)))
+			if (!(operator.toLowerCase().equals(Constants.AND_OPERATION)
+					|| operator.toLowerCase().equals(Constants.OR_OPERATION)
+					|| operator.toLowerCase().equals(Constants.XOR_OPERATION)))
 				return false;
 
 		}
@@ -370,12 +358,10 @@ public class Validator {
 	private static void validateTermColumn(SQLTerm[] sqlTerms) throws DBAppException {
 
 		for (int i = 0; i < sqlTerms.length; i++) {
-
 			Table table = Serializer.deserializeTable(sqlTerms[i]._strTableName);
 			Hashtable<String, Object> colNameValue = new Hashtable<>();
 			colNameValue.put(sqlTerms[i]._strColumnName, sqlTerms[i]._objValue);
 			getTableInfo(table);
-
 			if (!columnsExistenceInTable(colNameValue))
 				throw new DBAppException(Constants.ERROR_MESSAGE_COLUMNS_NOT_FOUND_IN_TABLE);
 			if (!isTheSameDataTypeMissingCol(colNameValue))
