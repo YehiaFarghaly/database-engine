@@ -715,7 +715,7 @@ public class DBAppTest {
 		engine.createIndex(newTableName, columns);
 		insertRow(3);
 		Table table = Serializer.deserializeTable(newTableName);
-		int oldQuerySize = table.getIndices().get(0).query(new OctreeBounds(1, 20, "bbbbb", 10, 60, "zzzzz")).size();
+		int oldQuerySize = table.getIndices().get(0).query(new OctreeBounds(1, 20, "bbbbb", 10, 60, "zzzzz"), 0, 0).size();
 
 		// When
 		Hashtable<String, Object> updateTable = new Hashtable<>();
@@ -724,7 +724,7 @@ public class DBAppTest {
 
 		// Then
 		table = Serializer.deserializeTable(newTableName);
-		int newQuerySize = table.getIndices().get(0).query(new OctreeBounds(1, 20, "bbbbb", 10, 60, "zzzzz")).size();
+		int newQuerySize = table.getIndices().get(0).query(new OctreeBounds(1, 20, "bbbbb", 10, 60, "zzzzz"), 0, 0).size();
 		assertThat(newQuerySize).isEqualTo(oldQuerySize - 1);
 	}
 
