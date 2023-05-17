@@ -67,7 +67,7 @@ engine.insertIntoTable("Students", htblColNameValue);
 ```
 ### Insertion Using SQL
 ```java
-StringBuffer command = new StringBuffer("INSERT INTO  Students(id, gpa, name) VALUES (1, 3.3, \'student1\')");
+StringBuffer command = new StringBuffer("INSERT INTO  Students(id, gpa, name) VALUES(1, 3.3, 'student1')");
 		engine.parseSQL(command);
 ```
 ---
