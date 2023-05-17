@@ -160,6 +160,9 @@ StringBuffer command = new StringBuffer("DELETE FROM  Students WHERE gpa = 3.3")
   ```
 </details>
 
+##  License
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://choosealicense.com/licenses/apache-2.0/)
+
 
 ## Authors
 - [Yehia Mohamed](https://github.com/YehiaFarghaly)
