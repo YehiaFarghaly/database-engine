@@ -25,9 +25,26 @@ Database Engine that supports some operations like:
 
 ---
 ## Tools
-
+- Language used is [Java](https://www.java.com/en/)
+- Project is built using [maven](https://maven.apache.org/)  
+- CI pipelines using [Github Actions](https://github.com/features/actions)
+- Tests are written in [Junit5](https://junit.org/junit5/)
+- Style is preserved using [checkStyle](https://checkstyle.sourceforge.io/)
+- SQL is parsed using [ANTLR](https://www.antlr.org/)
 ## Code examples
-
+### Normal Selection
+```java
+SQLTerm[] sqlTerms = new SQLTerm[2];
+sqlTerms[0] = new SQLTerm("Students", "gpa", "=", 4.0);
+sqlTerms[1] = new SQLTerm("Students", "id", ">", 100);
+String[] strArrOperator = new String[] { "AND" };
+engine.selectFromTable(sqlTerms, strArrOperator);
+```
+### Selection Using SQL
+```
+StringBuffer command = new StringBuffer("SELECT * FROM Students WHERE gpa = 4.0 AND id = 100");
+engine.parseSQL(command);
+```
 ## Running Application
 
 ## Authors
