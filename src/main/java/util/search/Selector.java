@@ -57,6 +57,10 @@ public class Selector {
 		}
 		return false;
 	}
+	
+//	private static Iterator selectWithIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+//		
+//	}
 
 	public static Iterator selectWithNoIndex(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 		Vector<Vector<Tuple>> result = new Vector<>();
