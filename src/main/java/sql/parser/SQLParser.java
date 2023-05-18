@@ -13,21 +13,22 @@ import sql.antlrfiles.SQLiteParser;
 import java.util.Iterator;
 
 public class SQLParser {
-    DBApp app ;
-    public SQLParser(DBApp app){
-        this.app=app;
-    }
+	DBApp app;
 
-    public Iterator parse(StringBuffer input) {
+	public SQLParser(DBApp app) {
+		this.app = app;
+	}
 
-        CharStream stream = CharStreams.fromString(input.toString());
-        SQLiteLexer lexer = new SQLiteLexer(stream);
-        CommonTokenStream token = new CommonTokenStream(lexer);
-        SQLiteParser parser = new SQLiteParser(token);
-        ParseTree tree = parser.parse();
-        MiniDBListener miniDBListener = new MiniDBListener(app);
-        ParseTreeWalker.DEFAULT.walk(miniDBListener, tree);
-        return miniDBListener.getResult();
+	public Iterator parse(StringBuffer input) {
 
-    }
-}//CHECKSTYLE:ON
+		CharStream stream = CharStreams.fromString(input.toString());
+		SQLiteLexer lexer = new SQLiteLexer(stream);
+		CommonTokenStream token = new CommonTokenStream(lexer);
+		SQLiteParser parser = new SQLiteParser(token);
+		ParseTree tree = parser.parse();
+		MiniDBListener miniDBListener = new MiniDBListener(app);
+		ParseTreeWalker.DEFAULT.walk(miniDBListener, tree);
+		return miniDBListener.getResult();
+
+	}
+}// CHECKSTYLE:ON

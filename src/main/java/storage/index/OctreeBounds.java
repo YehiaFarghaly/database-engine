@@ -2,8 +2,6 @@ package storage.index;
 
 import java.io.Serializable;
 import java.util.Date;
-
-import app.DBApp;
 import constants.Constants;
 import exceptions.DBAppException;
 

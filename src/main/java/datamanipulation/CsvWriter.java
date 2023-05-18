@@ -69,7 +69,8 @@ public class CsvWriter {
 		for (int i = 0; i < size; i++) {
 			if (tableInfo.get(i)[0].equals(strTableName)) {
 				String colName = tableInfo.get(i)[Constants.COLUMN_NAME_INDEX];
-				if (colName.equals(strarrColName[0]) || colName.equals(strarrColName[1]) || colName.equals(strarrColName[2])) {
+				if (colName.equals(strarrColName[0]) || colName.equals(strarrColName[1])
+						|| colName.equals(strarrColName[2])) {
 					tableInfo.get(i)[Constants.INDEX_NAME_INDEX] = indexName;
 					tableInfo.get(i)[Constants.INDEX_TYPE_INDEX] = "Octree";
 				}
@@ -78,7 +79,6 @@ public class CsvWriter {
 		try {
 			writeAll(tableInfo);
 		} catch (IOException e) {
-
 			throw new DBAppException(e.getMessage());
 		}
 	}

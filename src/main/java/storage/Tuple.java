@@ -7,12 +7,9 @@ import storage.index.DBAppNull;
 
 public class Tuple implements Cloneable, ITuple, Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7675064852791384832L;
 	private Vector<Cell> cells;
-	private Object primaryKey; // used in binary search within the same page
+	private Object primaryKey; 
 
 	public Tuple() {
 		cells = new Vector<>();

@@ -136,6 +136,7 @@ public class DBApp implements IDatabase {
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+
 		Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
 		if (strarrOperators.length < 2) {
 			return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators).iterator();
@@ -159,6 +160,7 @@ public class DBApp implements IDatabase {
 		CsvWriter cw = new CsvWriter();
 		cw.updateCsvFile(strTableName, indexName, strarrColName);
 	}
+
 
 	private void insertExisitngTuples(OctreeIndex index, Table table) throws DBAppException {
 		int numOfPages = table.getPagesName().size();
