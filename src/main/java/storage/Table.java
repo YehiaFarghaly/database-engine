@@ -348,14 +348,5 @@ public class Table implements Serializable {
 	public void deleteTableFiles() {
 		FileDeleter.deleteFile(this, FileType.TABLE);
 	}
-
-	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
-		Vector<Tuple> result = new Vector<>();
-		for (int i = 0; i < pagesName.size(); i++) {
-			Page page = getPageAtPosition(i);
-			result.addAll(page.select(colNameValue, operator));
-		}
-		return result;
-	}
   
 }
