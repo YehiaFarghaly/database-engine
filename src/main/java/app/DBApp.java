@@ -1,6 +1,5 @@
 package app;
 
-import constants.Constants;
 import datamanipulation.CsvReader;
 import datamanipulation.CsvWriter;
 import exceptions.DBAppException;

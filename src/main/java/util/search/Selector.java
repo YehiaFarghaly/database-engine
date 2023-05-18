@@ -180,7 +180,7 @@ public class Selector {
 		return strOperator;
 	}
 
-	public static Vector<Tuple> selectWithIndex(OctreeIndex index, SQLTerm[] arrSQLTerms, String[] ColumnsNames,
+	public static Vector<Tuple> selectWithIndex(OctreeIndex index, SQLTerm[] arrSQLTerms, String[] columnsNames,
 			Table table) throws DBAppException {
 		String[] strarrOperators = new String[2];
 		List pagepathes;
@@ -188,7 +188,7 @@ public class Selector {
 		String strOperator[] = setstrOperators(arrSQLTerms);
 		Vector<Vector<Tuple>> result = new Vector<>();
 		Hashtable<String, Object> colNameValue = setcolNameValues(arrSQLTerms);
-		pagepathes = getPageIndcies(strOperator, index, ColumnsNames, colNameValue, table.getName());
+		pagepathes = getPageIndcies(strOperator, index, columnsNames, colNameValue, table.getName());
 		pagenumbers = getPagesNumbers(pagepathes, table);
 		result.addAll(getSelectFromTableWithIndex(arrSQLTerms, pagenumbers, colNameValue));
 		strarrOperators[0] = Constants.AND_OPERATION;
