@@ -238,11 +238,11 @@ public class Selector {
 	}
 
 	private static String[] removeFromStrarrOperators(String[] strarrOperators, int index) {
-		String[] res = new String[strarrOperators.length];
-		for (int i = 0; i < strarrOperators.length && i != index; i++) {
-			for (int j = 0; j < strarrOperators.length - 1; j++) {
-				res[j] = strarrOperators[i];
-			}
+		String[] res = new String[strarrOperators.length-1];
+		int idx = 0;
+		for (int i = 0; i < strarrOperators.length ; i++) {
+			if( i != index)
+				res[idx++] = strarrOperators[i];	
 		}
 		return res;
 	}
@@ -253,7 +253,7 @@ public class Selector {
 		int len = sqlTerms.length;
 		for (int i = 0; i < len - 1; i++) {
 			incrementIndex = false;
-			if (i < len - 2 && conditionForIndex(operators[i], operators[i + 1])) {
+			if (i < len - 3 && conditionForIndex(operators[i], operators[i + 1])) {
 				result.addAll(getResultsFromIndex(sqlTerms, i));
 				if (incrementIndex) {
 					operators = removeFromStrarrOperators(operators, i);

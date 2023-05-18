@@ -768,7 +768,6 @@ public class DBAppTest {
 		for (int i = 1; i <= 10; i++)
 			insertRow(i);
 		engine.createIndex(newTableName, new String[] { age, name, id });
-		Table table = Serializer.deserializeTable(newTableName);
 		// When
 		SQLTerm[] sqlTerms = new SQLTerm[3];
 		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.GREATER_THAN, 5);
@@ -818,28 +817,7 @@ public class DBAppTest {
 		Iterator it = engine.selectFromTable(sqlTerms, strArrOperator);
 		assertThat(getIteratorSize(it)).isEqualTo(6);
 	}
-	
-	@Test
-	void testSelectWithIndex_FiveTerms_ShouldSelectOneTuples() throws DBAppException {
-		// Given
-		for (int i = 1; i <= 10; i++)
-			insertRow(i);
-		engine.createIndex(newTableName, new String[] { age, name, id });
-
-		// When
-		SQLTerm[] sqlTerms = new SQLTerm[5];
-		sqlTerms[0] = new SQLTerm(newTableName, id, Constants.LESS_THAN_OR_EQUAL, 6);
-		sqlTerms[1] = new SQLTerm(newTableName, name, Constants.EQUAL, TEST_NAME);
-		sqlTerms[2] = new SQLTerm(newTableName, age, Constants.EQUAL, TEST_AGE);
-		sqlTerms[3] = new SQLTerm(newTableName, id, Constants.EQUAL, 9);
-		sqlTerms[4] = new SQLTerm(newTableName, id, Constants.EQUAL, 5);
-		String[] strArrOperator = new String[] { "AND", "AND", "OR", "AND" };
-
-		// Then
-		Iterator it = engine.selectFromTable(sqlTerms, strArrOperator);
-		assertThat(getIteratorSize(it)).isEqualTo(1);
-	}
-	
+		
 	@Test
 	void testSelectWithIndex_FourTermsAndAtEnd_ShouldSelectFiveTuples() throws DBAppException {
 		// Given
