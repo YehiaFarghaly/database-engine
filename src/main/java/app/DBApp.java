@@ -33,6 +33,7 @@ public class DBApp implements IDatabase {
 	private final CsvWriter writer;
 	private Object clusteringKey;
 	private String clusteringKeyValue;
+	private static boolean incrementIndex;
 
 	public DBApp() {
 		this.myTables = new HashSet<>();
@@ -226,59 +227,87 @@ public class DBApp implements IDatabase {
 		}
 		return colNames;
 	}
-
-	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
-		Vector<Vector<Tuple>> result = new Vector<>();
-		Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
-		if (strarrOperators.length < 2) {
-
-			return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators).iterator();
+	
+	private static int[] fillIdx (ArrayList<String> colNames ,OctreeIndex index) {
+		int idx[] = new int[3];
+		idx[0] = colNames.indexOf(index.getColName1());
+		idx[1] = colNames.indexOf(index.getColName2());
+		idx[2] = colNames.indexOf(index.getColName3());
+		return idx;
+	}
+	
+	private static SQLTerm[] fillarrSQLTermsIndex(SQLTerm[] arrSQLTerms, int i , int[] idx) {
+		SQLTerm[] arrSQLTermsIndex = new SQLTerm[3];
+		for (int j = 0; j < 3; j++) {
+			arrSQLTermsIndex[j] = arrSQLTerms[i + idx[j]];
 		}
+		return arrSQLTermsIndex;
+	}
+	
+	private static String [] fillcolumnsNames(SQLTerm[] arrSQLTerms, ArrayList<String> colNames , int[] idx) {
+		String[] columnsNames = new String[3];
+		for (int j = 0; j < 3; j++) {
+				columnsNames[j] = colNames.get(idx[j]);
+		}
+		return columnsNames;
+	}
+
+	private static Vector<Vector<Tuple>> getResultsFromIndex(SQLTerm[] arrSQLTerms, int i) throws DBAppException{
+		Vector<Vector<Tuple>> result = new Vector<>();
+		ArrayList<String> colNames = fillcolNames(arrSQLTerms, i);
+		Table table = Serializer.deserializeTable(arrSQLTerms[0]._strTableName);
+		for (OctreeIndex<?> index : table.getIndices()) {
+			int idx[] = fillIdx(colNames,index);
+			if (idx[0] != -1 && idx[1] != -1 && idx[2] != -1) {
+				SQLTerm[] arrSQLTermsIndex = fillarrSQLTermsIndex(arrSQLTerms, i, idx);
+				String[] columnsNames = fillcolumnsNames(arrSQLTerms, colNames, idx);
+				result.add(Selector.selectWithIndex(index, arrSQLTermsIndex, columnsNames, table));
+				incrementIndex = true;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	private static Vector<Tuple> getResultsWithNoIndex(SQLTerm[] arrSQLTerms, int i) throws DBAppException{
+		Vector<Vector<Tuple>> result = new Vector<Vector<Tuple>>();
+ 		Hashtable<String, Object> colNameValue = new Hashtable<>();
+		colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
+		return Selector.selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue,
+				arrSQLTerms[i]._strOperator);
+	}
+	
+	private static Iterator selectWithMoreThanTwoOperators(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+		Vector<Vector<Tuple>> result = new Vector<>();
 		int len = arrSQLTerms.length;
 		for (int i = 0; i < len - 1; i++) {
-
-			Table table = Serializer.deserializeTable(arrSQLTerms[0]._strTableName);
+			incrementIndex = false;
 			if (i < len - 2 && strarrOperators[i].toLowerCase().equals(Constants.AND_OPERATION)
 					&& strarrOperators[i + 1].toLowerCase().equals(Constants.AND_OPERATION)) {
-				ArrayList<String> colNames = fillcolNames(arrSQLTerms, i);
-				for (OctreeIndex<?> index : table.getIndices()) {
-					int idx[] = new int[3];
-					idx[0] = colNames.indexOf(index.getColName1());
-					idx[1] = colNames.indexOf(index.getColName2());
-					idx[2] = colNames.indexOf(index.getColName3());
-					if (idx[0] != -1 && idx[1] != -1 && idx[2] != -1) {
-						SQLTerm[] arrSQLTermsIndex = new SQLTerm[3];
-						String[] columnsNames = new String[3];
-						for (int j = 0; j < 3; j++) {
-							arrSQLTermsIndex[j] = arrSQLTerms[i + idx[j]];
-							columnsNames[j] = colNames.get(idx[j]);
-						}
-
-						strarrOperators = removeFromStrarrOperators(strarrOperators, i);
-						strarrOperators = removeFromStrarrOperators(strarrOperators, i + 1);
-						result.add(Selector.selectWithIndex(index, arrSQLTermsIndex, columnsNames, table));
-						i = i + 1;
-						break;
-					}
-				}
+				result.addAll(getResultsFromIndex(arrSQLTerms, i ));
+				if(incrementIndex) {
+					strarrOperators = removeFromStrarrOperators(strarrOperators, i);
+					strarrOperators = removeFromStrarrOperators(strarrOperators, i+1);
+					i++;
+				}		
 			} else {
-				Hashtable<String, Object> colNameValue = new Hashtable<>();
-				colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
-				result.add(Selector.selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue,
-						arrSQLTerms[i]._strOperator));
-				if (i == strarrOperators.length - 1) {
-					colNameValue.put(arrSQLTerms[i + 1]._strColumnName, arrSQLTerms[i + 1]._objValue);
-					result.add(Selector.selectFromTableHelper(arrSQLTerms[i + 1]._strTableName, colNameValue,
-							arrSQLTerms[i + 1]._strOperator));
-				}
-
+				result.add(getResultsWithNoIndex(arrSQLTerms, i));
+				if (i == strarrOperators.length - 1) 
+					result.add(getResultsWithNoIndex(arrSQLTerms, i+1));
 			}
 		}
 		return Selector.applyArrOperators(result, strarrOperators).iterator();
-
+	}
+	
+	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+		Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
+		if (strarrOperators.length < 2) {
+			return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators).iterator();
+		}
+		return selectWithMoreThanTwoOperators(arrSQLTerms,strarrOperators);	
 	}
 
-	private String[] removeFromStrarrOperators(String[] strarrOperators, int index) {
+	private static String[] removeFromStrarrOperators(String[] strarrOperators, int index) {
 		String[] res = new String[strarrOperators.length];
 		for (int i = 0; i < strarrOperators.length && i != index; i++) {
 			for (int j = 0; j < strarrOperators.length - 1; j++) {
@@ -286,44 +315,6 @@ public class DBApp implements IDatabase {
 			}
 		}
 		return res;
-	}
-
-	private HashMap<OctreeIndex<?>, ArrayList<Integer>> getApplicableIndices(
-			HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices, String[] opr) {
-		HashMap<OctreeIndex<?>, ArrayList<Integer>> applicableIndices = new HashMap<>();
-		for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> index : possibleIndices.entrySet()) {
-			int idxSQLTerm1 = index.getValue().get(0);
-			int idxSQLTerm2 = index.getValue().get(1);
-			int idxSQLTerm3 = index.getValue().get(2);
-
-			if (Math.abs(idxSQLTerm3 - idxSQLTerm2) != 1 || Math.abs(idxSQLTerm3 - idxSQLTerm1) != 2
-					|| Math.abs(idxSQLTerm1 - idxSQLTerm2) != 1)
-				continue;
-			if (opr[idxSQLTerm1].equals(Constants.AND_OPERATION) && opr[idxSQLTerm1].equals(opr[idxSQLTerm2]))
-				applicableIndices.put(index.getKey(), index.getValue());
-		}
-		return applicableIndices;
-	}
-
-	private Integer[] chooseIndexIdx(HashMap<OctreeIndex<?>, ArrayList<Integer>> possibleIndices,
-			SQLTerm[] arrSQLTerms) {
-		ArrayList<Integer> allIndexIdx = new ArrayList<>();
-
-		for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> index : possibleIndices.entrySet())
-			for (int i : index.getValue())
-				allIndexIdx.add(i);
-
-		ArrayList<Integer> noIndexIdx = new ArrayList<>();
-
-		for (int i = 0; i < arrSQLTerms.length; i++)
-			if (!allIndexIdx.contains(i))
-				noIndexIdx.add(i);
-
-		Integer[] arr = new Integer[noIndexIdx.size()];
-		for (int i = 0; i < arr.length; i++) {
-			arr[i] = noIndexIdx.get(i);
-		}
-		return arr;
 	}
 
 	public Iterator union(Iterator i1, Iterator i2) {
@@ -343,35 +334,7 @@ public class DBApp implements IDatabase {
 		return union.iterator();
 	}
 
-	private HashMap<OctreeIndex<?>, ArrayList<Integer>> getPossibleIndex(SQLTerm[] arrSQLTerms) throws DBAppException {
-
-		if (arrSQLTerms.length < 3)
-			return null;
-		String table = arrSQLTerms[0]._strTableName;
-		ArrayList<String> colNames = new ArrayList<>();
-		for (int i = 0; i < arrSQLTerms.length; i++)
-			colNames.add(arrSQLTerms[i]._strColumnName);
-		Table currTable = Serializer.deserializeTable(table);
-		HashMap<OctreeIndex<?>, ArrayList<Integer>> foundIndexIdx = new HashMap<>();
-		for (OctreeIndex<?> index : currTable.getIndices()) {
-			int idx1 = colNames.indexOf(index.getColName1());
-			int idx2 = colNames.indexOf(index.getColName2());
-			int idx3 = colNames.indexOf(index.getColName3());
-			if (idx1 == -1 || idx2 == -1 || idx3 == -1)
-				continue;
-			colNames.set(idx1, null);
-			colNames.set(idx2, null);
-			colNames.set(idx3, null);
-			ArrayList<Integer> tmpIdx = new ArrayList<>();
-			tmpIdx.add(idx1);
-			tmpIdx.add(idx2);
-			tmpIdx.add(idx3);
-			foundIndexIdx.put(index, tmpIdx);
-		}
-		currTable = null;
-		return foundIndexIdx;
-	}
-
+	
 	@Override
 	public void createIndex(String strTableName, String[] strarrColName) throws DBAppException {
 		Validator.validateTable(strTableName, myTables);

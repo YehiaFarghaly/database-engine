@@ -14,8 +14,6 @@ import util.filecontroller.Serializer;
 
 import java.util.*;
 
-import static constants.Constants.*;
-
 public class Selector {
 
 	public static Vector<Tuple> selectOperation(Vector<Tuple> set1, Vector<Tuple> set2, String operation) {
@@ -161,21 +159,10 @@ public class Selector {
 		}
 		return result;
 	}
-
-	public static Vector<Tuple> selectWithIndex(OctreeIndex index, SQLTerm[] arrSQLTerms, String[] ColumnsNames,
-			Table table) throws DBAppException {
-		String[] strarrOperators = new String[2];
-		List pagepathes;
-		HashSet<Integer> pagenumbers;
-		String strOperator[] = new String[arrSQLTerms.length];
+	
+	private static Vector<Vector<Tuple>> getSelectFromTableWithIndex(SQLTerm[] arrSQLTerms, HashSet<Integer> pagenumbers
+			,Hashtable <String, Object> colNameValue) throws DBAppException{
 		Vector<Vector<Tuple>> result = new Vector<>();
-		Hashtable<String, Object> colNameValue = new Hashtable<>();
-		for (int i = 0; i < arrSQLTerms.length; i++) {
-			colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
-			strOperator[i] = arrSQLTerms[i]._strOperator;
-		}
-		pagepathes = getPageIndcies(strOperator, index, ColumnsNames, colNameValue, table.getName());
-		pagenumbers = getPagesNumbers(pagepathes, table);
 		int idx = 0;
 		for (String key : colNameValue.keySet()) {
 			Hashtable<String, Object> colVal = new Hashtable<>();
@@ -183,96 +170,55 @@ public class Selector {
 			result.add(selectFromTableWithIndex(arrSQLTerms[idx]._strTableName, colVal, arrSQLTerms[idx++]._strOperator,
 					pagenumbers));
 		}
+		return result;
+	}
+	
+	private static Hashtable<String, Object> setcolNameValues(SQLTerm[] arrSQLTerms){
+		Hashtable<String, Object> colNameValue = new Hashtable<>();
 		for (int i = 0; i < arrSQLTerms.length; i++) {
-
+			colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
 		}
+		return colNameValue;
+	}
+	
+	private static String[] setstrOperators(SQLTerm[] arrSQLTerms) {
+		String strOperator[] = new String[arrSQLTerms.length];
+		for (int i = 0; i < arrSQLTerms.length; i++) {
+			strOperator[i] = arrSQLTerms[i]._strOperator;
+		}
+		return strOperator;
+	}
+	
 
+	public static Vector<Tuple> selectWithIndex(OctreeIndex index, SQLTerm[] arrSQLTerms, String[] ColumnsNames,
+			Table table) throws DBAppException {
+		String[] strarrOperators = new String[2];
+		List pagepathes;
+		HashSet<Integer> pagenumbers;
+		String strOperator[] = setstrOperators(arrSQLTerms);
+		Vector<Vector<Tuple>> result = new Vector<>();
+		Hashtable<String, Object> colNameValue = setcolNameValues(arrSQLTerms);
+		pagepathes = getPageIndcies(strOperator, index, ColumnsNames, colNameValue, table.getName());
+		pagenumbers = getPagesNumbers(pagepathes, table);
+		result.addAll(getSelectFromTableWithIndex( arrSQLTerms, pagenumbers, colNameValue));
 		strarrOperators[0] = Constants.AND_OPERATION;
 		strarrOperators[1] = Constants.AND_OPERATION;
 		return applyArrOperators(result, strarrOperators);
 
 	}
 
-//    public static Iterator selectWithIndex(SQLTerm[] terms, String[] opr, HashMap<OctreeIndex<?>, ArrayList<Integer>> indIdx) throws DBAppException {
-//
-//        String tableName = terms[0]._strTableName;
-//        Vector<Vector<Tuple>> finalResult = new Vector<>();
-//        for (Map.Entry<OctreeIndex<?>, ArrayList<Integer>> curr : indIdx.entrySet()) {
-//            ArrayList<Integer> idx = curr.getValue();
-//            OctreeIndex currIndex = curr.getKey();
-//            OctreeBounds octreeBounds = prepareOctreeBounds(currIndex, idx, terms);
-//            List<Object> pages = curr.getKey().query(octreeBounds);
-//            Vector<Vector<Tuple>> result = new Vector<>();
-//            getPrimarySelectResult(pages, tableName, idx, terms, result);
-//            String[] oprBetweenIndexCol = {AND_OPERATION, AND_OPERATION, AND_OPERATION};
-//            finalResult.add(applyArrOperators(result, oprBetweenIndexCol));
-//        }
-//        return finalResult.iterator();
-//    }
 
-	private static void getPrimarySelectResult(List<Object> pages, String tableName, ArrayList<Integer> idx,
-			SQLTerm[] arrSQLTerms, Vector<Vector<Tuple>> result) throws DBAppException {
-		for (Object tmp : pages) {
-			String tmpPage = (String) tmp;
-			Page page = Serializer.deserializePage(tableName, tmpPage);
-			for (int i : idx) // O(3)
-				result.add(getResultforIndexSelect(page, i, arrSQLTerms));
-		}
-	}
 
-	private static Vector<Tuple> getResultforIndexSelect(Page page, int idx, SQLTerm[] terms) {
-		Hashtable<String, Object> colNameVal = new Hashtable<>();
-		colNameVal.put(terms[idx]._strColumnName, terms[idx]._objValue);
-		String operator = terms[idx]._strOperator;
-		return page.select(colNameVal, operator);
-	}
+	
 
-	private static OctreeBounds prepareOctreeBounds(OctreeIndex<?> index, ArrayList<Integer> idx,
-			SQLTerm[] arrSQLTerms) {
-		Object[] min = new Object[3];
-		Object[] max = new Object[3];
+//	private static Vector<Tuple> getResultforIndexSelect(Page page, int idx, SQLTerm[] terms) {
+//		Hashtable<String, Object> colNameVal = new Hashtable<>();
+//		colNameVal.put(terms[idx]._strColumnName, terms[idx]._objValue);
+//		String operator = terms[idx]._strOperator;
+//		return page.select(colNameVal, operator);
+//	}
 
-		for (int i : idx) {
-			Object[] minmax = prepareMinMax(arrSQLTerms[i]._objValue, arrSQLTerms[i]._strOperator);
-			min[i] = minmax[0];
-			max[i] = minmax[1];
-		}
-
-		return new OctreeBounds(min[0], min[1], min[2], max[0], max[1], max[2]);
-	}
-
-	private static Object[] prepareMinMax(Object val, String operator) {
-
-		Object[] minMax = new Object[2]; // 0 for min// 1 for max
-		switch (operator) {
-		case EQUAL:
-			minMax[0] = val;
-			minMax[1] = val;
-			break;
-		case GREATER_THAN:
-			minMax[0] = ((Integer) val + 1);
-			minMax[1] = Integer.MAX_VALUE;
-			break;
-		case LESS_THAN:
-			minMax[1] = ((Integer) val - 1);
-			minMax[0] = Integer.MIN_VALUE;
-			break;
-		case GREATER_THAN_OR_EQUAL:
-			minMax[0] = val;
-			minMax[1] = Integer.MAX_VALUE;
-			break;
-		case LESS_THAN_OR_EQUAL:
-			minMax[1] = val;
-			minMax[0] = Integer.MIN_VALUE;
-			break;
-		// SHOULD TO BE CHECKED
-		case NOT_EQUAL:
-			minMax[0] = Integer.MIN_VALUE;
-			minMax[1] = Integer.MAX_VALUE;
-		}
-		return minMax;
-	}
-
+	
 	public static Vector<Tuple> selectFromTableWithIndex(String strTableName, Hashtable<String, Object> colNameValue,
 			String operator, HashSet<Integer> pageIndex) throws DBAppException {
 		Vector<Tuple> result = new Vector<>();
