@@ -14,7 +14,6 @@ public class TupleBuilder implements ITupleBuilder {
 			Cell c = new Cell(entry.getKey(), null);
 			this.tuple.addCell(c);
 		}
-
 	}
 
 	@Override

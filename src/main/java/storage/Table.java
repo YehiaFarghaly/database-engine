@@ -107,6 +107,15 @@ public class Table implements Serializable {
 		return indices;
 	}
 
+	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) throws DBAppException {
+		Vector<Tuple> result = new Vector<>();
+		for (int i = 0; i < pagesName.size(); i++) {
+			Page page = getPageAtPosition(i);
+			result.addAll(page.select(colNameValue, operator));
+		}
+		return result;
+	}
+
 	public void insertTuple(Hashtable<String, Object> htblColNameValue) throws DBAppException {
 		removeEmptyPages();
 		Tuple tuple = createTuple(htblColNameValue);
@@ -348,6 +357,5 @@ public class Table implements Serializable {
 		}
 		return result;
 	}
-	
-
+  
 }
