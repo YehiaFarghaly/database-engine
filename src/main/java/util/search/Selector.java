@@ -84,15 +84,15 @@ public class Selector {
 	private static Hashtable<String, Object> getColAtIdx(List<String[]> columns, int idx, String[] colNames) {
 		Hashtable<String, Object> colMax = new Hashtable<String, Object>();
 		for (String[] arr : columns) {
-			if (arr[idx].equals(colNames[0])) {
+			if (arr[Constants.COLUMN_NAME_INDEX].equals(colNames[0])) {
 				colMax.put(colNames[0],
-						TypeParser.typeParser(arr[Constants.COL_MAX_VALUE_INDEX], arr[Constants.COLUMN_TYPE_INDEX]));
-			} else if (arr[idx].equals(colNames[1])) {
+						TypeParser.typeParser(arr[idx], arr[Constants.COLUMN_TYPE_INDEX]));
+			} else if (arr[Constants.COLUMN_NAME_INDEX].equals(colNames[1])) {
 				colMax.put(colNames[1],
-						TypeParser.typeParser(arr[Constants.COL_MAX_VALUE_INDEX], arr[Constants.COLUMN_TYPE_INDEX]));
-			} else if (arr[idx].equals(colNames[2])) {
+						TypeParser.typeParser(arr[idx], arr[Constants.COLUMN_TYPE_INDEX]));
+			} else if (arr[Constants.COLUMN_NAME_INDEX].equals(colNames[2])) {
 				colMax.put(colNames[2],
-						TypeParser.typeParser(arr[Constants.COL_MAX_VALUE_INDEX], arr[Constants.COLUMN_TYPE_INDEX]));
+						TypeParser.typeParser(arr[idx], arr[Constants.COLUMN_TYPE_INDEX]));
 			}
 		}
 		return colMax;
