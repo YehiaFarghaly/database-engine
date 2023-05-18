@@ -15,6 +15,7 @@ import util.filecontroller.Serializer;
 import java.util.*;
 
 public class Selector {
+	private static boolean incrementIndex;
 
 	public static Vector<Tuple> selectOperation(Vector<Tuple> set1, Vector<Tuple> set2, String operation) {
 		if (operation.equals(Constants.AND_OPERATION))
@@ -254,4 +255,95 @@ public class Selector {
 
 		return result;
 	}
+	
+	private static String[] removeFromStrarrOperators(String[] strarrOperators, int index) {
+		String[] res = new String[strarrOperators.length];
+		for (int i = 0; i < strarrOperators.length && i != index; i++) {
+			for (int j = 0; j < strarrOperators.length - 1; j++) {
+				res[j] = strarrOperators[i];
+			}
+		}
+		return res;
+	}
+
+	public static Iterator selectWithMoreThanTwoOperators(SQLTerm[] sqlTerms, String[] operators) throws DBAppException {
+		Vector<Vector<Tuple>> result = new Vector<>();
+		int len = sqlTerms.length;
+		for (int i = 0; i < len - 1; i++) {
+			incrementIndex = false;
+			if (i < len - 2 && conditionForIndex(operators[i], operators[i + 1])) {
+				result.addAll(getResultsFromIndex(sqlTerms, i));
+				if (incrementIndex) {
+					operators = removeFromStrarrOperators(operators, i);
+					operators = removeFromStrarrOperators(operators, ++i);
+				}
+			} else {
+				result.add(getResultsWithNoIndex(sqlTerms, i));
+				if (i == operators.length - 1)
+					result.add(getResultsWithNoIndex(sqlTerms, i + 1));
+			}
+		}
+		return Selector.applyArrOperators(result, operators).iterator();
+	}
+
+	private static boolean conditionForIndex(String operator1, String operator2) {
+		return operator1.toLowerCase().equals(Constants.AND_OPERATION)
+				&& operator2.toLowerCase().equals(Constants.AND_OPERATION);
+	}
+
+	private static ArrayList<String> fillcolNames(SQLTerm[] arrSQLTerms, int index) {
+		ArrayList<String> colNames = new ArrayList<String>();
+		for (int i = 0; i < 3; i++) {
+			colNames.add(arrSQLTerms[index + i]._strColumnName);
+		}
+		return colNames;
+	}
+
+	private static int[] fillIdx(ArrayList<String> colNames, OctreeIndex index) {
+		int idx[] = new int[3];
+		idx[0] = colNames.indexOf(index.getColName1());
+		idx[1] = colNames.indexOf(index.getColName2());
+		idx[2] = colNames.indexOf(index.getColName3());
+		return idx;
+	}
+
+	private static SQLTerm[] fillarrSQLTermsIndex(SQLTerm[] arrSQLTerms, int i, int[] idx) {
+		SQLTerm[] arrSQLTermsIndex = new SQLTerm[3];
+		for (int j = 0; j < 3; j++) {
+			arrSQLTermsIndex[j] = arrSQLTerms[i + idx[j]];
+		}
+		return arrSQLTermsIndex;
+	}
+
+	private static String[] fillcolumnsNames(SQLTerm[] arrSQLTerms, ArrayList<String> colNames, int[] idx) {
+		String[] columnsNames = new String[3];
+		for (int j = 0; j < 3; j++) {
+			columnsNames[j] = colNames.get(idx[j]);
+		}
+		return columnsNames;
+	}
+
+	private static Vector<Vector<Tuple>> getResultsFromIndex(SQLTerm[] arrSQLTerms, int i) throws DBAppException {
+		Vector<Vector<Tuple>> result = new Vector<>();
+		ArrayList<String> colNames = fillcolNames(arrSQLTerms, i);
+		Table table = Serializer.deserializeTable(arrSQLTerms[0]._strTableName);
+		for (OctreeIndex<?> index : table.getIndices()) {
+			int idx[] = fillIdx(colNames, index);
+			if (idx[0] != -1 && idx[1] != -1 && idx[2] != -1) {
+				SQLTerm[] arrSQLTermsIndex = fillarrSQLTermsIndex(arrSQLTerms, i, idx);
+				String[] columnsNames = fillcolumnsNames(arrSQLTerms, colNames, idx);
+				result.add(Selector.selectWithIndex(index, arrSQLTermsIndex, columnsNames, table));
+				incrementIndex = true;
+				break;
+			}
+		}
+		return result;
+	}
+
+	private static Vector<Tuple> getResultsWithNoIndex(SQLTerm[] arrSQLTerms, int i) throws DBAppException {
+		Hashtable<String, Object> colNameValue = new Hashtable<>();
+		colNameValue.put(arrSQLTerms[i]._strColumnName, arrSQLTerms[i]._objValue);
+		return Selector.selectFromTableHelper(arrSQLTerms[i]._strTableName, colNameValue, arrSQLTerms[i]._strOperator);
+	}
+
 }

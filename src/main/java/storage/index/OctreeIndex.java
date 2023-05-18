@@ -14,13 +14,14 @@ public class OctreeIndex<T> implements Serializable {
 	private static final long serialVersionUID = 4835109290601395974L;
 	private final String colName1, colName2, colName3;
 	private OctreeNode<T> root;
-	private String tableName;
+	private String tableName, name;
 
 	public OctreeIndex(String tableName, String col1, String col2, String col3) throws DBAppException {
 		this.tableName = tableName;
 		colName1 = col1;
 		colName2 = col2;
 		colName3 = col3;
+		name = colName1+ colName2 + colName3;
 		root = new OctreeNode<>(createBounds(col1, col2, col3));
 	}
 
@@ -108,5 +109,9 @@ public class OctreeIndex<T> implements Serializable {
 
 	public OctreeNode<T> getRoot() {
 		return root;
+	}
+	
+	public String getName() {
+		return name;
 	}
 }
