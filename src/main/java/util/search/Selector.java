@@ -240,8 +240,8 @@ public class Selector {
 	private static String[] removeFromStrarrOperators(String[] strarrOperators, int index) {
 		String[] res = new String[strarrOperators.length-1];
 		int idx = 0;
-		for (int i = 0; i < strarrOperators.length ; i++) {
-			if( i != index)
+		for (int i = 0; i < strarrOperators.length; i++) {
+			if ( i != index)
 				res[idx++] = strarrOperators[i];	
 		}
 		return res;
