@@ -7,7 +7,7 @@ import sql.SQLTerm;
 import sql.parser.SQLParser;
 import storage.Page;
 import storage.Table;
-import storage.Tuple; 
+import storage.Tuple;
 import storage.index.OctreeIndex;
 import util.TypeParser;
 import util.filecontroller.Serializer;
@@ -137,7 +137,10 @@ public class DBApp implements IDatabase {
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 
 		Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
-		return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators);
+		if (strarrOperators.length < 2) {
+			return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators).iterator();
+		}
+		return Selector.selectWithMoreThanTwoOperators(arrSQLTerms, strarrOperators);
 	}
 
 	@Override
@@ -147,11 +150,8 @@ public class DBApp implements IDatabase {
 		Validator.validateCreatIndex(table, strarrColName);
 		OctreeIndex index = new OctreeIndex(strTableName, strarrColName[0], strarrColName[1], strarrColName[2]);
 		table.getIndices().add(index);
-		if (!table.isEmpty()) {
-			insertExisitngTuples(strTableName, index, table);
-		}
-		String indexName = strarrColName[0] + strarrColName[1] + strarrColName[2];
-		updateCsvFile(strTableName, indexName, strarrColName);
+		insertExisitngTuples(index, table);
+		updateCsvFile(strTableName, index.getName(), strarrColName);
 		Serializer.serializeTable(table);
 	}
 
@@ -160,7 +160,8 @@ public class DBApp implements IDatabase {
 		cw.updateCsvFile(strTableName, indexName, strarrColName);
 	}
 
-	private void insertExisitngTuples(String strTableName, OctreeIndex index, Table table) throws DBAppException {
+
+	private void insertExisitngTuples(OctreeIndex index, Table table) throws DBAppException {
 		int numOfPages = table.getPagesName().size();
 		for (int i = 0; i < numOfPages; i++) {
 			Page page = table.getPageAtPosition(i);

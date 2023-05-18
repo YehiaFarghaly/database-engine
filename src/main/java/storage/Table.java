@@ -278,8 +278,9 @@ public class Table implements Serializable {
 		return null;
 	}
 
-	private int getPageIdxFromPath(String pageName) {
-		return pagesName.indexOf((pageName.split("//")[1]).split(Constants.DATA_EXTENSTION)[0]);
+	public int getPageIdxFromPath(String pageName) {
+
+		return pagesName.indexOf((pageName.split("//")[1]).split(".ser")[0]);
 	}
 
 	public void normalDelete(Hashtable<String, Object> htblColNameValue) throws DBAppException {
@@ -347,5 +348,5 @@ public class Table implements Serializable {
 	public void deleteTableFiles() {
 		FileDeleter.deleteFile(this, FileType.TABLE);
 	}
-
+  
 }

@@ -88,6 +88,7 @@ public class Page implements Serializable {
 		return ret;
 	}
 
+
 	public Vector<Tuple> select(Hashtable<String, Object> colNameValue, String operator) {
 		return PageSearch.linearSearchWithOperator(this, operator, colNameValue);
 	}
