@@ -128,6 +128,7 @@ public class OctreeNode<T> implements Serializable {
 			throws DBAppException {
 		for (Item<T> item : getItems()) {
 			OctreeBounds itemBounds = getBounds(item);
+		
 			if (searchBounds.contains(itemBounds, minBoundType, maxBoundType)) {
 				result.add(item.getData());
 				for (Object dup : item.getDuplicates()) {

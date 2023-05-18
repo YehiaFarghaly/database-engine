@@ -34,7 +34,6 @@ public class PageSearch {
 
 	public static Vector<Tuple> linearSearchWithOperator(Page page, String operator,
 			Hashtable<String, Object> colNameValue) {
-
 		Vector<Tuple> res = new Vector<>();
 		String key = colNameValue.keys().nextElement();
 		for (int i = 0; i < page.getSize(); i++) {
