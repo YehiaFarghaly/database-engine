@@ -15,5 +15,14 @@ public class SQLTerm {
 		this._objValue = objValue;
 	}
 
+	@Override
+	public String toString() {
+		return "SQLTerm{" +
+				"_strTableName='" + _strTableName + '\'' +
+				", _strColumnName='" + _strColumnName + '\'' +
+				", _strOperator='" + _strOperator + '\'' +
+				", _objValue=" + _objValue +" "+ _objValue.getClass() +
+				'}';
+	}
 }
 //CHECKSTYLE:ON: MemberName

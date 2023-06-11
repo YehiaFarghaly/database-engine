@@ -50,8 +50,8 @@ public class DBApp implements IDatabase {
 
 	@Override
 	public void createTable(String strTableName, String strClusteringKeyColumn,
-			Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
-			Hashtable<String, String> htblColNameMax) throws DBAppException {
+							Hashtable<String, String> htblColNameType, Hashtable<String, String> htblColNameMin,
+							Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		Validator.validateTableCreation(myTables, strTableName, strClusteringKeyColumn, htblColNameType, htblColNameMin,
 				htblColNameMax);
@@ -74,7 +74,7 @@ public class DBApp implements IDatabase {
 
 	@Override
 	public void updateTable(String strTableName, String strClusteringKeyValue,
-			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+							Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
 		this.clusteringKeyValue = strClusteringKeyValue;
 		takeAction(Action.UPDATE, strTableName, htblColNameValue);
@@ -135,7 +135,7 @@ public class DBApp implements IDatabase {
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
-
+		System.out.println("sql term   "+Arrays.toString(arrSQLTerms));
 		Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
 		if (strarrOperators.length < 2) {
 			return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators).iterator();
