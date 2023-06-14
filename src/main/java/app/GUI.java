@@ -10,48 +10,46 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import sql.SQLTerm;
-import storage.Page;
+import storage.Cell;
 import storage.Tuple;
-import util.PagePrinter;
-import util.filecontroller.Serializer;
-//import java.io.Serializable;
+
 import java.util.Iterator;
 
-public class GUI {
+public class GUI extends Application{
     private static TextArea outputArea;
     private TextField inputField;
     private static DBApp dbApp =new DBApp();
 
 
 
-    public static void main(String[] args) throws DBAppException {
-        dbApp.init();
-        SQLTerm[] sqlTerms = new SQLTerm[2];
-        sqlTerms[0] = new SQLTerm("malek", "gpa", "=", 3);
-        sqlTerms[1] = new SQLTerm("malek", "id", ">", 1);
-        String[] strArrOperator = new String[] { "AND" };
-        Iterator pages =  dbApp.selectFromTable(sqlTerms, strArrOperator);
-        while (pages !=null && pages.hasNext()){
-            System.out.println((Tuple)pages.next());
-
-        }
-        System.out.println("--------------------");
-//        launch(args);
-//        Page page = Serializer.deserializePage("malek", "0");
-//        PagePrinter p = new PagePrinter(page);
-//        p.printPage();
-        StringBuffer command = new StringBuffer("SELECT * FROM malek WHERE id = 1");
-        Iterator pag = dbApp.parseSQL(command);
-        while (pag !=null && pag.hasNext()){
-            System.out.println(pag.next());;
-        }
-    }
-
-//    @Override
-//    public void start(Stage stage) throws Exception {
-//        commandScene(stage);
+//    public static void main(String[] args) throws DBAppException {
+//        dbApp.init();
+//        SQLTerm[] sqlTerms = new SQLTerm[2];
+//        sqlTerms[0] = new SQLTerm("malek", "gpa", "=", 3);
+//        sqlTerms[1] = new SQLTerm("malek", "id", ">", 1);
+//        String[] strArrOperator = new String[] { "AND" };
+//        Iterator pages =  dbApp.selectFromTable(sqlTerms, strArrOperator);
+//        while (pages !=null && pages.hasNext()){
+//            System.out.println((Tuple)pages.next());
+//
+//        }
+//        System.out.println("--------------------");
+////        launch(args);
+////        Page page = Serializer.deserializePage("malek", "0");
+////        PagePrinter p = new PagePrinter(page);
+////        p.printPage();
+//        StringBuffer command = new StringBuffer("SELECT * FROM malek WHERE id = 1");
+//        Iterator pag = dbApp.parseSQL(command);
+//        while (pag !=null && pag.hasNext()){
+//            System.out.println(pag.next());;
+//        }
 //    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        dbApp.init();
+        commandScene(stage);
+    }
 
     private void commandScene(Stage primaryStage){
         primaryStage.setTitle("SuperMalekDB");
@@ -89,11 +87,39 @@ public class GUI {
     }
 
     private void processInput() throws DBAppException {
-        dbApp.init();
+        StringBuffer command = new StringBuffer(inputField.getText());
+        Iterator pag = dbApp.parseSQL(command);
+        String results = "";
+        boolean first = true;
+        while (pag.hasNext()){
+            Tuple t = (Tuple) pag.next();
+            if (first){
+                results = concat(results, true, t);
+                first = false;
+            }
+            results = concat(results, false, t);
+            System.out.println(results);
+        }
+        outputArea.setText(results);
+        System.out.println(results);
+    }
 
-//        StringBuffer input = new StringBuffer(inputField.getText());
-//        System.out.println(input);
+    private String concat(String s, boolean flag, Tuple t){
+        for (Cell cell:t.getCells()) {
+            s += calcStringLen((flag? cell.getKey():cell.getValue())+"");
+        }
+        s += "\n";
+        return s;
 
     }
+
+    private String calcStringLen(String s){
+        String tmp = "";
+        for (int i = 0; i < 30; i++) {
+            if (i< s.length()) continue;
+            tmp += " ";
+        }
+        s += tmp+ "| ";
+        return s;
+    }
 }
-//checkstyle: off
