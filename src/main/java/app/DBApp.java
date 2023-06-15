@@ -135,7 +135,6 @@ public class DBApp implements IDatabase {
 	}
 
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
-		System.out.println("sql term   "+Arrays.toString(arrSQLTerms));
 		Validator.validateSelectionInput(arrSQLTerms, strarrOperators, myTables);
 		if (strarrOperators.length < 2) {
 			return Selector.selectWithNoIndex(arrSQLTerms, strarrOperators).iterator();

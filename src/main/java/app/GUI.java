@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import storage.Cell;
 import storage.Tuple;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class GUI extends Application{
@@ -57,6 +58,7 @@ public class GUI extends Application{
         outputArea.setEditable(false);
         outputArea.setStyle("-fx-control-inner-background: black; -fx-text-fill: white;-fx-border-color: black;");
         outputArea.setMinHeight(300);
+        outputArea.setFont(javafx.scene.text.Font.font("Monospaced", 12));
         inputField = new TextField();
         inputField.setMinHeight(30);
         inputField.setStyle("-fx-focus-color: black;-fx-control-inner-background: black");
@@ -89,33 +91,51 @@ public class GUI extends Application{
     private void processInput() throws DBAppException {
         StringBuffer command = new StringBuffer(inputField.getText());
         Iterator pag = dbApp.parseSQL(command);
+        ArrayList<String> arrStr = new ArrayList<>();
         String results = "";
         boolean first = true;
-        while (pag.hasNext()){
+        while (pag != null && pag.hasNext()){
             Tuple t = (Tuple) pag.next();
             if (first){
-                results = concat(results, true, t);
+                arrStr.add(concat(results, true, t));
                 first = false;
             }
-            results = concat(results, false, t);
-            System.out.println(results);
+            arrStr.add(concat(results, false, t));
         }
+        results = computeResult(arrStr);
+        results += "command executed successfully";
         outputArea.setText(results);
-        System.out.println(results);
+    }
+
+    private String computeResult(ArrayList<String> arrStr) {
+        String result = "";
+        for (String s:arrStr) {
+            result += s.substring(0, s.length()-2)+ "\n";
+            result += newLine(s)+ "\n";
+        }
+        result += "\n\n";
+        return result;
+    }
+
+    private String newLine(String s) {
+        String result = "";
+        for (int i =0; i < s.length(); i++) {
+            result += ".";
+        }
+        return result;
     }
 
     private String concat(String s, boolean flag, Tuple t){
         for (Cell cell:t.getCells()) {
             s += calcStringLen((flag? cell.getKey():cell.getValue())+"");
         }
-        s += "\n";
         return s;
 
     }
 
     private String calcStringLen(String s){
         String tmp = "";
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 15; i++) {
             if (i< s.length()) continue;
             tmp += " ";
         }

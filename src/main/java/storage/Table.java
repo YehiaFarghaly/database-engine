@@ -253,8 +253,6 @@ public class Table implements Serializable {
 			throws DBAppException {
 		for (Object pageObj : pages) {
 			String pageName = (String) pageObj;
-			System.out.println(pageName);
-			System.out.println();
 			Page page = Serializer.deserializePage(name, pagesName.get(getPageIdxFromPath(pageName)));
 			Vector<Tuple> toBeDeleted = page.linearSearch(htblColNameValue);
 			deletePageRecords(toBeDeleted, page);
