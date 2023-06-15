@@ -21,31 +21,6 @@ public class GUI extends Application{
     private TextField inputField;
     private static DBApp dbApp =new DBApp();
 
-
-
-//    public static void main(String[] args) throws DBAppException {
-//        dbApp.init();
-//        SQLTerm[] sqlTerms = new SQLTerm[2];
-//        sqlTerms[0] = new SQLTerm("malek", "gpa", "=", 3);
-//        sqlTerms[1] = new SQLTerm("malek", "id", ">", 1);
-//        String[] strArrOperator = new String[] { "AND" };
-//        Iterator pages =  dbApp.selectFromTable(sqlTerms, strArrOperator);
-//        while (pages !=null && pages.hasNext()){
-//            System.out.println((Tuple)pages.next());
-//
-//        }
-//        System.out.println("--------------------");
-////        launch(args);
-////        Page page = Serializer.deserializePage("malek", "0");
-////        PagePrinter p = new PagePrinter(page);
-////        p.printPage();
-//        StringBuffer command = new StringBuffer("SELECT * FROM malek WHERE id = 1");
-//        Iterator pag = dbApp.parseSQL(command);
-//        while (pag !=null && pag.hasNext()){
-//            System.out.println(pag.next());;
-//        }
-//    }
-
     @Override
     public void start(Stage stage) throws Exception {
         dbApp.init();
@@ -62,14 +37,19 @@ public class GUI extends Application{
         inputField = new TextField();
         inputField.setMinHeight(30);
         inputField.setStyle("-fx-focus-color: black;-fx-control-inner-background: black");
+        executeCommand(primaryStage);
+    }
+
+    private void executeCommand(Stage primaryStage) {
+        check(primaryStage);
         inputField.setOnAction(event -> {
             try {
                 processInput();
             } catch (DBAppException e) {
-                throw new RuntimeException(e);
+                outputArea.setText("Error in executing command: " + e.getMessage());
             }
         });
-        check(primaryStage);
+
     }
 
     public void check(Stage primaryStage){
@@ -90,18 +70,27 @@ public class GUI extends Application{
 
     private void processInput() throws DBAppException {
         StringBuffer command = new StringBuffer(inputField.getText());
-        Iterator pag = dbApp.parseSQL(command);
+        Iterator pag;
+        try {
+            pag = dbApp.parseSQL(command);
+        } catch (Exception e) {
+            throw new DBAppException(e);
+        }
         ArrayList<String> arrStr = new ArrayList<>();
-        String results = "";
         boolean first = true;
         while (pag != null && pag.hasNext()){
             Tuple t = (Tuple) pag.next();
             if (first){
-                arrStr.add(concat(results, true, t));
+                arrStr.add(concat(true, t));
                 first = false;
             }
-            arrStr.add(concat(results, false, t));
+            arrStr.add(concat(false, t));
         }
+        outputResults(arrStr);
+    }
+
+    private void outputResults(ArrayList<String> arrStr) {
+        String results = "";
         results = computeResult(arrStr);
         results += "command executed successfully";
         outputArea.setText(results);
@@ -125,7 +114,8 @@ public class GUI extends Application{
         return result;
     }
 
-    private String concat(String s, boolean flag, Tuple t){
+    private String concat(boolean flag, Tuple t){
+        String s = "";
         for (Cell cell:t.getCells()) {
             s += calcStringLen((flag? cell.getKey():cell.getValue())+"");
         }
