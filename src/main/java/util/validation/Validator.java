@@ -22,8 +22,9 @@ public class Validator {
 	private static String[] indexName;
 
 	public static void validateTableCreation(HashSet<String> appTables, String strTableName,
-			String strClusteringKeyColumn, Hashtable<String, String> htblColNameType,
-			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) throws DBAppException {
+											 String strClusteringKeyColumn, Hashtable<String, String> htblColNameType,
+											 Hashtable<String, String> htblColNameMin,
+											 Hashtable<String, String> htblColNameMax) throws DBAppException {
 
 		if (isValidTable(strTableName, appTables)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_REPEATED_TABLE_NAME);
@@ -43,7 +44,7 @@ public class Validator {
 	}
 
 	public static void validateInsertionInput(Table table, Hashtable<String, Object> htblColNameValue,
-			HashSet<String> appTables) throws DBAppException {
+											  HashSet<String> appTables) throws DBAppException {
 		getTableInfo(table);
 		if (!primaryKeyExists(table, htblColNameValue)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_PK_IS_NOT_FOUND);
@@ -59,7 +60,7 @@ public class Validator {
 	}
 
 	public static void validateDeletionInput(Table table, Hashtable<String, Object> htblColNameValue,
-			HashSet<String> appTables) throws DBAppException {
+											 HashSet<String> appTables) throws DBAppException {
 		getTableInfo(table);
 		if (!isTheSameDataTypeMissingCol(htblColNameValue)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_IN_DATA_TYPES);
@@ -71,7 +72,7 @@ public class Validator {
 	}
 
 	public static void validateUpdateInput(Table table, Hashtable<String, Object> htblColNameValue,
-			HashSet<String> appTables) throws DBAppException {
+										   HashSet<String> appTables) throws DBAppException {
 		getTableInfo(table);
 		if (!checkTupleSize(htblColNameValue)) {
 			throw new DBAppException(Constants.ERROR_MESSAGE_IN_TUPLE_SIZE);
@@ -100,7 +101,7 @@ public class Validator {
 	}
 
 	private static boolean validClusteringKey(String strClusteringKeyColumn,
-			Hashtable<String, String> htblColNameType) {
+											  Hashtable<String, String> htblColNameType) {
 		if (strClusteringKeyColumn != null && htblColNameType.containsKey(strClusteringKeyColumn)) {
 			return true;
 		}
@@ -141,7 +142,7 @@ public class Validator {
 	}
 
 	private static boolean validMinAndMax(Hashtable<String, String> htblColNameType,
-			Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
+										  Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax) {
 		int length = htblColNameMin.values().size();
 
 		for (int i = 0; i < length; i++) {
@@ -160,7 +161,7 @@ public class Validator {
 	}
 
 	private static boolean sameCol(Hashtable<String, String> htblColNameMin, Hashtable<String, String> htblColNameMax,
-			Hashtable<String, String> htblColNameType) {
+								   Hashtable<String, String> htblColNameType) {
 		return htblColNameMin.keySet().equals(htblColNameMax.keySet())
 				&& htblColNameMin.keySet().equals(htblColNameType.keySet());
 
@@ -356,10 +357,11 @@ public class Validator {
 	}
 
 	private static void validateTermColumn(SQLTerm[] sqlTerms) throws DBAppException {
-
 		for (int i = 0; i < sqlTerms.length; i++) {
 			Table table = Serializer.deserializeTable(sqlTerms[i]._strTableName);
 			Hashtable<String, Object> colNameValue = new Hashtable<>();
+			if (sqlTerms[i]._objValue == null)
+				throw new DBAppException(Constants.ERROR_MESSAGE_COLUMNS_NOT_FOUND_IN_TABLE);
 			colNameValue.put(sqlTerms[i]._strColumnName, sqlTerms[i]._objValue);
 			getTableInfo(table);
 			if (!columnsExistenceInTable(colNameValue))

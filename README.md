@@ -160,6 +160,41 @@ StringBuffer command = new StringBuffer("DELETE FROM  Students WHERE gpa = 3.3")
   ```
 </details>
 
+## Run Locally
+
+1- Clone the project
+
+```bash
+  git clone https://github.com/YehiaFarghaly/Database-Engine.git
+```
+
+2- Go to the project directory
+
+
+3- Build the project using Maven
+```bash
+  mvn clean
+```
+
+4- Run Javafx project using Maven
+```bash
+  mvn javafx:run
+```
+
+## Notes
+
+- There is a ready table called student with the following columns (ID: int, GPA: Double, Name: String)
+- You must have maven in youe machine
+
+## Screenshots
+
+
+![Screenshot (130)](https://github.com/YehiaFarghaly/Database-Engine/assets/87043730/f11989f1-9802-417e-b72e-d9d46a5cba30)
+|----------------------------------------------------------------|
+![Screenshot (131)](https://github.com/YehiaFarghaly/Database-Engine/assets/87043730/22f540dc-7459-4cd9-abae-2fea1e8042f9)
+![Screenshot (132)](https://github.com/YehiaFarghaly/Database-Engine/assets/87043730/8e0f36a0-60af-4b21-978b-7eebc5cc725f)
+
+
 ##  License
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 

@@ -294,6 +294,7 @@ public class MiniDBListener extends SQLiteParserBaseListener {
 		for (int i = 0; i < conditions.size(); i++) {
 			String colName = conditions.get(i).expr(0).getText();
 			Object Value = cleanString(conditions.get(i).expr(1).getText());
+			Value = TypeParser.parseFromTable(Value, colName, tableName);
 			String strOperator = chooseInSqlOperator(conditions.get(i));
 			terms[i] = new SQLTerm(tableName, colName, strOperator, Value);
 		}
