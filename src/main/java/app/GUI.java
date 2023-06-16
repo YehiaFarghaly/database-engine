@@ -46,7 +46,11 @@ public class GUI extends Application{
             try {
                 processInput();
             } catch (DBAppException e) {
-                outputArea.setText("Error in executing command: " + e.getMessage());
+                outputArea.setText("Error in executing command: " + e.getLocalizedMessage());
+                System.out.println("Error in executing command: " + e.getMessage());
+                System.out.println("Error in executing command: " + e.getLocalizedMessage());
+            } catch (RuntimeException e){
+                e.printStackTrace();
             }
         });
 
