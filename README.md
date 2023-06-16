@@ -186,7 +186,6 @@ StringBuffer command = new StringBuffer("DELETE FROM  Students WHERE gpa = 3.3")
 ### Notes
 
 - There is a ready table called student with the following columns (ID: int, GPA: Double, Name: String)
-- You must have maven in youe machine
 
 ---
 
