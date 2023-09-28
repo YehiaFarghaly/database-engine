@@ -25,7 +25,7 @@ Database Engine that supports some features like:
 
 ---
 ## Tools
-- Language used is [Java](https://www.java.com/en/)
+- Language used i [Java](https://www.java.com/en/)
 - Project is built using [maven](https://maven.apache.org/)  
 - CI pipeline using [Github Actions](https://github.com/features/actions)
 - Tests are written in [Junit5](https://junit.org/junit5/)
